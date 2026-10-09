@@ -1,32 +1,47 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Panel · RonALL</title>
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="theme-color" content="#000"><link rel="icon" type="image/png" href="favicon.png"><title>Panel</title>
 <style>
 body{margin:0;background:#000;color:#e8e6e3;font:14px/1.5 'Helvetica Neue',Arial,sans-serif;padding:16px;max-width:760px;margin:auto}
-h1{font:400 28px Impact,sans-serif;letter-spacing:.1em;margin:6px 0 14px}
+h1{font:400 28px Impact,sans-serif;letter-spacing:.1em;margin:6px 0 14px;display:flex;align-items:center;gap:12px}
+h1 img{width:34px;height:34px;border-radius:50%}
 input,button{font:inherit;background:none;border:1px solid #ffffff55;color:#e8e6e3;padding:10px;border-radius:0}
 input{width:100%;box-sizing:border-box;margin-bottom:8px}button{cursor:pointer;margin:2px}button:hover{background:#e8e6e3;color:#000}
 .r{border:1px solid #ffffff2a;padding:10px;margin:8px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .r b{font-size:17px}.r small{color:#e8e6e380;flex-basis:100%}.p{border-color:#fff}.a{color:#7dffa0}.d{color:#ff7d7d}
 .s{margin-left:auto}#msg{color:#ff7d7d;min-height:20px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}.top button{padding:6px 10px;font-size:12px}
+details{margin:8px 0;color:#e8e6e380}summary{cursor:pointer;margin-bottom:8px}
 </style></head><body>
-<h1>PANEL RonALL</h1>
+<h1><img src="favicon.png" alt="">PANEL</h1>
 <div id="login">
- <input id="u" placeholder="URL de Supabase (https://xxxx.supabase.co)"><input id="k" placeholder="Clave anon public"><input id="pw" type="password" placeholder="Clave de administrador">
+ <input id="pw" type="password" placeholder="Clave de administrador" autocomplete="current-password">
+ <details><summary>Ajustes de conexión</summary><input id="u" placeholder="URL de Supabase"><input id="k" placeholder="Clave pública"></details>
  <button id="go">Entrar</button><div id="msg"></div>
 </div>
-<div id="app" style="display:none"><div id="cnt"></div><div id="list"></div></div>
+<div id="app" style="display:none"><div class="top"><div id="cnt"></div><button id="out">Salir</button></div><div id="list"></div></div>
 <script>
-const $=id=>document.getElementById(id);let U,K,PW,T;
-$('u').value=localStorage.pU||'';$('k').value=localStorage.pK||'';
-async function rpc(f,b){const r=await fetch(U+'/rest/v1/rpc/'+f,{method:'POST',headers:{apikey:K,Authorization:'Bearer '+K,'Content-Type':'application/json'},body:JSON.stringify(b)});if(!r.ok)throw new Error('error');return r.status===204?null:r.json()}
+// Todo queda guardado en este navegador: no vuelves a escribir nada. Para olvidarlo, pulsa "Salir".
+const DEF={u:"https://kwxbdckegbyivcrekevv.supabase.co",k:"sb_publishable_80B-AoZBWu7crLRcjANK_Q_jk7QTzwK"};
+const $=id=>document.getElementById(id),L=localStorage;
+let U=L.pU||DEF.u,K=L.pK||DEF.k,PW=L.pP||'',T;
+$('u').value=U;$('k').value=K;
+async function rpc(f,b){const h={apikey:K,'Content-Type':'application/json'};if(/^eyJ/.test(K))h.Authorization='Bearer '+K;
+ const r=await fetch(U+'/rest/v1/rpc/'+f,{method:'POST',headers:h,body:JSON.stringify(b)});if(!r.ok)throw new Error('error');return r.status===204?null:r.json()}
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-async function load(){try{const rows=await rpc('admin_listar',{p_pass:PW});
+function draw(rows){
  $('login').style.display='none';$('app').style.display='block';
- const pend=rows.filter(x=>x.status==='pending').length;$('cnt').textContent=pend+' pendiente(s) · '+rows.length+' en total';document.title=(pend?'('+pend+') ':'')+'Panel · RonALL';
+ const pend=rows.filter(x=>x.status==='pending').length;$('cnt').textContent=pend+' pendiente(s) · '+rows.length+' en total';document.title=(pend?'('+pend+') ':'')+'Panel';
  $('list').innerHTML=rows.map(x=>`<div class="r ${x.status==='pending'?'p':''}"><b>${esc(x.username)}</b><span class="${x.status==='approved'?'a':x.status==='denied'?'d':''}">${x.status==='pending'?'PENDIENTE':x.status==='approved'?'APROBADO':'RECHAZADO'}</span>
  <span class="s"><button onclick="st(${x.id},'approved')">Aceptar</button><button onclick="st(${x.id},'denied')">Rechazar</button><button onclick="ip('${esc(x.ip)}','approved')">Aceptar IP</button><button onclick="ip('${esc(x.ip)}','denied')">Bloquear IP</button><button onclick="st(${x.id},'delete')">✕</button></span>
  <small>IP ${esc(x.ip)} · pidió ${new Date(x.created_at).toLocaleString()} · última vez ${new Date(x.last_seen).toLocaleString()}</small></div>`).join('')||'<p>Nadie ha pedido acceso todavía.</p>'}
- catch(e){$('msg').textContent='Datos incorrectos';clearInterval(T);$('login').style.display='block';$('app').style.display='none'}}
+async function load(){try{const rows=await rpc('admin_listar',{p_pass:PW});L.pLast=JSON.stringify(rows);draw(rows)}
+ catch(e){if(navigator.onLine===false)return;$('msg').textContent='Clave o conexión incorrectas';stop();$('login').style.display='block';$('app').style.display='none'}}
+function start(){load();clearInterval(T);T=setInterval(load,6000)}
+function stop(){clearInterval(T);L.removeItem('pP');PW=''}
 window.st=async(id,s)=>{await rpc('admin_set',{p_pass:PW,p_id:id,p_status:s});load()};
 window.ip=async(i,s)=>{if(confirm((s==='approved'?'Aceptar':'Bloquear')+' a TODOS los de la IP '+i+'?')){await rpc('admin_ip',{p_pass:PW,p_ip:i,p_status:s});load()}};
-$('go').onclick=()=>{U=$('u').value.trim().replace(/\/$/,'');K=$('k').value.trim();PW=$('pw').value;localStorage.pU=U;localStorage.pK=K;$('msg').textContent='';load();clearInterval(T);T=setInterval(load,6000)};
+$('go').onclick=()=>{U=$('u').value.trim().replace(/\/$/,'')||DEF.u;K=$('k').value.trim()||DEF.k;PW=$('pw').value;L.pU=U;L.pK=K;L.pP=PW;$('msg').textContent='';start()};
+$('pw').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
+$('out').onclick=()=>{stop();L.removeItem('pLast');location.reload()};
+// al abrir: si ya entraste antes, muestra la ultima lista al instante y entra solo
+if(PW){try{draw(JSON.parse(L.pLast||'[]'))}catch(e){}start()}
 </script></body></html>
