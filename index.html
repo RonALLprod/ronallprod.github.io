@@ -355,7 +355,7 @@ html.lgr body:not(.lq) :is(#aviso .pn,#cpanel .pn,#ipanel .pn):hover::before{bac
 
 /* ===== LIQUID GLASS BOTONES — tecnica exacta de la tarjeta de referencia ===== */
 :root{--lg-bg:rgba(255,255,255,0)}
-body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk){
+body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk){
   position:relative;isolation:isolate;overflow:visible;
   background:transparent!important;border-color:transparent!important;
   -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
@@ -364,13 +364,13 @@ body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.ta
   transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,color .3s;
 }
 /* tinte + sombra interior (::before de la tarjeta) */
-body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk)::before{
+body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk)::before{
   content:'';position:absolute;inset:-1px;z-index:-1;border-radius:inherit;
   box-shadow:inset 0 0 10px -6px rgba(255,255,255,.7);
   background:var(--lg-bg);pointer-events:none;transition:background .3s;
 }
 /* blur de fondo + distorsion (::after de la tarjeta) */
-body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk)::after{
+body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk)::after{
   content:'';position:absolute;inset:-1px;z-index:-2;border-radius:inherit;
   -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   isolation:isolate;pointer-events:none;
@@ -381,27 +381,33 @@ html.lgr body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,
   -webkit-filter:url(#glass-btn);filter:url(#glass-btn);
 }
 /* hover / press */
-body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk):hover{
+body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk):hover{
   color:var(--fg)!important;box-shadow:0px 0px 21px -8px rgba(255,255,255,.3)!important}
-body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk):hover::before{
+body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk):hover::before{
   --lg-bg:rgba(255,255,255,.08)}
-body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk):active{
+body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk):active{
   transform:scale(.94)!important}
+/* botones dentro de paneles (Cerrar / OK): el vidrio anidado se veia negro -> tinte claro sin backdrop propio */
+body :is(#cx,#ix,#avOk)::after{display:none}
+body :is(#cx,#ix,#avOk)::before{--lg-bg:rgba(255,255,255,.1);box-shadow:inset 0 0 10px -6px rgba(255,255,255,.7),inset 0 0 0 1px rgba(255,255,255,.14)}
+body :is(#cx,#ix,#avOk):hover::before{--lg-bg:rgba(255,255,255,.18)}
 /* estados activos */
-body:not(.lq) #rside #lkb.on::before{--lg-bg:rgba(255,255,255,.14)}
-body:not(.lq) #atb.on::before{--lg-bg:rgba(255,255,255,.12)}
-body:not(.lq) .tabs button.on{color:#fff!important;box-shadow:0px 0px 21px -8px rgba(255,255,255,.3)!important}
-body:not(.lq) .tabs button.on::before{--lg-bg:rgba(255,255,255,.22)}
+body #rside #lkb.on::before{--lg-bg:rgba(255,255,255,.14)}
+body #atb.on::before{--lg-bg:rgba(255,255,255,.12)}
+body .tabs button.on{color:#fff!important;box-shadow:0px 0px 21px -8px rgba(255,255,255,.3)!important}
+body .tabs button.on::before{--lg-bg:rgba(255,255,255,.22)}
 /* el carrito mantiene su latido, ahora sobre el cristal */
-body:not(.lq) .cartb{animation:cblg2 3.6s ease-in-out infinite!important}
+body .cartb{animation:cblg2 3.6s ease-in-out infinite!important}
 @keyframes cblg2{0%,100%{box-shadow:0px 0px 21px -8px rgba(255,255,255,.3)}50%{box-shadow:0px 0px 21px -6px rgba(255,255,255,.5)}}
 /* #newb: su brillo barrido usaba ::after (ahora es el vidrio) -> brillo en el punto */
 #newb{overflow:visible}
 @media (prefers-reduced-transparency:reduce){
-  body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk)::before,
-  body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk)::after{display:none}
-  body:not(.lq) :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk){background:#1b1b1d!important;border-color:#ffffff40!important}
+  body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk)::before,
+  body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk)::after{display:none}
+  body :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk){background:#1b1b1d!important;border-color:#ffffff40!important}
 }
+
+body.lq :is(.tb button,.cartb,.ctb,#rside button,#inb,#atb,#favb,#newb,.tabs button,#mc,#cx,#ix,#avOk){background:transparent!important}
 </style></head><body><div id="gate"><div id="gbox"><img class="av" src="pfp.jpg" alt=""><p class="pl">Cargando</p></div></div>
 <svg width="0" height="0" style="position:absolute"><filter id="fx" color-interpolation-filters="sRGB" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur in="SourceGraphic" id="gb" stdDeviation="0 0" result="b"/><feColorMatrix in="b" values="1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" result="r"/><feColorMatrix in="b" values="0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0" result="g"/><feColorMatrix in="b" values="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0" result="bl"/><feOffset in="r" id="or" dx="0" dy="0" result="r2"/><feOffset in="bl" id="ob" dx="0" dy="0" result="b2"/><feBlend in="r2" in2="g" mode="screen" result="rg"/><feBlend in="rg" in2="b2" mode="screen"/></filter><filter id="fxt" x="-10%" y="-25%" width="120%" height="150%"><feGaussianBlur id="gbt" stdDeviation="0 0"/></filter></svg>
 <svg width="0" height="0" style="position:absolute"><filter id="hmb" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB"><feGaussianBlur id="hmbg" stdDeviation="0 0"/></filter></svg><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="lgf" x="0" y="0" width="1" height="1" filterUnits="objectBoundingBox" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB"><feImage x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="m" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cdefs%3E%3ClinearGradient id='x' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='rgb(0,0,0)'/%3E%3Cstop offset='.16' stop-color='rgb(128,0,0)'/%3E%3Cstop offset='.84' stop-color='rgb(128,0,0)'/%3E%3Cstop offset='1' stop-color='rgb(255,0,0)'/%3E%3C/linearGradient%3E%3ClinearGradient id='y' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='rgb(0,0,0)'/%3E%3Cstop offset='.16' stop-color='rgb(0,128,0)'/%3E%3Cstop offset='.84' stop-color='rgb(0,128,0)'/%3E%3Cstop offset='1' stop-color='rgb(0,255,0)'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='256' height='256' fill='url(%23x)'/%3E%3Crect width='256' height='256' fill='url(%23y)' style='mix-blend-mode:screen'/%3E%3C/svg%3E"/><feDisplacementMap in="SourceGraphic" in2="m" scale="0.34" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -2250,10 +2256,10 @@ body:not(.lq) .cartb{animation:cblg2 3.6s ease-in-out infinite!important}
       _0x11a729.style.fontSize = "calc(var(--u)*" + (_0x304150 * 15).toFixed(2) + ")";
     }
   }
-  const _0x344079 = [["ttl", -1], ["meta", 1], ["cnt", -1], ["dots", 1]];
+  const _0x344079 = [["ttl", -1, 0], ["meta", 1, 1], ["inb", -1, 1], ["cnt", -1, 2], ["dots", 1, 3]];
   function _0x3ffd03(_0x2f2049, _0x3752bb) {
     const _0x336887 = _0x5bcd18 * 0.3;
-    _0x344079.forEach(([_0x4e64fd, _0xd4f932], _0x5c2025) => {
+    _0x344079.forEach(([_0x4e64fd, _0xd4f932, _0x5c2025]) => {
       const _0x4f9891 = _0x4543c0(_0x4e64fd);
       _0x4f9891.getAnimations().forEach(_0x24eca7 => _0x24eca7.cancel());
       const _0x46638b = {
@@ -2264,7 +2270,7 @@ body:not(.lq) .cartb{animation:cblg2 3.6s ease-in-out infinite!important}
       const _0x2d73fe = {
         opacity: 1,
         transform: "none",
-        filter: "blur(0) brightness(1)"
+        filter: _0x4e64fd === "inb" ? "none" : "blur(0) brightness(1)"
       };
       _0x4f9891.animate(_0x2f2049 ? [_0x46638b, _0x2d73fe] : [_0x2d73fe, {
         ..._0x46638b,
@@ -4399,7 +4405,7 @@ body:not(.lq) .cartb{animation:cblg2 3.6s ease-in-out infinite!important}
       const _0x21dc26 = [_0x3a6e14.includes(_0x1c4df7.n) && "Favorito", _0x381584.includes(_0x1c4df7.n) && "Experimento", _0x4e7d65.includes(_0x1c4df7.n) && "Reciente", _0x38f35b.includes(_0x1c4df7.n) && "En tus likes"].filter(Boolean);
       const _0x27aee9 = (_0x453fac, _0x75dba3, _0xcd0ac8) => "<div" + (_0xcd0ac8 ? " class=\"w2\"" : "") + "><b>" + _0x453fac + "</b><span>" + _0x75dba3 + "</span></div>";
       _0x4543c0("ih").textContent = _0x1c4df7.n;
-      _0x4543c0("ig").innerHTML = _0x27aee9(_0x2fc8d6 ? "~" + _0x2fc8d6.bpm : "—", "BPM") + _0x27aee9(_0x2fc8d6 ? _0x2fc8d6.key : "—", "Nota") + _0x27aee9(_0x1c4df7.d, "Duración") + _0x27aee9(_0x1c4df7.bd || "—", "808") + _0x27aee9(_0x172e0d.plays || 0, "Escuchas") + (_0x21dc26.length ? _0x27aee9(_0x21dc26.join(" · "), "Etiquetas", 1) : "");
+      _0x4543c0("ig").innerHTML = _0x27aee9(_0x2fc8d6 ? "~" + _0x2fc8d6.bpm : "—", "BPM") + _0x27aee9(_0x2fc8d6 ? _0x2fc8d6.key : "—", "Nota") + _0x27aee9(_0x1c4df7.d, "Duración") + _0x27aee9(_0x172e0d.plays || 0, "Escuchas") + _0x27aee9(_0x1c4df7.bd || "—", "808", 1) + (_0x21dc26.length ? _0x27aee9(_0x21dc26.join(" · "), "Etiquetas", 1) : "");
       _0x4543c0("igo").href = _0x2bcc48(_0x1c4df7);
     }
     _0x4543c0("inb").onclick = _0x512ff9 => {
