@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V13 · beat.js — página individual (HTML generado por tools/build.mjs) */
+/* RONALL-VISUAL-2026-11-11-V17 · beat.js — página individual (HTML generado por tools/build.mjs) */
 (async()=>{const R=RON,{$,money,S}=R;R.boot();
  const b=JSON.parse($('#beat-data').textContent);if((await R.sold()).includes(b.id))b.exclusiveSold=true;R.track('beat',{beat:b.id});
  const play=$('#bp-play'),sync=()=>{const on=R.P.cur&&R.P.cur.id===b.id&&!R.P.audio.paused;play.innerHTML=R.svg(on?'pause':'play',24);play.setAttribute('aria-label',on?'Pausar':'Reproducir preview')};
@@ -15,4 +15,10 @@
  buy.onclick=()=>{const k=ui.value;if(!k)return;R.track('wa',{beat:b.id,lic:k});window.open(R.waRequest(b,k),'_blank','noopener')};
  R.Cart.ev.addEventListener('change',()=>refresh(ui.value));
  $('#bp-copy').onclick=()=>R.copy(R.beatUrl(b),'Enlace copiado');$('#bp-share').onclick=()=>R.share(b);
+ /* El motor de movimiento también se conecta en páginas individuales, no solo en el home. */
+ if(window.RonMotion){
+  const M=window.RonMotion,MAG='.btn,.play,.ctl button,.cartb,.ib,.chip,.lnk,.lic-info summary',TILT='.card,.tile,.lic,.row';
+  const bind=root=>{if(!root||root.nodeType!==1)return;const one=el=>{if(el.matches(MAG))M.magnetic(el,{mag:.16,rot:4.5,scale:1.035});if(el.matches(TILT))M.tilt(el,{max:7,lift:1.035})};one(root);root.querySelectorAll(`${MAG},${TILT}`).forEach(one)};
+  bind(document.body);new MutationObserver(rs=>rs.forEach(r=>r.addedNodes.forEach(n=>{if(n.nodeType===1)bind(n)}))).observe(document.body,{childList:true,subtree:true});
+ }
 })();

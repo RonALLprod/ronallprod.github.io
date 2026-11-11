@@ -94,8 +94,8 @@ begin
     from (select generate_series((desde at time zone tzn)::date,(now() at time zone tzn)::date,interval '1 day')::date dia) g
     left join (select (created_at at time zone tzn)::date dia,count(distinct sid) v,count(*) filter(where ev='play') p,count(*) filter(where ev='buy') c
                from ron_eventos where created_at>=desde group by 1) e on e.dia=g.dia),
- 'horas',(select jsonb_agg(coalesce(e.c,0) order by h) from generate_series(0,23) h
-    left join (select extract(hour from created_at at time zone tzn)::int hh,count(*) c from ron_eventos where ev='view' and created_at>=desde group by 1) e on e.hh=h),
+ 'horas',(select coalesce(jsonb_agg(coalesce(e.c,0) order by h.hora),'[]'::jsonb) from generate_series(0,23) as h(hora)
+    left join (select extract(hour from created_at at time zone tzn)::int hh,count(*) c from ron_eventos where ev='view' and created_at>=desde group by 1) e on e.hh=h.hora),
  'origen',(select coalesce(jsonb_agg(jsonb_build_object('ref',ref,'n',n) order by n desc),'[]'::jsonb) from (
     select coalesce(nullif(ref,''),'directo') ref,count(distinct sess) n from ron_eventos where ev='view' and created_at>=desde group by 1 order by n desc limit 10) t),
  'dispositivos',(select coalesce(jsonb_agg(jsonb_build_object('dev',dev,'n',n) order by n desc),'[]'::jsonb) from (
@@ -115,3 +115,7 @@ grant execute on function public.admin_analitica(text,int) to anon;
 
 -- PASO FINAL (solo si aún no lo hiciste con 01_ventas.sql): define tu clave de administrador, una sola vez.
 -- insert into public.ron_admin_cfg(id,pass_hash) values(1, crypt('TU_CLAVE', gen_salt('bf'))) on conflict(id) do update set pass_hash=excluded.pass_hash;
+
+
+-- Refresca el caché de funciones de PostgREST para que el panel vea la RPC recién instalada.
+notify pgrst, 'reload schema';

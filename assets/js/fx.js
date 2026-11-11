@@ -1,5 +1,5 @@
-/* Build: RONALL-VISUAL-2026-11-11-V15 */
-/* RONALL PROD V9 · FX ENGINE
+/* Build: RONALL-VISUAL-2026-11-11-V17 */
+/* RONALL PROD V10 · FX ENGINE · V17
    Reactor del motor original v5 + escena de fondo basada en la arquitectura REAL
    del Private Catalog: cover + cámara 2D + bloom independiente + luz WebGL + scan/flash.
    La portada no se deforma con un shader; el movimiento es de cámara, como en Private. */
@@ -97,24 +97,32 @@
       const root = this.n.root; if (!root) return;
       const field = document.createElement('div'); field.className = 'fx-ambient'; field.setAttribute('aria-hidden', 'true');
       const nodes = [];
-      for (let i = 0; i < 4; i++) { const orb = document.createElement('i'); orb.setAttribute('aria-hidden', 'true'); field.appendChild(orb); nodes.push(orb); }
+      /* Cinco masas de luz con fases distintas: el movimiento no depende del audio. */
+      for (let i = 0; i < 5; i++) {
+        const orb = document.createElement('i');
+        orb.setAttribute('aria-hidden', 'true');
+        orb.dataset.orb = String(i + 1);
+        field.appendChild(orb); nodes.push(orb);
+      }
       if (this.n.light && this.n.light.parentNode === root) root.insertBefore(field, this.n.light); else root.appendChild(field);
       this.ambient = nodes; this.ambientAt = 0;
+      this._moveAmbient(0, true);
     }
-    _moveAmbient(now) {
-      /* Targets are randomized on a slow cadence. CSS interpolates them on the compositor,
-         independently of audio playback and without a per-frame DOM write. */
-      if (!this.ambient || now < this.ambientAt) return;
-      this.ambientAt = now + 7800 + Math.random() * 7200;
+    _moveAmbient(now, force = false) {
+      /* CSS keyframes mueven las luces en el compositor. Cada cierto tiempo se
+         vuelven a sortear amplitudes y duración para que el fondo nunca repita
+         exactamente la misma trayectoria. No se escribe en DOM cada fotograma. */
+      if (!this.ambient || (!force && now < this.ambientAt)) return;
+      this.ambientAt = now + 18000 + Math.random() * 12000;
       this.ambient.forEach((el, i) => {
-        const x = (Math.random() - .5) * (i === 3 ? 25 : 36);
-        const y = (Math.random() - .5) * (i === 3 ? 28 : 42);
-        const rot = (Math.random() - .5) * 24;
-        const scale = .88 + Math.random() * .34;
-        const duration = 9 + Math.random() * 8;
-        el.style.transitionDuration = `${duration.toFixed(2)}s,${(duration * .82).toFixed(2)}s`;
-        el.style.transform = `translate3d(${x.toFixed(1)}vw,${y.toFixed(1)}vh,0) rotate(${rot.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
-        el.style.opacity = (.27 + Math.random() * .3).toFixed(2);
+        const slow = 26 + Math.random() * 22;
+        el.style.setProperty('--drift-x', `${(Math.random() * 16 + 7).toFixed(1)}vw`);
+        el.style.setProperty('--drift-y', `${(Math.random() * 15 + 6).toFixed(1)}vh`);
+        el.style.setProperty('--drift-r', `${(Math.random() * 16 + 7).toFixed(1)}deg`);
+        el.style.setProperty('--drift-scale', (1.04 + Math.random() * .12).toFixed(3));
+        el.style.animationDuration = `${(slow + i * 2.4).toFixed(1)}s`;
+        el.style.animationDelay = `${(-Math.random() * slow).toFixed(1)}s`;
+        el.style.opacity = (.52 + Math.random() * .24).toFixed(2);
       });
     }
     _initGL() {

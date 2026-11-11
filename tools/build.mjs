@@ -5,7 +5,7 @@ import fs from 'fs';import path from 'path';import {fileURLToPath} from 'url';
 const R=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const S=new Function('window',fs.readFileSync(R+'/config/site-config.js','utf8')+';return window.SITE')({});
 const cat=JSON.parse(fs.readFileSync(R+'/data/catalog.json','utf8'));
-const BUILD='RONALL-VISUAL-2026-11-11-V12';
+const BUILD='RONALL-VISUAL-2026-11-11-V17';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const live=cat.beats.filter(b=>b.visibility==='public'&&b.active!==false);
 // 1) JSON público (solo beats publicados y activos)
@@ -39,7 +39,7 @@ for(const b of live){
 <div class="acts"><button class="play" id="bp-play" aria-label="Reproducir preview"></button><button class="ib" id="bp-copy" data-i="link" aria-label="Copiar enlace"></button><button class="ib" id="bp-share" data-i="share" aria-label="Compartir"></button></div>
 <div class="sold" id="bp-sold" hidden>La licencia EXCLUSIVE de este beat ya fue vendida. Las demás licencias siguen disponibles.</div>
 <div class="split"><section><h2 class="sec-h">Elige tu licencia</h2><div class="lics" id="lics"></div><div class="ldet" id="bp-det"></div></section>
-<aside class="buy" aria-label="Compra"><div class="lbl">Total</div><div class="tot" id="bp-tot">—</div><div class="sub" id="bp-sub"></div><button class="btn fill block" id="bp-buy" disabled>Solicitar por WhatsApp</button><button class="btn block" id="bp-add" disabled>Añadir al carrito</button><ul class="trust"><li>Solicitud directa por WhatsApp</li><li>Confirmación de licencia y pago antes de cerrar</li></ul></aside></div>
+<aside class="buy" aria-label="Compra"><div class="lbl">Total</div><div class="tot" id="bp-tot">—</div><div class="sub" id="bp-sub"></div><button class="btn fill block" id="bp-buy" disabled>Comprar</button><button class="btn block" id="bp-add" disabled>Añadir al carrito</button><ul class="trust"><li>Solicitud directa por WhatsApp</li><li>Confirmación de licencia y pago antes de cerrar</li></ul></aside></div>
 </main>
 <footer class="foot"><span>© ${esc(S.brand.name)}</span><a href="../../index.html#beats">Beats</a><a href="../../private.html">Private Catalog</a></footer>
 </div>

@@ -162,10 +162,16 @@ function drawerView(){
 
 /* ---------- init ---------- */
 const sold=async()=>{try{return await rpc('exclusivos_vendidos')}catch(e){return[]}};
-/* ---------- analítica anónima: sin IP, nombre ni correo (solo un id aleatorio del navegador) ---------- */
+/* ---------- analítica anónima + diagnóstico local de medición ---------- */
 const track=(()=>{
- let ok=!!(S.supabase&&S.supabase.url&&S.supabase.key);
- try{if(navigator.doNotTrack==='1'||localStorage.ronNoTrack||/^(localhost|127\.|\[::1\])/.test(location.hostname))ok=false}catch(e){}
+ let reason='ready', enabled=!!(S.supabase&&S.supabase.url&&S.supabase.key);
+ const diag={enabled:false,reason:'',state:'idle',lastSuccess:null,lastError:null};
+ const saveDiag=()=>{try{localStorage.setItem('ronAnaDiag',JSON.stringify(diag))}catch(e){}};
+ try{
+  if(navigator.doNotTrack==='1' && localStorage.ronCountMe!=='1') { enabled=false; reason='do-not-track'; }
+  if(localStorage.ronNoTrack && localStorage.ronCountMe!=='1') { enabled=false; reason='admin-excluded'; }
+  if(/^(localhost|127\.|\[::1\])/.test(location.hostname)) { enabled=false; reason='local-preview'; }
+ }catch(e){enabled=false;reason='storage-blocked'}
  const rid=()=>{const a=new Uint8Array(10);try{crypto.getRandomValues(a)}catch(e){for(let i=0;i<a.length;i++)a[i]=Math.random()*256}return Array.from(a,x=>x.toString(36).padStart(2,'0')).join('')};
  const mem=(st,k)=>{try{let v=st.getItem(k);if(!v){v=rid();st.setItem(k,v)}return v}catch(e){return rid()}};
  const sid=mem(localStorage,'ronSid'),sess=mem(sessionStorage,'ronSess');
@@ -174,16 +180,31 @@ const track=(()=>{
  const path=location.pathname.replace(/index\.html$/,'').slice(0,120)||'/';
  const ref=(()=>{try{const u=new URLSearchParams(location.search).get('utm_source');if(u)return u.slice(0,40).toLowerCase();const h=document.referrer&&new URL(document.referrer).hostname.replace(/^www\./,'');return h&&h!==location.hostname?h:''}catch(e){return''}})();
  let cur=null;const seen={};
- const send=(ev,x={})=>{if(!ok)return;
+ diag.enabled=enabled;diag.reason=enabled?'enabled':reason;diag.state=enabled?'connecting':'paused';
+ window.__RON_ANALYTICS=diag;saveDiag();
+ const send=(ev,x={})=>{
+  if(!enabled)return Promise.resolve(false);
   const now=Date.now(),key=ev+'|'+(x.beat||'')+'|'+(x.lic||''),gap=ev==='play'?20000:ev==='hb'?0:3000;
-  if(gap&&seen[key]&&now-seen[key]<gap)return;seen[key]=now;
+  if(gap&&seen[key]&&now-seen[key]<gap)return Promise.resolve(false);seen[key]=now;
   if(ev==='beat'||ev==='play')cur=x.beat||cur;
   const body={p_sess:sess,p_sid:sid,p_ev:ev,p_beat:x.beat||(ev==='hb'?cur:null)||null,p_lic:x.lic||null,p_path:path,p_ref:ev==='view'?ref:null,p_dev:dev,p_tz:tz,p_lang:lang};
-  try{fetch(S.supabase.url+'/rest/v1/rpc/ron_track',{method:'POST',headers:{apikey:S.supabase.key,'Content-Type':'application/json'},body:JSON.stringify(body),keepalive:true}).catch(()=>{})}catch(e){}};
- send('view');
- setInterval(()=>{if(!D.hidden)send('hb')},30000);
- D.addEventListener('visibilitychange',()=>{if(!D.hidden)send('hb')});
- return send})();
+  /* Publishable keys van SOLO en apikey: no son JWT y no deben ir como Bearer. */
+  return fetch(S.supabase.url.replace(/\/$/,'')+'/rest/v1/rpc/ron_track',{
+   method:'POST',headers:{apikey:S.supabase.key,'Content-Type':'application/json','Accept':'application/json'},
+   body:JSON.stringify(body),keepalive:true,cache:'no-store'
+  }).then(async r=>{
+   if(!r.ok){const detail=(await r.text().catch(()=>'' )).slice(0,500);throw Object.assign(new Error('HTTP '+r.status),{status:r.status,detail})}
+   diag.state='connected';diag.lastSuccess=new Date().toISOString();diag.lastError=null;saveDiag();
+   window.dispatchEvent(new CustomEvent('ron:analytics',{detail:{ok:true,event:ev}}));return true;
+  }).catch(e=>{
+   diag.state='error';diag.lastError={status:e.status||0,message:e.message||'Network error',detail:e.detail||''};saveDiag();
+   window.dispatchEvent(new CustomEvent('ron:analytics',{detail:{ok:false,event:ev,error:diag.lastError}}));
+   console.warn('[RONALL analytics] No se pudo registrar',ev,diag.lastError);return false;
+  });
+ };
+ if(enabled){send('view');setInterval(()=>{if(!D.hidden)send('hb')},25000);D.addEventListener('visibilitychange',()=>{if(!D.hidden)send('hb')});}
+ return send;
+})();
 
 window.RON={S,$,$$,esc,money,fmt,beatUrl,price,avail,fromPrice,was,wa,waInfo,waRequest,waNumDisplay,svg,toast,copy,share,rpc,track,P,Cart,sold,openCart,closeCart,accent,boot};
 })();

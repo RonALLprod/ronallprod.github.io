@@ -1,4 +1,4 @@
-/* RONALL PROD · MOTION ENGINE (V11)
+/* RONALL PROD · MOTION ENGINE (V12 / V17)
    Un solo bucle rAF que SOLO corre mientras algún resorte se mueve.
    Resortes sub-amortiguados = péndulo natural al soltar. Sin librerías. */
 (() => {
@@ -11,9 +11,14 @@
   /* ── resortes ── */
   const live = new Set(); let raf = 0, last = 0;
   class Spring {
-    constructor(k = 170, c = 11) { this.x = 0; this.v = 0; this.t = 0; this.k = k; this.c = c; }
-    step(dt) { const a = -this.k * (this.x - this.t) - this.c * this.v; this.v += a * dt; this.x += this.v * dt; }
-    get rest() { return Math.abs(this.x - this.t) < .0008 && Math.abs(this.v) < .0008; }
+    /* Amortiguación subcrítica: llega rápido, sobrepasa un poco y aterriza sin golpe seco. */
+    constructor(k = 180, c = 14) { this.x = 0; this.v = 0; this.t = 0; this.k = k; this.c = c; }
+    step(dt) {
+      /* Substeps pequeños mantienen estable el resorte incluso a 30 fps. */
+      const n = Math.max(1, Math.ceil(dt / .008)), h = dt / n;
+      for (let i = 0; i < n; i++) { const a = -this.k * (this.x - this.t) - this.c * this.v; this.v += a * h; this.x += this.v * h; }
+    }
+    get rest() { return Math.abs(this.x - this.t) < .0012 && Math.abs(this.v) < .0015; }
   }
   const wake = o => { live.add(o); if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } };
   function loop(now) {
@@ -24,9 +29,11 @@
 
   /* ── magnético + pendulo + brillo que sigue al cursor ── */
   function magnetic(el, o = {}) {
-    if (el._mag || reduce) return; el._mag = 1;
-    const m = o.mag ?? .45, rot = o.rot ?? 12, sc = o.scale ?? 1.1, press = o.press !== false;
-    const sx = new Spring(150, 24), sy = new Spring(150, 24), sr = new Spring(130, 23), ss = new Spring(200, 28);   /* c ≈ 2√k: sin rebote */
+    if (el._mag) return; el._mag = 1;
+    /* Reduced motion keeps tactile feedback, but uses a much smaller travel and overshoot. */
+    const factor = reduce ? .28 : 1;
+    const m = (o.mag ?? .32) * factor, rot = (o.rot ?? 8) * factor, sc = reduce ? Math.min(o.scale ?? 1.045, 1.012) : (o.scale ?? 1.045), press = o.press !== false, pressScale = reduce ? .985 : .9;
+    const sx = new Spring(185, 16), sy = new Spring(185, 16), sr = new Spring(150, 15), ss = new Spring(220, 18);
     ss.x = ss.t = 1;
     const obj = {
       tick(dt) { for (const s of [sx, sy, sr, ss]) s.step(dt); el.style.transform = `translate3d(${sx.x.toFixed(2)}px,${sy.x.toFixed(2)}px,0) rotate(${sr.x.toFixed(2)}deg) scale(${ss.x.toFixed(4)})`; },
@@ -37,21 +44,22 @@
       el.addEventListener('pointerenter', () => { el.style.willChange = 'transform'; ss.t = sc; wake(obj); });
       el.addEventListener('pointermove', e => {
         const r = el.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-        sx.t = clamp(dx * m, -24, 24); sy.t = clamp(dy * m, -16, 16); sr.t = clamp(dx / r.width * rot, -rot, rot);
+        sx.t = clamp(dx * m, -22, 22); sy.t = clamp(dy * m, -14, 14); sr.t = clamp(dx / Math.max(1,r.width) * rot, -rot, rot);
         el.style.setProperty('--mx', (e.clientX - r.left) + 'px'); el.style.setProperty('--my', (e.clientY - r.top) + 'px'); wake(obj);
       }, { passive: true });
       el.addEventListener('pointerleave', () => { sx.t = sy.t = 0; sr.t = 0; ss.t = 1; wake(obj); }); /* patada aleatoria → péndulo */
     }
     if (o.hot && fine) { el.style.willChange = 'transform'; ss.t = sc; wake(obj); }
-    el.addEventListener('pointerdown', () => { if (press) ss.t = .9; wake(obj); });
+    el.addEventListener('pointerdown', () => { if (press) ss.t = pressScale; wake(obj); });
     el.addEventListener('pointerup', () => { ss.t = fine ? sc : 1; wake(obj); });
   }
 
   /* ── inclinación 3D + reflejo (cards, licencias, compra) ── */
   function tilt(el, o = {}) {
-    if (el._tilt || reduce || !fine) return; el._tilt = 1;
-    const max = o.max ?? 12, lift = o.lift ?? 1.04;
-    const rx = new Spring(170, 12), ry = new Spring(170, 12), sc = new Spring(210, 14), gl = new Spring(120, 16); sc.x = sc.t = 1;
+    if (el._tilt || !fine) return; el._tilt = 1;
+    const factor = reduce ? .24 : 1;
+    const max = (o.max ?? 8) * factor, lift = reduce ? Math.min(o.lift ?? 1.035, 1.01) : (o.lift ?? 1.035);
+    const rx = new Spring(190, 15), ry = new Spring(190, 15), sc = new Spring(230, 18), gl = new Spring(135, 17); sc.x = sc.t = 1;
     const obj = {
       tick(dt) { for (const s of [rx, ry, sc, gl]) s.step(dt); el.style.transform = `perspective(800px) rotateX(${rx.x.toFixed(2)}deg) rotateY(${ry.x.toFixed(2)}deg) scale(${sc.x.toFixed(4)})`; el.style.setProperty('--gl', clamp(gl.x, 0, 1).toFixed(3)); },
       done() { return rx.rest && ry.rest && sc.rest && gl.rest; },
@@ -59,13 +67,14 @@
     };
     el.addEventListener('pointerenter', () => { el.style.willChange = 'transform'; sc.t = lift; gl.t = 1; wake(obj); });
     el.addEventListener('pointermove', e => {
-      const r = el.getBoundingClientRect(), px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      const r = el.getBoundingClientRect(), px = clamp((e.clientX - r.left) / Math.max(1,r.width),0,1), py = clamp((e.clientY - r.top) / Math.max(1,r.height),0,1);
       ry.t = (px - .5) * 2 * max; rx.t = -(py - .5) * 2 * max;
+      el.style.setProperty('--mx', (px * 100).toFixed(1) + '%'); el.style.setProperty('--my', (py * 100).toFixed(1) + '%');
       el.style.setProperty('--px', (px * 100).toFixed(1) + '%'); el.style.setProperty('--py', (py * 100).toFixed(1) + '%'); wake(obj);
     }, { passive: true });
-    el.addEventListener('pointerleave', () => { rx.t = ry.t = 0; sc.t = 1; gl.t = 0; ry.v += (Math.random() < .5 ? -1 : 1) * 30; wake(obj); });
+    el.addEventListener('pointerleave', () => { rx.t = ry.t = 0; sc.t = 1; gl.t = 0; ry.v += (Math.random() < .5 ? -1 : 1) * 18; rx.v += (Math.random() - .5) * (reduce ? 2 : 10); wake(obj); });
     if (o.hot) { el.style.willChange = 'transform'; sc.t = lift; gl.t = 1; wake(obj); }
-    el.addEventListener('pointerdown', () => { sc.t = .965; wake(obj); });
+    el.addEventListener('pointerdown', () => { sc.t = reduce ? .993 : .965; wake(obj); });
     el.addEventListener('pointerup', () => { sc.t = lift; sc.v += 3; wake(obj); });
   }
 

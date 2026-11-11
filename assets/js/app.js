@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V15 · app.js — tienda pública (reutiliza core.js y lic.js) */
+/* RONALL-VISUAL-2026-11-11-V17 · app.js — tienda pública (reutiliza core.js y lic.js) */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
@@ -154,11 +154,25 @@ fx && fx.onFrame((dt, s, time) => {
 main.addEventListener('pointerleave', () => { tx = ty = 0; });
 main.addEventListener('pointermove', e => { const r = main.getBoundingClientRect(); tx = ((e.clientX - r.left) / r.width) * 2 - 1; ty = ((e.clientY - r.top) / r.height) * 2 - 1; if (!fx) return; fx.pointerTo = [((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1)]; }, { passive: true });
 
-/* ───────── Motion: magnético + péndulo (botones) e inclinación 3D (tarjetas) ───────── */
-const MAG = '.btn.fill,.play,.ctl .pp', M = RonMotion;
-D.addEventListener('pointerover', e => {
-  const m = e.target.closest(MAG); if (m && !m._mag) M.magnetic(m, { mag: .12, rot: 0, scale: 1, press: false });
-}, { passive: true });
+/* ───────── Motion graphics: resortes, magnetismo y tilt 3D ───────── */
+const M = RonMotion;
+const MAG = '.btn,.play,.ctl button,.cartb,.ib,.chip,.snav button,.tabs button,.lnk,.lic-info summary';
+const TILT = '.card,.tile,.lic,.row';
+function bindMotion(root) {
+  if (!root || root.nodeType !== 1) return;
+  const bind = el => {
+    if (el.matches(MAG)) M.magnetic(el, { mag: .16, rot: 4.5, scale: 1.035, press: true });
+    if (el.matches(TILT)) M.tilt(el, { max: el.matches('.row') ? 3.5 : 7, lift: el.matches('.row') ? 1.012 : 1.035 });
+  };
+  bind(root);
+  root.querySelectorAll(`${MAG},${TILT}`).forEach(bind);
+}
+/* El observador cubre filas, licencias, tarjetas y drawer que se crean después del load. */
+bindMotion(D.body);
+const motionObserver = new MutationObserver(records => {
+  for (const record of records) for (const node of record.addedNodes) if (node.nodeType === 1) bindMotion(node);
+});
+motionObserver.observe(D.body, { childList: true, subtree: true });
 M.scrollSkew(main, $('.marq'));
 { let lt = 0; new MutationObserver(() => { const b = $('.drawer .tr b'); if (!b || b._m) return; b._m = 1; const to = +b.textContent.replace(/\D/g, ''); M.count(b, lt, to, { dur: 900 }); lt = to; }).observe($('.drawer'), { childList: true }); }
 M.reveal($('#v-cats'), '.tile');
