@@ -1,0 +1,207 @@
+<!DOCTYPE html><html lang="es" data-root=""><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#050505"><link rel="icon" type="image/png" href="favicon.png"><title>Panel · RONALL PROD</title>
+<link rel="stylesheet" href="assets/css/base.css"><script src="config/site-config.js"></script>
+<style>body{padding:0}.pw{width:min(1080px,100% - 28px);margin:0 auto;padding:26px 0 80px}
+h1.t{margin:0 0 18px;font:34px/1 var(--disp);letter-spacing:.12em;display:flex;align-items:center;gap:12px}h1.t img{width:34px;height:34px;border-radius:50%}
+.tabs{display:flex;gap:6px;margin:6px 0 20px;border-bottom:1px solid var(--ln);overflow-x:auto}.tabs button{padding:12px 18px;font:12px 'Courier New',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);border-bottom:2px solid transparent;transition:all .3s}.tabs button.on{color:var(--fg);border-color:var(--fg)}
+.pan{display:none;animation:fu .6s var(--ease)}.pan.on{display:block}
+.r{border:1px solid var(--ln);border-radius:12px;padding:12px 14px;margin:8px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#0a0a0b}.r.p{border-color:var(--fg)}.r b{font-size:16px}.r small{color:var(--dim);flex-basis:100%}
+.a{color:#7dffa0}.d{color:#ff7d7d}.s{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}.s button,.r button{border:1px solid var(--ln2);padding:7px 11px;border-radius:99px;font-size:12px;transition:all .25s}.s button:hover,.r button:hover{background:var(--fg);color:#000}
+#msg{color:#ff9d9d;min-height:20px}.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}.bt{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center}.bt img{width:64px;height:64px;border-radius:10px;object-fit:cover}
+.pill{display:inline-block;padding:3px 9px;border:1px solid var(--ln2);border-radius:99px;font:10px 'Courier New',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}.pill.g{color:#7dffa0;border-color:#7dffa055}
+pre{white-space:pre-wrap;background:#0b0b0c;border:1px solid var(--ln);border-radius:10px;padding:12px;color:var(--dim);font-size:12.5px}textarea.inp{min-height:150px;font:12.5px 'Courier New',monospace}
+.warn{border:1px solid #ffd37d66;color:#ffd37d;border-radius:10px;padding:10px 12px;font-size:12.5px;margin:10px 0}
+.rng{display:flex;gap:6px;flex-wrap:wrap}.rng button{border:1px solid var(--ln2);padding:7px 14px;border-radius:99px;font-size:12px;color:var(--dim);transition:all .25s}.rng button.on,.rng button:hover{background:var(--fg);color:#000;border-color:var(--fg)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}.kpi{border:1px solid var(--ln);border-radius:14px;padding:14px 15px;background:#0a0a0b;min-width:0}
+.kpi .l{font:10.5px 'Courier New',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}.kpi b{display:block;font:600 32px/1.1 var(--disp,inherit);margin-top:6px;font-variant-numeric:tabular-nums}.kpi small{display:block;color:var(--dim);font-size:11.5px;margin-top:5px;line-height:1.35}
+.kpi.live{border-color:#7dffa055}.kpi.live b{color:#7dffa0}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#7dffa0;margin-right:8px;flex:none;animation:pl 1.8s infinite}@keyframes pl{0%{box-shadow:0 0 0 0 #7dffa099}70%{box-shadow:0 0 0 9px #7dffa000}100%{box-shadow:0 0 0 0 #7dffa000}}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:10px;margin:10px 0}
+.cd{border:1px solid var(--ln);border-radius:14px;padding:16px;background:#0a0a0b;min-width:0;margin:0}.cd h3{margin:0 0 12px;font:11px 'Courier New',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);font-weight:400;display:flex;justify-content:space-between;gap:8px}
+.mut{color:var(--dim);font-size:12.5px;margin:8px 0 0}.lg{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--dim);margin-top:6px}.lg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.on-i{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--ln)}.on-i:last-child{border:0}.on-i div{flex:1;min-width:0}.on-i b{display:block;font-size:13.5px}.on-i small{display:block;color:var(--dim);font-size:11.5px;margin-top:2px}.on-i>span{color:var(--dim);font-size:11.5px;white-space:nowrap}
+.tw{overflow-x:auto}table.tb{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}.tb th,.tb td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}.tb th:first-child,.tb td:first-child{text-align:left}
+.tb th button{font:10.5px 'Courier New',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:2px 0}.tb th button.on{color:var(--fg)}.tb td.a{color:#7dffa0;font-weight:700}
+.bc{display:flex;align-items:center;gap:10px;min-width:170px}.bc img{width:36px;height:36px;border-radius:8px;object-fit:cover}.bc div{flex:1}.bc b{font-size:13px}.bc em{display:block;height:3px;border-radius:9px;background:var(--ln);margin-top:5px;overflow:hidden}.bc em i{display:block;height:100%;background:var(--fg);opacity:.8}
+.hb{display:grid;grid-template-columns:minmax(70px,1.1fr) 2.2fr auto;gap:10px;align-items:center;margin:8px 0;font-size:13px}.hb em{display:block;height:7px;border-radius:99px;background:var(--ln);overflow:hidden}.hb em i{display:block;height:100%;border-radius:99px;background:var(--fg);opacity:.85}.hb b{font-weight:600;white-space:nowrap}.hb small{color:var(--dim);font-weight:400}
+.hrs{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;height:96px;align-items:end}.hrs div{display:flex;flex-direction:column;justify-content:flex-end;height:100%;align-items:center;gap:4px}.hrs i{display:block;width:100%;background:var(--fg);opacity:.5;border-radius:3px 3px 0 0}.hrs i.pk{opacity:1;background:#7dffa0}.hrs span{font-size:9px;color:var(--dim);height:10px}
+.ev{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid var(--ln);font-size:13px}.ev:last-child{border:0}.ev small{margin-left:auto;color:var(--dim);font-size:11.5px}#a-rec{max-height:420px;overflow:auto}
+.sum4{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.sum4 .kpi{flex:1;min-width:150px}
+@media(max-width:560px){.kpi b{font-size:26px}.tabs button{padding:12px 12px}}
+</style></head><body>
+<div class="pw"><h1 class="t"><img src="favicon.png" alt="">PANEL</h1>
+<div id="login"><div class="fld"><input class="inp" id="pw" type="password" placeholder="Clave de administrador" autocomplete="current-password"></div>
+<details style="margin:10px 0;color:var(--dim)"><summary style="cursor:pointer;margin-bottom:8px">Ajustes de conexión</summary><div class="fld"><input class="inp" id="u" placeholder="URL de Supabase"></div><div class="fld" style="margin-top:8px"><input class="inp" id="k" placeholder="Clave pública"></div></details>
+<button class="btn fill" id="go">Entrar</button><div id="msg"></div></div>
+<div id="app" style="display:none"><div class="top"><div id="cnt" class="eyebrow"></div><button class="btn sm" id="out">Salir</button></div>
+<div class="tabs"><button data-t="ana" class="on">Analítica</button><button data-t="usr">Usuarios</button><button data-t="beats">Beats</button><button data-t="ven">Ventas</button><button data-t="cfg">Ajustes</button></div>
+<section class="pan on" id="p-ana">
+<div class="top"><div class="rng" id="a-rng"><button data-d="1">Hoy</button><button data-d="7">7 días</button><button data-d="30">30 días</button><button data-d="90">90 días</button></div><span class="note" id="a-upd"></span><button class="btn sm" id="a-ref">Actualizar</button></div>
+<div class="warn" id="a-err" hidden></div>
+<div class="kpis" id="a-kpi"></div>
+<div class="g2"><div class="cd"><h3><span id="a-chtt">Visitas por día</span></h3><div id="a-chart"></div></div><div class="cd"><h3><span>En línea ahora</span><span id="a-onn">0</span></h3><div id="a-on"></div></div></div>
+<div class="g2"><div class="cd"><h3><span>Embudo de compra</span></h3><div id="a-fun"></div></div><div class="cd"><h3><span>Licencias más pedidas</span></h3><div id="a-lic"></div></div></div>
+<div class="cd"><h3><span>Rendimiento por beat</span><span>toca una columna para ordenar</span></h3><div class="tw" id="a-beats"></div></div>
+<div class="g2"><div class="cd"><h3><span>De dónde llegan</span></h3><div id="a-src"></div></div><div class="cd"><h3><span>Dispositivos</span></h3><div id="a-dev"></div></div></div>
+<div class="g2"><div class="cd"><h3><span>Países</span></h3><div id="a-geo"></div></div><div class="cd"><h3><span>Horas con más visitas</span></h3><div id="a-hrs"></div></div></div>
+<div class="cd"><h3><span>Actividad reciente</span></h3><div id="a-rec"></div></div>
+<div class="cd" style="margin-top:10px"><h3><span>Catálogo privado</span><span>reproducciones, likes y tiempo de escucha</span></h3><div id="a-priv"><p class="mut">Cargando…</p></div></div>
+</section>
+<section class="pan" id="p-usr"><div id="list"></div></section>
+<section class="pan" id="p-beats"><div class="top"><div class="note">Los cambios se guardan como borrador en este navegador. Pulsa <b>Descargar catalog.json</b>, sustituye <code>data/catalog.json</code> y ejecuta <code>node tools/build.mjs</code>.</div><span><button class="btn sm" id="dl">Descargar catalog.json</button> <button class="btn sm" id="rs">Descartar borrador</button></span></div><div id="blist"></div></section>
+<section class="pan" id="p-ven"><div class="sum4" id="vsum"></div><div class="note">Los pedidos entran como <b>Pendiente</b>. Confirma el pago manualmente (PayPal) antes de pasar a <b>Pagado</b>. Nada se marca pagado automáticamente.</div><div id="vlist"></div></section>
+<section class="pan" id="p-cfg"><div id="cfgbox"></div></section></div></div>
+<div class="modal" id="ed" role="dialog"><div class="sheet" id="edb"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script>
+const S=window.SITE;
+// Todo queda guardado en este navegador: no vuelves a escribir nada. Para olvidarlo, pulsa "Salir".
+const DEF={u:S.supabase.url,k:S.supabase.key};
+const $=id=>document.getElementById(id),L=localStorage;
+let U=L.pU||DEF.u,K=L.pK||DEF.k,PW=L.pP||'',T;
+$('u').value=U;$('k').value=K;
+async function rpc(f,b){const h={apikey:K,'Content-Type':'application/json'};if(/^eyJ/.test(K))h.Authorization='Bearer '+K;
+ const r=await fetch(U+'/rest/v1/rpc/'+f,{method:'POST',headers:h,body:JSON.stringify(b)});if(!r.ok){const e=new Error('error');e.status=r.status;e.body=await r.text().catch(()=>'');throw e}return r.status===204?null:r.json()}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=(n,c=S.currency)=>new Intl.NumberFormat('en-US',{style:'currency',currency:c,maximumFractionDigits:2}).format(n);
+const toast=m=>{let t=document.querySelector('.toast')||document.body.appendChild(Object.assign(document.createElement('div'),{className:'toast'}));t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)};
+const copy=async(t,m='Copiado')=>{try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast(m)};
+/* ===== USUARIOS (lógica original intacta: admin_listar / admin_set / admin_ip) ===== */
+function draw(rows){
+ $('login').style.display='none';$('app').style.display='block';if(window.__anaReady)anaStart();
+ const pend=rows.filter(x=>x.status==='pending').length;$('cnt').textContent=pend+' pendiente(s) · '+rows.length+' en total';document.title=(pend?'('+pend+') ':'')+'Panel';
+ $('list').innerHTML=rows.map(x=>`<div class="r ${x.status==='pending'?'p':''}"><b>${esc(x.username)}</b><span class="${x.status==='approved'?'a':x.status==='denied'?'d':''}">${x.status==='pending'?'PENDIENTE':x.status==='approved'?'APROBADO':'RECHAZADO'}</span>
+ <span class="s"><button onclick="st(${x.id},'approved')">Aceptar</button><button onclick="st(${x.id},'denied')">Rechazar</button><button onclick="ip('${esc(x.ip)}','approved')">Aceptar IP</button><button onclick="ip('${esc(x.ip)}','denied')">Bloquear IP</button><button onclick="st(${x.id},'delete')">✕</button></span>
+ <small>IP ${esc(x.ip)} · pidió ${new Date(x.created_at).toLocaleString()} · última vez ${new Date(x.last_seen).toLocaleString()}</small></div>`).join('')||'<p>Nadie ha pedido acceso todavía.</p>'}
+async function load(){try{const rows=await rpc('admin_listar',{p_pass:PW});L.pLast=JSON.stringify(rows);draw(rows)}
+ catch(e){if(navigator.onLine===false)return;$('msg').textContent='Clave o conexión incorrectas';stop();$('login').style.display='block';$('app').style.display='none'}}
+function start(){load();clearInterval(T);T=setInterval(load,6000)}
+function stop(){clearInterval(T);if(window.__anaReady)anaStop();L.removeItem('pP');PW=''}
+window.st=async(id,s)=>{await rpc('admin_set',{p_pass:PW,p_id:id,p_status:s});load()};
+window.ip=async(i,s)=>{if(confirm((s==='approved'?'Aceptar':'Bloquear')+' a TODOS los de la IP '+i+'?')){await rpc('admin_ip',{p_pass:PW,p_ip:i,p_status:s});load()}};
+$('go').onclick=()=>{U=$('u').value.trim().replace(/\/$/,'')||DEF.u;K=$('k').value.trim()||DEF.k;PW=$('pw').value;L.pU=U;L.pK=K;L.pP=PW;if(L.ronCountMe!=='1')L.ronNoTrack='1';$('msg').textContent='';start()};
+$('pw').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
+$('out').onclick=()=>{stop();L.removeItem('pLast');location.reload()};
+if(PW){try{draw(JSON.parse(L.pLast||'[]'))}catch(e){}start()}
+/* ===== pestañas ===== */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button,.pan').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('p-'+b.dataset.t).classList.add('on');if(b.dataset.t==='ana')anaLoad();if(b.dataset.t==='ven')loadV();if(b.dataset.t==='beats')loadB();if(b.dataset.t==='cfg')cfg()});
+/* ===== BEATS ===== */
+let CAT=null;const url=b=>`${S.url}/beats/${b.slug}/`;
+const waLink=(t='')=>`https://wa.me/${S.whatsapp.number}${t?'?text='+encodeURIComponent(t):''}`;
+const yt=b=>S.youtubeTemplate.replaceAll('{URL}',url(b)).replaceAll('{NAME}',b.name).replaceAll('{TYPE}',b.type||'').replaceAll('{WHATSAPP}','+'+S.whatsapp.number).replaceAll('{WA_LINK}',waLink());
+async function loadB(){if(!CAT){try{CAT=JSON.parse(L.pCat||'null')||await (await fetch('data/catalog.json',{cache:'no-cache'})).json()}catch(e){$('blist').innerHTML='<p class="note err">No se pudo cargar data/catalog.json</p>';return}}drawB()}
+const persist=()=>{L.pCat=JSON.stringify(CAT)};
+function drawB(){$('blist').innerHTML=CAT.beats.map((b,i)=>`<div class="r"><div class="bt" style="width:100%"><img src="${esc(b.thumb)}" alt=""><div><b>${esc(b.name)}</b> <span class="pill ${b.visibility==='public'&&b.active?'g':''}">${b.visibility==='public'?'público':'privado'}${b.active?'':' · inactivo'}${b.exclusiveSold?' · exclusive vendido':''}</span>
+ <small style="display:block">${esc(b.type||'')} · ${b.bpm||'BPM —'} · ${esc(b.key||'Key —')} · ${esc(b.genre||'')}</small><small style="display:block"><a href="${url(b)}" target="_blank" rel="noopener" style="text-decoration:underline">${url(b)}</a></small></div>
+ <span class="s" style="flex-direction:column;align-items:stretch"><button onclick="edit(${i})">Editar</button><button onclick="copy('${esc(url(b))}','Enlace copiado')">Copiar enlace</button><button onclick="copy(yt(CAT.beats[${i}]),'Descripción copiada')">Descripción YouTube</button></span></div></div>`).join('')||'<p>Sin beats.</p>'}
+window.edit=i=>{const b=CAT.beats[i];const lk=Object.keys(S.licenses);
+ $('edb').innerHTML=`<h3 class="disp">${esc(b.name)}</h3><div class="note">Slug (URL permanente): <b>${esc(b.slug)}</b> — no se cambia.</div>
+ <div class="row2"><div class="fld"><label>Nombre</label><input class="inp" id="e-name" value="${esc(b.name)}"></div><div class="fld"><label>Tipo de beat</label><input class="inp" id="e-type" value="${esc(b.type||'')}"></div><div class="fld"><label>Género</label><input class="inp" id="e-genre" value="${esc(b.genre||'')}"></div>
+ <div class="fld"><label>BPM</label><input class="inp" id="e-bpm" type="number" value="${b.bpm??''}"></div><div class="fld"><label>Tonalidad</label><input class="inp" id="e-key" value="${esc(b.key||'')}" placeholder="p. ej. F# min"></div></div>
+ <div class="row2">${lk.map(k=>`<div class="fld"><label><input type="checkbox" id="e-l-${k}" ${b.licenses.includes(k)?'checked':''}> ${S.licenses[k].name} (base ${money(S.licenses[k].price)})</label><input class="inp" id="e-p-${k}" type="number" placeholder="Precio específico" value="${b.prices?.[k]??''}"></div>`).join('')}</div>
+ <div class="row2"><label class="chk"><input type="checkbox" id="e-pub" ${b.visibility==='public'?'checked':''}> Público (aparece en el marketplace)</label><label class="chk"><input type="checkbox" id="e-act" ${b.active?'checked':''}> Activo</label><label class="chk"><input type="checkbox" id="e-ex" ${b.exclusiveSold?'checked':''}> Exclusive vendido (bloquea ventas)</label></div>
+ <div class="fld"><label>Descripción para YouTube (lista para pegar)</label><textarea class="inp" id="e-yt" readonly></textarea></div>
+ <div class="buyb" style="margin-top:14px"><button class="btn sm" id="e-cp">Copiar descripción</button><button class="btn sm" id="e-cl">Copiar enlace</button><button class="btn fill" id="e-sv" style="margin-left:auto">Guardar borrador</button></div>`;
+ const t=$('e-yt');t.value=yt(b);$('e-cp').onclick=()=>copy(t.value,'Descripción copiada');$('e-cl').onclick=()=>copy(url(b),'Enlace copiado');
+ $('e-sv').onclick=()=>{b.name=$('e-name').value.trim()||b.name;b.type=$('e-type').value.trim();b.genre=$('e-genre').value.trim();b.bpm=$('e-bpm').value?+$('e-bpm').value:null;b.key=$('e-key').value.trim()||null;
+  b.licenses=lk.filter(k=>$('e-l-'+k).checked);b.prices={};lk.forEach(k=>{const v=$('e-p-'+k).value;if(v!=='')b.prices[k]=+v});b.visibility=$('e-pub').checked?'public':'private';b.active=$('e-act').checked;b.exclusiveSold=$('e-ex').checked;persist();drawB();$('ed').classList.remove('on');toast('Borrador guardado')};
+ $('ed').classList.add('on')};
+$('ed').onclick=e=>{if(e.target===$('ed'))$('ed').classList.remove('on')};
+$('dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(CAT,null,1)],{type:'application/json'}));a.download='catalog.json';a.click()};
+$('rs').onclick=()=>{if(confirm('¿Descartar el borrador local?')){L.removeItem('pCat');CAT=null;loadB()}};
+/* ===== VENTAS ===== */
+let V=[];const ESTADOS=['pendiente','pagado','entregado','cancelado'];
+async function loadV(){try{V=await rpc('admin_ventas_listar',{p_pass:PW});drawV()}catch(e){$('vlist').innerHTML='<p class="note err">No se pudieron cargar las ventas. ¿Ejecutaste sql/01_ventas.sql y configuraste la clave en ron_admin_cfg?</p>'}}
+function drawV(){const ok=V.filter(v=>v.status==='pagado'||v.status==='entregado'),tot=ok.reduce((a,v)=>a+ +v.price,0),pen=V.filter(v=>v.status==='pendiente');$('vsum').innerHTML=`<div class="kpi"><span class="l">Cobrado</span><b>${money(tot)}</b><small>${ok.length} pedido(s) pagados/entregados</small></div><div class="kpi"><span class="l">Por cobrar</span><b>${money(pen.reduce((a,v)=>a+ +v.price,0))}</b><small>${pen.length} pedido(s) pendientes</small></div><div class="kpi"><span class="l">Pedidos totales</span><b>${V.length}</b><small>registrados</small></div>`;$('vlist').innerHTML=V.map(v=>`<div class="r ${v.status==='pendiente'?'p':''}"><b>${esc(v.beat_name)}</b><span class="pill">${esc(v.license).toUpperCase()}</span><span>${money(v.price,v.currency)}</span><span class="pill ${v.status==='pagado'||v.status==='entregado'?'g':''}">${esc(v.status)}</span>
+ <span class="s">${ESTADOS.map(e=>`<button ${v.status===e?'disabled':''} onclick="setV(${v.id},'${e}')">${e}</button>`).join('')}<button onclick="pdf(${v.id})">PDF licencia</button></span>
+ <small>${esc(v.purchase_id)} · ${esc(v.buyer_name)} &lt;${esc(v.buyer_email)}&gt; · ${new Date(v.created_at).toLocaleString()}${v.pdf_at?' · PDF '+new Date(v.pdf_at).toLocaleDateString():''}</small>
+ <small>Historial: ${(v.history||[]).map(h=>esc(h.status)+' '+new Date(h.at).toLocaleString()).join(' → ')}</small></div>`).join('')||'<p>Sin pedidos todavía.</p>'}
+window.setV=async(id,s)=>{if(s==='pagado'&&!confirm('¿Confirmas que YA recibiste este pago en PayPal?'))return;try{await rpc('admin_venta_set',{p_pass:PW,p_id:id,p_status:s});loadV()}catch(e){toast('Error al actualizar')}};
+window.pdf=async id=>{const v=V.find(x=>x.id===id);if(!window.jspdf)return toast('jsPDF aún cargando…');const {jsPDF}=window.jspdf,d=new jsPDF({unit:'mm',format:'a4'}),t=v.terms||{},P=S.producer;let y=20;const W=170;
+ const H=(s,sz=11)=>{d.setFont('helvetica','bold');d.setFontSize(sz);d.text(s,20,y);y+=sz*.5+2};
+ const T=(s,sz=10)=>{d.setFont('helvetica','normal');d.setFontSize(sz);d.splitTextToSize(String(s),W).forEach(l=>{if(y>275){d.addPage();y=20}d.text(l,20,y);y+=5})};
+ const KV=(k,val)=>{d.setFont('helvetica','bold');d.setFontSize(10);d.text(k,20,y);d.setFont('helvetica','normal');d.splitTextToSize(String(val),W-42).forEach((l,i)=>{d.text(l,62,y+i*5)});y+=Math.max(6,d.splitTextToSize(String(val),W-42).length*5+1)};
+ d.setFont('helvetica','bold');d.setFontSize(24);d.text(S.brand.name,20,y);y+=9;d.setFontSize(11);d.text('CONTRATO DE LICENCIA DE USO · '+(t.name||v.license.toUpperCase()),20,y);y+=4;d.setDrawColor(0);d.line(20,y,190,y);y+=8;
+ KV('Identificador',v.purchase_id);KV('Fecha',new Date(v.created_at).toLocaleDateString('es'));KV('Comprador',v.buyer_name+' <'+v.buyer_email+'>');KV('Beat',v.beat_name+'  ('+url({slug:v.beat_slug})+')');KV('Licencia',t.name||v.license);KV('Precio',money(v.price,v.currency));KV('Estado del pago',v.status);y+=3;
+ H('Permisos acordados');(t.permissions||[]).forEach(p=>T('• '+p));KV('Formatos',(t.formats||[]).join(', ')||'—');KV('Distribución',t.distribution||'—');KV('Monetización',t.monetization||'—');y+=2;
+ H('Restricciones y condiciones');(t.restrictions||[]).forEach(p=>T('• '+p));T('• Esta licencia concede derechos de uso y no constituye cesión de la titularidad de los derechos de autor, salvo pacto escrito expreso.');y+=4;
+ H('Datos del productor');KV('Productor',P.name);KV('Razón/nombre legal',P.legalName);KV('País',P.country);KV('Email',P.email);KV('WhatsApp','+'+S.whatsapp.number);y+=4;
+ T('Los términos anteriores son una copia exacta de los aceptados por el comprador al realizar el pedido.',9);y+=10;if(y>250){d.addPage();y=30}
+ d.line(20,y+14,90,y+14);d.line(110,y+14,180,y+14);d.setFontSize(9);d.text('Productor (firma)',20,y+19);d.text('Comprador (firma / aceptación)',110,y+19);
+ d.save(v.purchase_id+'.pdf');try{await rpc('admin_venta_pdf',{p_pass:PW,p_id:id});loadV()}catch(e){}};
+/* ===== AJUSTES (solo lectura: se editan en config/site-config.js) ===== */
+function cfg(){$('cfgbox').innerHTML=`<div class="warn">Número de WhatsApp en uso: <b>+${esc(S.whatsapp.number)}</b> ${S.whatsapp.confirmed?'(confirmado)':'— SIN CONFIRMAR. Edita <code>config/site-config.js</code> antes del lanzamiento.'}</div>
+ <p class="note">URL del sitio: ${esc(S.url)} · PayPal: ${esc(S.paypal.me)} · Moneda: ${esc(S.currency)}</p>
+ <p class="note">Licencias (precio base): ${Object.values(S.licenses).map(l=>l.name+' '+money(l.price)).join(' · ')}</p>
+ <div class="fld"><label>Plantilla YouTube (editable en site-config.js)</label><pre>${esc(S.youtubeTemplate)}</pre></div>`}
+
+/* ===== ANALÍTICA (admin_analitica · sql/02_analitica.sql) ===== */
+const AN={d:+(L.pAnaD||30),data:null,cat:null,sort:'compras',dir:-1,privT:0};let AT=null;
+const NF=new Intl.NumberFormat('es'),num=n=>NF.format(+n||0),pc=(a,b)=>b?(Math.round(a/b*1000)/10).toLocaleString('es')+'%':'—';
+const ago=t=>{const s=Math.max(0,Math.round((Date.now()-new Date(t))/1000));return s<5?'ahora':s<60?'hace '+s+' s':s<3600?'hace '+Math.floor(s/60)+' min':s<86400?'hace '+Math.floor(s/3600)+' h':'hace '+Math.floor(s/86400)+' d'};
+const dur=(a,b)=>{const s=Math.max(0,Math.round((new Date(b)-new Date(a))/1000));return s<60?s+' s':s<3600?Math.floor(s/60)+' min':Math.floor(s/3600)+' h '+Math.floor(s%3600/60)+' min'};
+const TZC={'America/Bogota':'CO','America/Lima':'PE','America/Mexico_City':'MX','America/Cancun':'MX','America/Monterrey':'MX','America/Tijuana':'MX','America/Guayaquil':'EC','America/Caracas':'VE','America/Santiago':'CL','America/Argentina/Buenos_Aires':'AR','America/Buenos_Aires':'AR','America/Montevideo':'UY','America/Asuncion':'PY','America/La_Paz':'BO','America/Panama':'PA','America/Costa_Rica':'CR','America/Guatemala':'GT','America/El_Salvador':'SV','America/Tegucigalpa':'HN','America/Managua':'NI','America/Havana':'CU','America/Santo_Domingo':'DO','America/Puerto_Rico':'PR','America/New_York':'US','America/Chicago':'US','America/Denver':'US','America/Los_Angeles':'US','America/Phoenix':'US','America/Anchorage':'US','Pacific/Honolulu':'US','America/Sao_Paulo':'BR','America/Toronto':'CA','America/Vancouver':'CA','Europe/Madrid':'ES','Atlantic/Canary':'ES','Europe/London':'GB','Europe/Paris':'FR','Europe/Berlin':'DE','Europe/Rome':'IT','Europe/Lisbon':'PT','Europe/Amsterdam':'NL','Europe/Zurich':'CH'};
+const DN=(()=>{try{return new Intl.DisplayNames(['es'],{type:'region'})}catch(e){return null}})();
+const flag=c=>c.replace(/./g,x=>String.fromCodePoint(127397+x.charCodeAt()));
+const where=tz=>{const c=TZC[tz];if(c){let n=c;try{n=DN?DN.of(c):c}catch(e){}return flag(c)+' '+n}return tz&&tz!=='desconocida'?tz.split('/').pop().replace(/_/g,' '):'Desconocido'};
+const DEV={movil:'Móvil',pc:'Computador',tablet:'Tablet',otro:'Otro'};
+const src=r=>{r=(r||'').toLowerCase();if(!r||r==='directo')return'Directo / WhatsApp';if(/instagram|^ig$/.test(r))return'Instagram';if(/youtu/.test(r))return'YouTube';if(/tiktok/.test(r))return'TikTok';if(/facebook|^fb$|^l\.fb/.test(r))return'Facebook';if(/whatsapp|wa\.me/.test(r))return'WhatsApp';if(/google/.test(r))return'Google';if(/^t\.co$|twitter|^x\.com$/.test(r))return'X / Twitter';if(/spotify/.test(r))return'Spotify';return r};
+const EVN={view:['Visita',''],beat:['Vio un beat',''],play:['Escuchó',''],cart:['Al carrito',''],buy:['Pidió / compró','g'],share:['Compartió',''],wa:['Contacto WhatsApp','g']};
+async function ensureCat(){let c=CAT;if(!c){try{c=JSON.parse(L.pCat||'null')||await (await fetch('data/catalog.json',{cache:'no-cache'})).json()}catch(e){c={beats:[]}}}return c}
+function anaStart(){if(AT)return;anaLoad();AT=setInterval(()=>{if(!document.hidden&&$('p-ana').classList.contains('on'))anaLoad()},8000)}
+function anaStop(){clearInterval(AT);AT=null}
+async function anaLoad(){
+ try{const [d,c]=await Promise.all([rpc('admin_analitica',{p_pass:PW,p_dias:AN.d}),ensureCat()]);AN.data=d;AN.cat=c;$('a-err').hidden=true;anaDraw();anaPrivate()}
+ catch(e){const miss=e&&(e.status===404||/PGRST202|Could not find/i.test(e.body||''));if(!AN.data||miss){$('a-err').hidden=false;$('a-err').innerHTML=miss?'Falta activar la analítica: abre <b>Supabase → SQL Editor</b>, pega <code>sql/02_analitica.sql</code> y pulsa Run. Después recarga el panel.':'No se pudo cargar la analítica. Revisa tu conexión y la clave.'}}}
+function bars(items,lab,key='n'){const m=Math.max(1,...items.map(x=>x[key])),t=items.reduce((s,x)=>s+x[key],0)||1;return items.length?items.map(x=>`<div class="hb"><span>${esc(lab(x))}</span><em><i style="width:${Math.max(3,x[key]/m*100)}%"></i></em><b>${num(x[key])} <small>${Math.round(x[key]/t*100)}%</small></b></div>`).join(''):'<p class="mut">Sin datos todavía.</p>'}
+function chart(sr){
+ const W=640,H=210,pl=32,pr=8,pt=16,pb=26,n=sr.length||1,max=Math.max(1,...sr.map(x=>Math.max(x.visitantes,x.plays)));
+ const p=Math.pow(10,Math.floor(Math.log10(max))),f=max/p,nice=(f<=1?1:f<=2?2:f<=5?5:10)*p,iw=W-pl-pr,ih=H-pt-pb,bw=iw/n,y=v=>pt+ih-(v/nice)*ih;
+ let g='';for(let i=0;i<=3;i++){const v=nice*i/3;g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="currentColor" opacity=".12"/><text x="${pl-6}" y="${y(v)+3}" text-anchor="end" font-size="9" fill="currentColor" opacity=".55">${Math.round(v*10)/10}</text>`}
+ const br=sr.map((x,i)=>{const h=Math.max(x.visitantes?2:0,ih*(x.visitantes/nice));return`<rect x="${pl+i*bw+bw*.14}" y="${pt+ih-h}" width="${Math.max(1,bw*.72)}" height="${h}" rx="2" fill="currentColor" opacity=".85"><title>${x.dia} · ${x.visitantes} visitantes · ${x.plays} reproducciones · ${x.compras} pedidos</title></rect>`}).join('');
+ const ln=sr.map((x,i)=>`${i?'L':'M'}${(pl+i*bw+bw/2).toFixed(1)},${y(x.plays).toFixed(1)}`).join('');
+ const buy=sr.map((x,i)=>x.compras>0?`<circle cx="${pl+i*bw+bw/2}" cy="${y(x.visitantes)-9}" r="6" fill="#7dffa0"/><text x="${pl+i*bw+bw/2}" y="${y(x.visitantes)-6}" text-anchor="middle" font-size="8" font-weight="700" fill="#000">${x.compras}</text>`:'').join('');
+ const dl=i=>{const d=(sr[i]||{}).dia||'';return d.slice(8)+'/'+d.slice(5,7)};
+ const lbl=[0,Math.floor((n-1)/2),n-1].filter((v,i,a)=>a.indexOf(v)===i).map(i=>`<text x="${pl+i*bw+bw/2}" y="${H-8}" text-anchor="middle" font-size="9" fill="currentColor" opacity=".6">${dl(i)}</text>`).join('');
+ return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Visitantes por día" style="width:100%;height:auto;color:var(--fg)">${g}${br}<path d="${ln}" fill="none" stroke="#8ab4ff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${buy}${lbl}</svg><div class="lg"><span><i style="background:currentColor"></i>Visitantes</span><span><i style="background:#8ab4ff"></i>Reproducciones</span><span><i style="background:#7dffa0"></i>Pedidos</span></div>`}
+function anaDraw(){
+ const d=AN.data;if(!d)return;const bm=Object.fromEntries((AN.cat.beats||[]).map(b=>[b.id,b])),bn=id=>(bm[id]&&bm[id].name)||String(id||'').replace(/-/g,' ').toUpperCase();
+ const k=d.hoy,w=d.semana,r=d.rango,nr=d.nuevos_recurrentes||{nuevos:0,recurrentes:0},lab=AN.d===1?'hoy':'últimos '+AN.d+' días';
+ document.querySelectorAll('#a-rng button').forEach(b=>b.classList.toggle('on',+b.dataset.d===AN.d));
+ const KP=(l,v,s,c='')=>`<div class="kpi ${c}"><span class="l">${c==='live'?'<i class="dot"></i>':''}${l}</span><b>${v}</b><small>${s}</small></div>`;
+ $('a-kpi').innerHTML=KP('En línea ahora',num(d.en_linea),d.en_linea===1?'persona viendo la web':'personas viendo la web','live')+KP('Visitantes hoy',num(k.visitantes),`${num(k.vistas)} visitas · ${num(k.plays)} reproducciones`)+KP('Últimos 7 días',num(w.visitantes),`${num(w.plays)} reproducciones · ${num(w.compras)} pedidos`)
+  +KP('Visitantes ('+lab+')',num(r.visitantes),`${num(nr.nuevos)} nuevos · ${num(nr.recurrentes)} que vuelven`)+KP('Reproducciones',num(r.plays),`${num(r.escuchas)} oyentes distintos`)+KP('Pedidos',num(r.compras),`${num(r.compradores)} personas · ${num(r.carrito)} al carrito`)
+  +KP('Conversión',pc(r.compradores,r.visitantes),'visitantes que hicieron un pedido')+KP('Contacto / compartir',num(r.whatsapp+r.compartidos),`${num(r.whatsapp)} WhatsApp · ${num(r.compartidos)} compartidos`);
+ const fn=[['Visitantes',r.visitantes],['Escucharon un beat',r.escuchas],['Añadieron al carrito',r.carrito],['Hicieron pedido',r.compradores]];
+ $('a-fun').innerHTML=bars(fn.map(x=>({l:x[0],n:x[1]})),x=>x.l)+'<p class="mut">Embudo del periodo. Carrito cuenta acciones, no personas.</p>';
+ $('a-chart').innerHTML=chart(d.serie||[]);$('a-chtt').textContent='Visitas por día · '+lab;
+ $('a-onn').textContent=d.en_linea;
+ $('a-on').innerHTML=(d.online||[]).length?d.online.map(o=>`<div class="on-i"><i class="dot"></i><div><b>${esc(where(o.tz))}</b><small>${esc(DEV[o.dev]||'—')} · ${o.beat?'escuchando/viendo <b>'+esc(bn(o.beat))+'</b>':esc(o.path==='/'?'tienda':o.path)} · lleva ${dur(o.desde,o.ultimo)}</small></div><span>${ago(o.ultimo)}</span></div>`).join(''):'<p class="mut">Nadie conectado en este momento.</p>';
+ const rows={};(AN.cat.beats||[]).forEach(b=>rows[b.id]={beat:b.id,vistas:0,visitantes:0,plays:0,oyentes:0,carrito:0,compras:0,compartidos:0});(d.por_beat||[]).forEach(x=>rows[x.beat]=x);
+ const arr=Object.values(rows).map(x=>({...x,conv:x.visitantes?x.compras/x.visitantes:0})).sort((a,b)=>(b[AN.sort]-a[AN.sort])*-AN.dir||b.plays-a.plays);
+ const mp=Math.max(1,...arr.map(x=>x.plays)),th=(key,t)=>`<th><button data-s="${key}" class="${AN.sort===key?'on':''}">${t}${AN.sort===key?(AN.dir<0?' ↓':' ↑'):''}</button></th>`;
+ $('a-beats').innerHTML=`<table class="tb"><thead><tr><th>Beat</th>${th('vistas','Vistas')}${th('plays','Reprod.')}${th('oyentes','Oyentes')}${th('carrito','Carrito')}${th('compras','Pedidos')}${th('compartidos','Compart.')}${th('conv','Conv.')}</tr></thead><tbody>${arr.map(x=>{const b=bm[x.beat];return`<tr><td><div class="bc">${b&&b.thumb?`<img src="${esc(b.thumb)}" alt="" width="36" height="36">`:''}<div><b>${esc(bn(x.beat))}</b><em><i style="width:${x.plays/mp*100}%"></i></em></div></div></td><td>${num(x.vistas)}</td><td>${num(x.plays)}</td><td>${num(x.oyentes)}</td><td>${num(x.carrito)}</td><td class="${x.compras?'a':''}">${num(x.compras)}</td><td>${num(x.compartidos)}</td><td>${x.visitantes?pc(x.compras,x.visitantes):'—'}</td></tr>`}).join('')||'<tr><td colspan="8">Sin beats.</td></tr>'}</tbody></table>`;
+ $('a-src').innerHTML=bars((d.origen||[]).map(x=>({...x,ref:src(x.ref)})).reduce((a,x)=>{const f=a.find(y=>y.ref===x.ref);f?f.n+=x.n:a.push({...x});return a},[]).sort((a,b)=>b.n-a.n),x=>x.ref);
+ $('a-dev').innerHTML=bars(d.dispositivos||[],x=>DEV[x.dev]||x.dev);
+ $('a-geo').innerHTML=bars((d.zonas||[]).map(x=>({...x,w:where(x.tz)})).reduce((a,x)=>{const f=a.find(y=>y.w===x.w);f?f.n+=x.n:a.push({...x});return a},[]).sort((a,b)=>b.n-a.n),x=>x.w)+'<p class="mut">País estimado por la zona horaria del navegador.</p>';
+ const hs=d.horas||[],hm=Math.max(1,...hs);
+ $('a-hrs').innerHTML=`<div class="hrs">${hs.map((v,h)=>`<div title="${h}:00 · ${v} visitas"><i style="height:${Math.max(v?4:1,v/hm*100)}%" class="${v===hm&&v?'pk':''}"></i><span>${h%3===0?h:''}</span></div>`).join('')}</div><p class="mut">Hora de Colombia (UTC−5). ${hs.some(Boolean)?'Hora pico: <b>'+hs.indexOf(hm)+':00</b>.':''}</p>`;
+ const ls=d.licencias||[],lm=Math.max(1,...ls.map(y=>y.compras));
+ $('a-lic').innerHTML=Object.keys(S.licenses).map(kk=>{const x=ls.find(y=>y.lic===kk)||{carrito:0,compras:0};return`<div class="hb"><span>${S.licenses[kk].name}</span><em><i style="width:${Math.max(3,x.compras/lm*100)}%"></i></em><b>${x.compras} <small>${x.carrito} al carrito</small></b></div>`}).join('')+'<p class="mut">Pedidos creados por licencia.</p>';
+ $('a-rec').innerHTML=(d.recientes||[]).map(x=>{const e=EVN[x.ev]||[x.ev,''];return`<div class="ev"><span class="pill ${e[1]==='g'?'g':''}">${e[0]}</span><span>${x.beat?esc(bn(x.beat))+(x.lic?' · '+esc(x.lic.toUpperCase()):''):'tienda'}</span><small>${esc(DEV[x.dev]||'')} · ${esc(where(x.tz))} · ${ago(x.t)}</small></div>`}).join('')||'<p class="mut">Aún no hay actividad. Se registra en cuanto alguien visite la web.</p>';
+ $('a-upd').textContent='Actualizado '+new Date(d.generado).toLocaleTimeString()+' · se refresca solo cada 8 s'}
+async function anaPrivate(force){
+ if(!force&&Date.now()-AN.privT<60000)return;AN.privT=Date.now();
+ try{const r=await fetch(U+'/rest/v1/beat_stats?select=*',{headers:{apikey:K}});if(!r.ok)throw 0;const rows=(await r.json()).filter(x=>x&&x.slug);
+  const tot=f=>rows.reduce((s,x)=>s+(+x[f]||0),0);rows.sort((a,b)=>(+b.plays||0)-(+a.plays||0));
+  const t=s=>{s=Math.round(+s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+  $('a-priv').innerHTML=rows.length?`<p class="mut" style="margin:0 0 8px"><b>${num(tot('plays'))}</b> reproducciones · <b>${num(tot('likes'))}</b> likes · <b>${num(tot('shares'))}</b> compartidos · <b>${num(tot('searches'))}</b> búsquedas</p><div class="tw"><table class="tb"><thead><tr><th>Pista</th><th>Reprod.</th><th>Likes</th><th>Comp.</th><th>Prom. escucha</th><th>Completa</th></tr></thead><tbody>${rows.slice(0,15).map(x=>`<tr><td><b>${esc(String(x.slug).replace(/-/g,' ').toUpperCase())}</b></td><td>${num(x.plays)}</td><td>${num(x.likes)}</td><td>${num(x.shares)}</td><td>${(+x.plays)?t((+x.listen_secs||0)/(+x.plays)):'—'}</td><td>${(+x.plays)?pc(+x.completes||0,+x.plays):'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="mut">Sin estadísticas del catálogo privado todavía.</p>'}
+ catch(e){$('a-priv').innerHTML='<p class="mut">No se pudieron leer las estadísticas del catálogo privado.</p>'}}
+document.querySelectorAll('#a-rng button').forEach(b=>b.onclick=()=>{AN.d=+b.dataset.d;L.pAnaD=AN.d;anaLoad()});
+$('a-beats').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;const s=b.dataset.s;AN.dir=AN.sort===s?-AN.dir:-1;AN.sort=s;anaDraw()});
+$('a-ref').onclick=()=>{anaLoad();anaPrivate(true)};
+/* tus propias visitas no cuentan (este navegador) */
+if(PW&&L.ronCountMe!=='1')L.ronNoTrack='1';
+const _cfg=cfg;cfg=function(){_cfg();const on=L.ronCountMe==='1';$('cfgbox').insertAdjacentHTML('beforeend',`<div class="fld"><label>Analítica</label><p class="note">Se registra de forma anónima (sin IP, nombre ni correo). Por defecto <b>tus visitas desde este navegador no cuentan</b>.</p><button class="btn sm" id="cnt-me">${on?'Dejar de contar mis visitas':'Contar mis visitas en este navegador'}</button></div>`);$('cnt-me').onclick=()=>{if(L.ronCountMe==='1'){L.removeItem('ronCountMe');L.ronNoTrack='1'}else{L.ronCountMe='1';L.removeItem('ronNoTrack')}cfg()}};
+window.__anaReady=true;if(PW)anaStart();
+</script></body></html>

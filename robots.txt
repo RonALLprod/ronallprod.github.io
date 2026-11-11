@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /private.html
+Disallow: /panel.html
+Sitemap: https://ronallprod.github.io/sitemap.xml
