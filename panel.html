@@ -37,7 +37,7 @@ pre{white-space:pre-wrap;background:#0b0b0c;border:1px solid var(--ln);border-ra
 <div class="tabs"><button data-t="ana" class="on">Analítica</button><button data-t="usr">Usuarios</button><button data-t="beats">Beats</button><button data-t="ven">Ventas</button><button data-t="cfg">Ajustes</button></div>
 <section class="pan on" id="p-ana">
 <div class="top"><div class="rng" id="a-rng"><button data-d="1">Hoy</button><button data-d="7">7 días</button><button data-d="30">30 días</button><button data-d="90">90 días</button></div><span class="note" id="a-upd"></span><button class="btn sm" id="a-ref">Actualizar</button></div>
-<div class="warn" id="a-err" hidden></div>
+<div class="warn" id="a-err" hidden></div><div class="note" id="a-health" style="margin:8px 0 12px;padding:10px 12px;border:1px solid var(--ln);border-radius:10px;background:#0a0a0b"></div>
 <div class="kpis" id="a-kpi"></div>
 <div class="g2"><div class="cd"><h3><span id="a-chtt">Visitas por día</span></h3><div id="a-chart"></div></div><div class="cd"><h3><span>En línea ahora</span><span id="a-onn">0</span></h3><div id="a-on"></div></div></div>
 <div class="g2"><div class="cd"><h3><span>Embudo de compra</span></h3><div id="a-fun"></div></div><div class="cd"><h3><span>Licencias más pedidas</span></h3><div id="a-lic"></div></div></div>
@@ -61,7 +61,7 @@ const $=id=>document.getElementById(id),L=localStorage;
 let U=L.pU||DEF.u,K=L.pK||DEF.k,PW=L.pP||'',T;
 $('u').value=U;$('k').value=K;
 async function rpc(f,b){const h={apikey:K,'Content-Type':'application/json'};if(/^eyJ/.test(K))h.Authorization='Bearer '+K;
- const r=await fetch(U+'/rest/v1/rpc/'+f,{method:'POST',headers:h,body:JSON.stringify(b)});if(!r.ok){const e=new Error('error');e.status=r.status;e.body=await r.text().catch(()=>'');throw e}return r.status===204?null:r.json()}
+ const r=await fetch(U+'/rest/v1/rpc/'+f,{method:'POST',headers:{...h,'Accept':'application/json'},body:JSON.stringify(b),cache:'no-store'});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;e.body=await r.text().catch(()=>'');throw e}return r.status===204?null:r.json()}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=(n,c=S.currency)=>new Intl.NumberFormat('en-US',{style:'currency',currency:c,maximumFractionDigits:2}).format(n);
 const toast=m=>{let t=document.querySelector('.toast')||document.body.appendChild(Object.assign(document.createElement('div'),{className:'toast'}));t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)};
@@ -152,7 +152,7 @@ function anaStart(){if(AT)return;anaLoad();AT=setInterval(()=>{if(!document.hidd
 function anaStop(){clearInterval(AT);AT=null}
 async function anaLoad(){
  try{const [d,c]=await Promise.all([rpc('admin_analitica',{p_pass:PW,p_dias:AN.d}),ensureCat()]);AN.data=d;AN.cat=c;$('a-err').hidden=true;anaDraw();anaPrivate()}
- catch(e){const body=String(e&&e.body||''),miss=e&&(e.status===404||/PGRST202|Could not find|admin_analitica/i.test(body));$('a-err').hidden=false;$('a-err').innerHTML=miss?'La analítica todavía no está instalada en Supabase. Abre <b>Supabase → SQL Editor</b>, ejecuta completo <code>sql/02_analitica.sql</code> y vuelve a pulsar <b>Actualizar</b>.':'No se pudo consultar la analítica. '+(e&&e.status?'HTTP '+e.status+'. ':'')+'Comprueba la conexión, la clave de administrador y que <code>sql/02_analitica.sql</code> se haya ejecutado. <details style="margin-top:8px"><summary>Ver detalle técnico</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(body||String(e&&e.message||'Error desconocido'))+'</pre></details>';console.error('RONALL panel analytics:',e)}}
+ catch(e){const body=String(e&&e.body||''),miss=e&&(e.status===404||/PGRST202|Could not find|admin_analitica/i.test(body));$('a-err').hidden=false;$('a-err').innerHTML=miss?'La función de analítica no está instalada o Supabase aún no actualizó su esquema. Abre <b>Supabase → SQL Editor</b>, ejecuta completo <code>sql/02_analitica.sql</code> y vuelve a pulsar <b>Actualizar</b>.':(e&&e.status===401||e&&e.status===403)?'Supabase rechazó la consulta. Revisa que la clave pública de este panel corresponda al proyecto y que la función <code>admin_analitica</code> permita ejecutar al rol anon.':'No se pudo consultar la analítica. '+(e&&e.status?'HTTP '+e.status+'. ':'')+'Comprueba la conexión, la clave de administrador y que <code>sql/02_analitica.sql</code> se haya ejecutado. <details style="margin-top:8px"><summary>Ver detalle técnico</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(body||String(e&&e.message||'Error desconocido'))+'</pre></details>';if($('a-health'))$('a-health').textContent='No hay confirmación de lectura de la base de datos. El panel de usuarios puede funcionar aunque la analítica todavía no esté instalada.';console.error('RONALL panel analytics:',e)}}
 function bars(items,lab,key='n'){const m=Math.max(1,...items.map(x=>x[key])),t=items.reduce((s,x)=>s+x[key],0)||1;return items.length?items.map(x=>`<div class="hb"><span>${esc(lab(x))}</span><em><i style="width:${Math.max(3,x[key]/m*100)}%"></i></em><b>${num(x[key])} <small>${Math.round(x[key]/t*100)}%</small></b></div>`).join(''):'<p class="mut">Sin datos todavía.</p>'}
 function chart(sr){
  const W=640,H=210,pl=32,pr=8,pt=16,pb=26,n=sr.length||1,max=Math.max(1,...sr.map(x=>Math.max(x.visitantes,x.plays)));
@@ -165,8 +165,23 @@ function chart(sr){
  const lbl=[0,Math.floor((n-1)/2),n-1].filter((v,i,a)=>a.indexOf(v)===i).map(i=>`<text x="${pl+i*bw+bw/2}" y="${H-8}" text-anchor="middle" font-size="9" fill="currentColor" opacity=".6">${dl(i)}</text>`).join('');
  return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Visitantes por día" style="width:100%;height:auto;color:var(--fg)">${g}${br}<path d="${ln}" fill="none" stroke="#8ab4ff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${buy}${lbl}</svg><div class="lg"><span><i style="background:currentColor"></i>Visitantes</span><span><i style="background:#8ab4ff"></i>Reproducciones</span><span><i style="background:#7dffa0"></i>Pedidos</span></div>`}
 function anaDraw(){
- const d=AN.data;if(!d)return;const bm=Object.fromEntries((AN.cat.beats||[]).map(b=>[b.id,b])),bn=id=>(bm[id]&&bm[id].name)||String(id||'').replace(/-/g,' ').toUpperCase();
- const k=d.hoy,w=d.semana,r=d.rango,nr=d.nuevos_recurrentes||{nuevos:0,recurrentes:0},lab=AN.d===1?'hoy':'últimos '+AN.d+' días';
+ const d=AN.data;if(!d)return;
+ const zero={visitantes:0,sesiones:0,vistas:0,escuchas:0,plays:0,carrito:0,compras:0,compradores:0,whatsapp:0,compartidos:0};
+ const bm=Object.fromEntries((AN.cat.beats||[]).map(b=>[b.id,b])),bn=id=>(bm[id]&&bm[id].name)||String(id||'').replace(/-/g,' ').toUpperCase();
+ const k={...zero,...(d.hoy||{})},w={...zero,...(d.semana||{})},r={...zero,...(d.rango||{})},nr=d.nuevos_recurrentes||{nuevos:0,recurrentes:0},lab=AN.d===1?'hoy':'últimos '+AN.d+' días';
+ let localDiag=null;try{localDiag=JSON.parse(L.ronAnaDiag||'null')}catch(e){}
+ const ownOff=(L.ronNoTrack==='1'&&L.ronCountMe!=='1')||(localDiag&&localDiag.reason==='do-not-track'&&L.ronCountMe!=='1');
+ const localPreview=localDiag&&localDiag.reason==='local-preview';
+ const health=$('a-health');
+ health.innerHTML=ownOff
+  ?'<b>Este navegador está excluido de las estadísticas.</b> Puede ser por la protección del panel o por “No rastrear” del navegador. Para probar la medición desde este equipo, pulsa <button class="btn sm" id="a-own">Incluir mis visitas</button> y vuelve a abrir el catálogo público.'
+  :localPreview
+   ?'<b>Estás probando el catálogo en una dirección local.</b> Las visitas de localhost no se envían a Supabase. Publica el sitio y prueba desde su dominio para verificar las estadísticas.'
+  :d.total_eventos===0
+   ?'<b>Conexión de analítica activa, pero todavía hay 0 eventos.</b> Abre el catálogo público desde otro dispositivo o pestaña. Si sigue en cero, verifica que ejecutaste <code>sql/02_analitica.sql</code> en Supabase y que publicaste la última versión.'
+   :`<b>Analítica conectada.</b> ${num(d.total_eventos)} eventos registrados desde ${d.primer_evento?new Date(d.primer_evento).toLocaleString():'el inicio'}. ${d.en_linea?num(d.en_linea)+' persona(s) activa(s) ahora.':'No hay visitantes activos en este momento.'}`;
+ const ownBtn=$('a-own');if(ownBtn)ownBtn.onclick=()=>{L.ronCountMe='1';L.removeItem('ronNoTrack');anaDraw()};
+ if(localDiag&&localDiag.state==='error'&&!ownOff){health.insertAdjacentHTML('beforeend',`<p style="margin:7px 0 0;color:#ffb3b3">Último envío desde este navegador: ${esc(localDiag.lastError?.message||'error de conexión')} ${localDiag.lastError?.status?'(HTTP '+esc(localDiag.lastError.status)+')':''}. ${esc(localDiag.lastError?.detail||'')}</p>`)}
  document.querySelectorAll('#a-rng button').forEach(b=>b.classList.toggle('on',+b.dataset.d===AN.d));
  const KP=(l,v,s,c='')=>`<div class="kpi ${c}"><span class="l">${c==='live'?'<i class="dot"></i>':''}${l}</span><b>${v}</b><small>${s}</small></div>`;
  $('a-kpi').innerHTML=KP('En línea ahora',num(d.en_linea),d.en_linea===1?'persona viendo la web':'personas viendo la web','live')+KP('Visitantes hoy',num(k.visitantes),`${num(k.vistas)} visitas · ${num(k.plays)} reproducciones`)+KP('Últimos 7 días',num(w.visitantes),`${num(w.plays)} reproducciones · ${num(w.compras)} pedidos`)
