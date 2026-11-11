@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V12 · app.js — tienda pública (reutiliza core.js y lic.js) */
+/* RONALL-VISUAL-2026-11-11-V15 · app.js — tienda pública (reutiliza core.js y lic.js) */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
@@ -84,7 +84,7 @@ function select(b, first) {
 }
 $('#cplay').onclick = () => sel && P.play(sel, cur.length ? cur : beats);
 $('#b-add').onclick = () => { if (!ui || !ui.value) return; if (R.Cart.has(sel.id, ui.value)) R.openCart(); else R.Cart.add(sel, ui.value, $('#cimg')); };
-$('#b-buy').onclick = () => { if (!ui || !ui.value) return; if (!R.Cart.has(sel.id, ui.value)) R.Cart.add(sel, ui.value, $('#cimg')); R.openCart('info'); };
+$('#b-buy').onclick = () => { if (!sel || !ui || !ui.value) return; R.track('wa',{beat:sel.id,lic:ui.value}); window.open(R.waRequest(sel,ui.value),'_blank','noopener'); };
 $('#b-sh').onclick = () => sel && R.share(sel);
 R.Cart.ev.addEventListener('change', () => refreshBuy());
 

@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V12 · lic.js */
+/* RONALL-VISUAL-2026-11-11-V13 · lic.js */
 /* selector de licencias reutilizable (home + página de beat) */
 (()=>{const R=window.RON,S=R.S;
  const ok=v=>v&&!/^por definir$/i.test(String(v).trim());
@@ -6,7 +6,7 @@
  R.licDetails=k=>{const L=S.licenses[k];if(!L)return'';
   const inc=[`Formatos: ${L.formats.map(R.esc).join(' + ')}`,ok(L.distribution)&&`Distribución: ${R.esc(L.distribution)}`,ok(L.monetization)&&`Monetización: ${R.esc(L.monetization)}`,...L.permissions.map(R.esc)].filter(Boolean);
   const res=L.restrictions.map(R.esc);
-  return `<div><h4>Incluye</h4><ul>${inc.map(x=>`<li>${x}</li>`).join('')}</ul></div>${res.length?`<div><h4>Condiciones</h4><ul>${res.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}`};
+  return `<details class="lic-info"><summary>Ver más información de esta licencia</summary><div><h4>Qué incluye</h4><ul>${inc.map(x=>`<li>${x}</li>`).join('')}</ul></div>${res.length?`<div><h4>Condiciones y límites</h4><ul>${res.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}<p class="lic-note">Antes de pagar, confirma por WhatsApp los términos completos y cualquier condición que aparezca pendiente de definir.</p></details>`};
  R.licUI=(beat,box,onChange)=>{let sel=beat.licenses.find(k=>R.avail(beat,k))||null;
   box.setAttribute('role','radiogroup');
   box.innerHTML=beat.licenses.map(k=>{const L=S.licenses[k],a=R.avail(beat,k);

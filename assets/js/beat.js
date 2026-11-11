@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V12 · beat.js — página individual (HTML generado por tools/build.mjs) */
+/* RONALL-VISUAL-2026-11-11-V13 · beat.js — página individual (HTML generado por tools/build.mjs) */
 (async()=>{const R=RON,{$,money,S}=R;R.boot();
  const b=JSON.parse($('#beat-data').textContent);if((await R.sold()).includes(b.id))b.exclusiveSold=true;R.track('beat',{beat:b.id});
  const play=$('#bp-play'),sync=()=>{const on=R.P.cur&&R.P.cur.id===b.id&&!R.P.audio.paused;play.innerHTML=R.svg(on?'pause':'play',24);play.setAttribute('aria-label',on?'Pausar':'Reproducir preview')};
@@ -12,7 +12,7 @@
  ui=R.licUI(b,$('#lics'),k=>{if(k){cnt(R.price(b,k));const L=S.licenses[k];$('#bp-sub').innerHTML=`Licencia ${L.name} · ${L.formats.join(' + ')}${R.was(b,k)?` · <s class="wp">${R.money(R.was(b,k))}</s>`:''}`;$('#bp-det').innerHTML=R.licDetails(k)}else{tot.textContent='—';$('#bp-det').innerHTML=''}refresh(k)});
  if(b.exclusiveSold)$('#bp-sold').hidden=false;
  add.onclick=()=>{const k=ui.value;if(!k)return;R.Cart.has(b.id,k)?R.openCart():R.Cart.add(b,k,im)};
- buy.onclick=()=>{const k=ui.value;if(!k)return;if(!R.Cart.has(b.id,k))R.Cart.add(b,k,im);R.openCart('info')};
+ buy.onclick=()=>{const k=ui.value;if(!k)return;R.track('wa',{beat:b.id,lic:k});window.open(R.waRequest(b,k),'_blank','noopener')};
  R.Cart.ev.addEventListener('change',()=>refresh(ui.value));
  $('#bp-copy').onclick=()=>R.copy(R.beatUrl(b),'Enlace copiado');$('#bp-share').onclick=()=>R.share(b);
 })();

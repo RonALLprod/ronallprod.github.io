@@ -126,4 +126,4 @@ body:before{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;
 .mini .sk,.mini .vl{display:none}.mini .bar{display:block}.mini .tk img{width:46px;height:46px}.mini .ctl .nx,.mini .ctl .pv{display:none}body.has-mini{--mini:78px}.wrap{width:calc(100% - 28px)}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
 
-/* Build: RONALL-VISUAL-2026-11-11-V12 */
+/* Build: RONALL-VISUAL-2026-11-11-V13 */

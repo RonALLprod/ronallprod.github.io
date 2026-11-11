@@ -169,3 +169,17 @@ input,select,textarea,option{text-shadow:none}
 .lic .lpw{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:8px}.lic .lpw .lp{margin-top:0}
 .wp{font-weight:500;color:var(--dim);text-decoration:line-through;text-decoration-thickness:1.5px;text-shadow:none;font-variant-numeric:tabular-nums}
 .lic .wp{font-size:18px}.buy .sub .wp{font-size:.95em}
+
+
+/* RONALL PROD · solicitud directa + lectura de licencias */
+.lic-info{margin-top:14px;border-top:1px solid var(--ln,rgba(255,255,255,.12));padding-top:12px;color:var(--fg,#fff)}
+.lic-info summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg,#fff);opacity:.82;transition:opacity .25s}
+.lic-info summary::-webkit-details-marker{display:none}
+.lic-info summary:after{content:'+';margin-left:auto;font-size:18px;line-height:1;transition:transform .25s}
+.lic-info[open] summary:after{transform:rotate(45deg)}
+.lic-info summary:hover{opacity:1}
+.lic-info>div{padding-top:10px}
+.lic-info h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.65;margin:12px 0 7px}
+.lic-info ul{margin:0;padding-left:18px}
+.lic-info li,.lic-note{font-size:12px;line-height:1.65;color:var(--dim,#aaa)}
+.lic-note{margin:12px 0 2px;padding:10px 12px;border-left:1px solid currentColor;background:rgba(255,255,255,.025)}

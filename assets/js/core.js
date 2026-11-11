@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V12 · core.js */
+/* RONALL-VISUAL-2026-11-11-V13 · core.js */
 /* RONALL PROD · core — helpers, cabecera, reproductor global (AES-GCM), carrito, checkout */
 (()=>{
 const S=window.SITE,D=document,ROOT=D.documentElement.dataset.root||'';
@@ -14,6 +14,7 @@ const avail=(b,k)=>b.licenses.includes(k)&&!(S.licenses[k].exclusive&&b.exclusiv
 const fromPrice=b=>{const a=b.licenses.filter(k=>avail(b,k)).map(k=>price(b,k));return a.length?Math.min(...a):null};
 const wa=txt=>`https://wa.me/${S.whatsapp.number}?text=${encodeURIComponent(txt)}`;
 const waInfo=b=>wa(`Hola Ronall Prod. Quiero información sobre el beat ${b.name}.\n${beatUrl(b)}`);
+const waRequest=(b,k)=>{const L=S.licenses[k];return wa(`Hola Ronall Prod. Quiero solicitar el beat *${b.name}* con la licencia *${L.name}* por *${money(price(b,k))} ${S.currency}*.\n\nBeat: ${beatUrl(b)}\nLicencia: ${L.name}\nFormatos: ${L.formats.join(' + ')}\n\n¿Me confirmas disponibilidad, condiciones completas y cómo realizar el pago?`)};
 const waNumDisplay='+'+S.whatsapp.number;
 const IC={cart:'<path class="cp" d="M2 3.5h3.1l2.2 10.6a2 2 0 0 0 2 1.6h8.1a2 2 0 0 0 1.95-1.55L20.9 7.2H5.6"/><circle class="cw" cx="9.6" cy="19.6" r="1.4"/><circle class="cw" cx="17" cy="19.6" r="1.4"/>',
 wa:'<path d="M3 21l1.6-4.7A8.5 8.5 0 1 1 8 19.5z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-1 .8c-.9-.4-1.7-1.2-2.1-2.1l.8-1-1-2z"/>',
@@ -184,5 +185,5 @@ const track=(()=>{
  D.addEventListener('visibilitychange',()=>{if(!D.hidden)send('hb')});
  return send})();
 
-window.RON={S,$,$$,esc,money,fmt,beatUrl,price,avail,fromPrice,was,wa,waInfo,waNumDisplay,svg,toast,copy,share,rpc,track,P,Cart,sold,openCart,closeCart,accent,boot};
+window.RON={S,$,$$,esc,money,fmt,beatUrl,price,avail,fromPrice,was,wa,waInfo,waRequest,waNumDisplay,svg,toast,copy,share,rpc,track,P,Cart,sold,openCart,closeCart,accent,boot};
 })();

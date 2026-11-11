@@ -1,4 +1,4 @@
-/* Build: RONALL-VISUAL-2026-11-11-V12 */
+/* Build: RONALL-VISUAL-2026-11-11-V15 */
 /* RONALL PROD V9 · FX ENGINE
    Reactor del motor original v5 + escena de fondo basada en la arquitectura REAL
    del Private Catalog: cover + cámara 2D + bloom independiente + luz WebGL + scan/flash.
@@ -73,8 +73,9 @@
     float d=length((uv-lp)*vec2(1.,1.15));
     float core=.012/(d*d+.004)*(.42+bass*1.35+hit*1.1);
     float halo=exp(-d*4.8)*(.16+bass*.65+hit*.48);
-    float shaft=pow(max(0.,1.-abs(uv.x-lp.x)*2.5),3.)*smoothstep(-1.,.2,uv.y)*.055*(.35+high*1.25+hit*.45);
-    float fogm=(.025+f*.24)*(.26+bass*.38);
+    float shaft=pow(max(0.,1.-abs(uv.x-lp.x)*2.5),3.)*smoothstep(-1.,.2,uv.y)*.062*(.46+high*1.1+hit*.45);
+    /* La luz ambiente conserva vida aun sin reproducción; el audio solo añade intensidad. */
+    float fogm=(.038+f*.25)*(.42+bass*.34+hit*.12);
     vec3 tint=mix(cA,cB,.35);
     vec3 c=tint*(halo*(.48+w*.42)+shaft+fogm)+mix(tint,vec3(.92),.72)*core*.46;
     c*=1.-smoothstep(.3,1.05,length(uv*vec2(.9,1.)))*.82;
@@ -89,8 +90,32 @@
       this.visible = true; this.pointer = [0,0]; this.pointerTo = [0,0]; this.pz = .25;
       this.flash = 0; this.q = 0; this.fn = 0; this.slow = 0; this.lastGL = 0; this._o = {}; this.ready = false; this.gl = null; this.uniforms = {};
       this.ctx = this.n.camera?.getContext('2d', { alpha: true, desynchronized: true }) || null;
-      this._initGL(); this._resize(); this._bind();
+      this._initGL(); this._initAmbient(); this._resize(); this._bind();
       this._tick = this._tick.bind(this); requestAnimationFrame(this._tick);
+    }
+    _initAmbient() {
+      const root = this.n.root; if (!root) return;
+      const field = document.createElement('div'); field.className = 'fx-ambient'; field.setAttribute('aria-hidden', 'true');
+      const nodes = [];
+      for (let i = 0; i < 4; i++) { const orb = document.createElement('i'); orb.setAttribute('aria-hidden', 'true'); field.appendChild(orb); nodes.push(orb); }
+      if (this.n.light && this.n.light.parentNode === root) root.insertBefore(field, this.n.light); else root.appendChild(field);
+      this.ambient = nodes; this.ambientAt = 0;
+    }
+    _moveAmbient(now) {
+      /* Targets are randomized on a slow cadence. CSS interpolates them on the compositor,
+         independently of audio playback and without a per-frame DOM write. */
+      if (!this.ambient || now < this.ambientAt) return;
+      this.ambientAt = now + 7800 + Math.random() * 7200;
+      this.ambient.forEach((el, i) => {
+        const x = (Math.random() - .5) * (i === 3 ? 25 : 36);
+        const y = (Math.random() - .5) * (i === 3 ? 28 : 42);
+        const rot = (Math.random() - .5) * 24;
+        const scale = .88 + Math.random() * .34;
+        const duration = 9 + Math.random() * 8;
+        el.style.transitionDuration = `${duration.toFixed(2)}s,${(duration * .82).toFixed(2)}s`;
+        el.style.transform = `translate3d(${x.toFixed(1)}vw,${y.toFixed(1)}vh,0) rotate(${rot.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+        el.style.opacity = (.27 + Math.random() * .3).toFixed(2);
+      });
     }
     _initGL() {
       const c = this.n.light; if (!c) return;
@@ -193,10 +218,11 @@
       if (!this.visible) return;
       requestAnimationFrame(this._tick);
       const raw = this.last ? (now - this.last) : 16.7; const dt = clamp(raw/1000,.001,.05); this.last = now;
+      this._moveAmbient(now);
       if (this.last0) this._govern(raw); this.last0 = 1;
       const playing = !this.audio.paused && !this.audio.ended;
       const st = this.reactor.update(dt, playing);
-      this.time += dt*(playing?1:.42); this.pz = follow(this.pz, playing?0:.26, dt, .75, .95);
+      this.time += dt*(playing?1:.42); this.pz = follow(this.pz, playing?0:.09, dt, .75, .95);
       const kp = 1-Math.exp(-dt/.55);
       this.pointer[0] += (this.pointerTo[0]-this.pointer[0])*kp; this.pointer[1] += (this.pointerTo[1]-this.pointer[1])*kp;
       this.flash = Math.max(0, this.flash-dt*1.65);
