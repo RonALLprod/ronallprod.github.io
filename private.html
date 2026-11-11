@@ -1600,7 +1600,7 @@ html,body{touch-action:auto}
     n: "PLO PLO PLO",
     g: "beat",
     d: "0:34",
-    a: 56,
+    a: 55,
     img: _0xc229af[52],
     c: [0.4, 0.9, 1],
     fog: 1.1,
@@ -2521,7 +2521,13 @@ html,body{touch-action:auto}
       if (_0x80f5cd === _0x4f9d31) {
         const _0xtoast = document.getElementById("toast");
         if (_0xtoast) {
-          _0xtoast.textContent = "No se pudo abrir este audio. Intenta otra vez.";
+          const _0xerrName = String(_0xplayError && _0xplayError.name || "");
+          const _0xerrMsg = String(_0xplayError && _0xplayError.message || "");
+          _0xtoast.textContent = _0xerrName === "OperationError"
+            ? "No coincide la clave AES del catálogo privado en Supabase (ron_secret)."
+            : /audio 404/i.test(_0xerrMsg)
+              ? "No se encontró el archivo de audio. Revisa su ruta en private.html."
+              : "No se pudo decodificar este audio. Revisa el archivo .bin y su cifrado.";
           _0xtoast.classList.add("on");
           clearTimeout(window.__ronAudioToastTimer);
           window.__ronAudioToastTimer = setTimeout(() => _0xtoast.classList.remove("on"), 2600);
