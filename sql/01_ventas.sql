@@ -1,5 +1,5 @@
--- 01 · VENTAS Y PEDIDOS (nuevo). No toca admin_listar / admin_set / admin_ip ni pedir_acceso.
--- Despliegue: Supabase > SQL Editor > pegar todo > Run. Después ejecuta el PASO FINAL (clave del panel).
+-- 01 · VENTAS Y PEDIDOS. Ejecutar en el proyecto público S.supabase de config/site-config.js.
+-- No toca admin_listar / admin_set / admin_ip ni pedir_acceso del proyecto privado.
 create extension if not exists pgcrypto;
 
 -- Clave del panel para las funciones NUEVAS (no pude ver cómo validan tus funciones admin_* actuales,
@@ -61,4 +61,4 @@ $$ begin if not ron_admin_ok(p_pass) then raise exception 'no'; end if; update v
 grant execute on function public.admin_ventas_listar(text),public.admin_venta_set(text,bigint,text),public.admin_venta_pdf(text,bigint) to anon;
 
 -- PASO FINAL (ejecutar UNA vez, cambiando TU_CLAVE por tu clave de administrador):
--- insert into public.ron_admin_cfg(id,pass_hash) values(1, crypt('TU_CLAVE', gen_salt('bf'))) on conflict(id) do update set pass_hash=excluded.pass_hash;
+-- insert into public.ron_admin_cfg(id,pass_hash) values(1, extensions.crypt('TU_CLAVE', extensions.gen_salt('bf'))) on conflict(id) do update set pass_hash=excluded.pass_hash;

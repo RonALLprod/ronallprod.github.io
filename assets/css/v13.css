@@ -259,3 +259,44 @@
   .fx-ambient i{animation-duration:90s!important;}
   .fx-ambient:before,.fx-ambient:after,.fx-scene:before,.fx-scene:after{animation-duration:110s!important;}
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   V18 · performance pass: clearer depth, visible motion, fewer GPU layers.
+   Keep the atmosphere, but reserve blur and compositing for small accents.
+   ═══════════════════════════════════════════════════════════════════════ */
+.fx-engine-ready:before{display:none!important;}
+.fx-ambient{mix-blend-mode:normal!important;opacity:.82!important;}
+.fx-ambient i{filter:blur(3px) saturate(1.06)!important;}
+.fx-ambient:before,.fx-ambient:after{filter:none!important;}
+.fx-ambient:before{animation-duration:23s!important;opacity:.54!important;}
+.fx-ambient:after{animation-duration:31s!important;opacity:.44!important;}
+.fx-scene:before{mix-blend-mode:normal;opacity:.32;animation:fallbackAuroraClean 25s cubic-bezier(.42,0,.24,1) infinite alternate;}
+@keyframes fallbackAuroraClean{0%{transform:translate3d(-2%,1%,0) scale(.97)}50%{transform:translate3d(2%,-2%,0) scale(1.045)}100%{transform:translate3d(-1%,2%,0) scale(1.08)}}
+.fx-scene:after{animation-duration:22s!important;}
+.side,.main,.mini{backdrop-filter:blur(7px) saturate(1.08)!important;-webkit-backdrop-filter:blur(7px) saturate(1.08)!important;}
+.card,.tile,.lic{will-change:auto;}
+.card img{transform:none;}
+.card:hover img{transform:scale(1.045);}
+.btn,.cartb,.ib,.play,.ctl button,.chip,.tile,.card,.lic,.row,.snav button,.tabs button{transform-style:flat;backface-visibility:visible;}
+.rv2{filter:none!important;}
+.rv2.in{transition:opacity .55s cubic-bezier(.16,1,.3,1),translate .6s cubic-bezier(.16,1,.3,1),scale .6s cubic-bezier(.16,1,.3,1)!important;}
+@keyframes surfaceArrive{0%{opacity:0;translate:0 12px;scale:.985}68%{opacity:1;translate:0 -1px;scale:1.003}100%{opacity:1;translate:0 0;scale:1}}
+.card,.tile,.lic{animation:surfaceArrive .62s cubic-bezier(.16,1,.3,1) both;}
+#fx-camera{filter:none!important;}
+#gl{opacity:.21!important;mix-blend-mode:normal!important;}
+@media(max-width:899px){
+ .side,.main,.mini{backdrop-filter:blur(6px) saturate(1.04)!important;-webkit-backdrop-filter:blur(6px) saturate(1.04)!important;}
+ .fx-ambient{opacity:.72!important;}
+ .fx-ambient i{filter:blur(2.5px)!important;}
+}
+@media(prefers-reduced-motion:reduce){
+ .fx-ambient{opacity:.42!important;}
+ .fx-ambient i{animation-duration:48s!important;filter:blur(2px)!important;}
+ .fx-ambient:before,.fx-ambient:after,.fx-scene:before,.fx-scene:after{animation-duration:58s!important;}
+ .rv2{opacity:1!important;translate:0 0!important;scale:1!important;}
+}
+
+/* Keep the film texture, but avoid a full-screen animated repaint every second. */
+.fx-grain{opacity:.045!important;animation-duration:3.2s!important;}
+@media(prefers-reduced-motion:reduce){.fx-ambient:before,.fx-ambient:after,.fx-scene:before,.fx-scene:after{animation-duration:42s!important;}.fx-ambient i{animation-duration:36s!important;}}

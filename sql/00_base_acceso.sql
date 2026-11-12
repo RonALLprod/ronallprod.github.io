@@ -1,5 +1,5 @@
--- 00 · BASE (reconstrucción): acceso al catálogo privado, estadísticas y funciones del panel de usuarios.
--- Ejecútalo PRIMERO en Supabase > SQL Editor > New query > Run. Luego 01_ventas.sql y 02_analitica.sql.
+-- 00 · BASE PRIVADA: acceso al catálogo, clave AES de audios .bin, beat_stats y gestión de usuarios.
+-- Ejecutar SOLO en el proyecto privateSupabase de config/site-config.js.
 -- Se puede ejecutar varias veces sin romper nada (no borra datos ni cambia la clave de cifrado si ya existe).
 create extension if not exists pgcrypto;
 

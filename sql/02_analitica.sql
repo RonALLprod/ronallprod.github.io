@@ -1,5 +1,5 @@
--- 02 · ANALÍTICA (visitas, gente en línea, actividad por beat). Independiente: no toca nada existente.
--- Despliegue: Supabase > SQL Editor > pegar todo > Run. Se puede ejecutar varias veces sin problema.
+-- 02 · ANALÍTICA PÚBLICA (visitas, presencia y actividad por beat).
+-- Ejecutar en el proyecto público S.supabase de config/site-config.js; no en privateSupabase.
 -- Privacidad: NO se guarda IP, nombre ni correo. Solo un id aleatorio por navegador, dispositivo,
 -- zona horaria (para estimar el país), idioma y de qué sitio llegó la visita.
 create extension if not exists pgcrypto;
@@ -114,7 +114,7 @@ revoke all on function public.admin_analitica(text,int) from public;
 grant execute on function public.admin_analitica(text,int) to anon;
 
 -- PASO FINAL (solo si aún no lo hiciste con 01_ventas.sql): define tu clave de administrador, una sola vez.
--- insert into public.ron_admin_cfg(id,pass_hash) values(1, crypt('TU_CLAVE', gen_salt('bf'))) on conflict(id) do update set pass_hash=excluded.pass_hash;
+-- insert into public.ron_admin_cfg(id,pass_hash) values(1, extensions.crypt('TU_CLAVE', extensions.gen_salt('bf'))) on conflict(id) do update set pass_hash=excluded.pass_hash;
 
 
 -- Refresca el caché de funciones de PostgREST para que el panel vea la RPC recién instalada.

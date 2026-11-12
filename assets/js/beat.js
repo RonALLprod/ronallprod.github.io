@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V17 · beat.js — página individual (HTML generado por tools/build.mjs) */
+/* RONALL-VISUAL-2026-11-11-V18 · beat.js — página individual (HTML generado por tools/build.mjs) */
 (async()=>{const R=RON,{$,money,S}=R;R.boot();
  const b=JSON.parse($('#beat-data').textContent);if((await R.sold()).includes(b.id))b.exclusiveSold=true;R.track('beat',{beat:b.id});
  const play=$('#bp-play'),sync=()=>{const on=R.P.cur&&R.P.cur.id===b.id&&!R.P.audio.paused;play.innerHTML=R.svg(on?'pause':'play',24);play.setAttribute('aria-label',on?'Pausar':'Reproducir preview')};

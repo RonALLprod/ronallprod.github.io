@@ -19,7 +19,14 @@ window.SITE = {
 
   supabase: {
     url: "https://kwmofbiiwvpojtkvlmxz.supabase.co",
-    key: "sb_publishable_HL_vNXAUhonkIgq7RRaPmQ_ojk54lmW"   // clave PÚBLICA (nunca service_role)
+    key: "sb_publishable_HL_vNXAUhonkIgq7RRaPmQ_ojk54lmW"   // tienda, pedidos y analítica pública
+  },
+
+  // El catálogo privado conserva su backend original: allí vive la clave AES
+  // con la que se cifraron los .bin. No mezclarlo con el backend de la tienda.
+  privateSupabase: {
+    url: "https://kwxbdckegbyivcrekevv.supabase.co",
+    key: "sb_publishable_80B-AoZBWu7crLRcjANK_Q_jk7QTzwK"
   },
 
   producer: { name: "RONALL PROD", legalName: "[Nombre legal del productor — por definir]", country: "[por definir]", email: "[por definir]" },

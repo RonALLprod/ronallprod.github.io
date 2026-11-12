@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V17 · app.js — tienda pública (reutiliza core.js y lic.js) */
+/* RONALL-VISUAL-2026-11-11-V18 · app.js — tienda pública (reutiliza core.js y lic.js) */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');

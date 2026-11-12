@@ -1,4 +1,4 @@
-/* Build: RONALL-VISUAL-2026-11-11-V17 */
+/* Build: RONALL-VISUAL-2026-11-11-V18 */
 /* RONALL PROD V10 · FX ENGINE · V17
    Reactor del motor original v5 + escena de fondo basada en la arquitectura REAL
    del Private Catalog: cover + cámara 2D + bloom independiente + luz WebGL + scan/flash.
@@ -75,7 +75,7 @@
     float halo=exp(-d*4.8)*(.16+bass*.65+hit*.48);
     float shaft=pow(max(0.,1.-abs(uv.x-lp.x)*2.5),3.)*smoothstep(-1.,.2,uv.y)*.062*(.46+high*1.1+hit*.45);
     /* La luz ambiente conserva vida aun sin reproducción; el audio solo añade intensidad. */
-    float fogm=(.038+f*.25)*(.42+bass*.34+hit*.12);
+    float fogm=(.026+f*.17)*(.42+bass*.34+hit*.12);
     vec3 tint=mix(cA,cB,.35);
     vec3 c=tint*(halo*(.48+w*.42)+shaft+fogm)+mix(tint,vec3(.92),.72)*core*.46;
     c*=1.-smoothstep(.3,1.05,length(uv*vec2(.9,1.)))*.82;
@@ -86,7 +86,7 @@
   class PrivateBackdrop {
     constructor(nodes, audio) {
       this.n = nodes; this.audio = audio; this.reactor = new Reactor(audio);
-      this.image = null; this.acc = [.8,.8,.8]; this.time = 0; this.last = 0; this.lastCamera = 0;
+      this.image = null; this.acc = [.8,.8,.8]; this.time = 0; this.last = 0; this.lastCamera = 0; this.lastRAF = 0; this.lastRender = 0;
       this.visible = true; this.pointer = [0,0]; this.pointerTo = [0,0]; this.pz = .25;
       this.flash = 0; this.q = 0; this.fn = 0; this.slow = 0; this.lastGL = 0; this._o = {}; this.ready = false; this.gl = null; this.uniforms = {};
       this.ctx = this.n.camera?.getContext('2d', { alpha: true, desynchronized: true }) || null;
@@ -95,6 +95,7 @@
     }
     _initAmbient() {
       const root = this.n.root; if (!root) return;
+      root.classList.add('fx-engine-ready');
       const field = document.createElement('div'); field.className = 'fx-ambient'; field.setAttribute('aria-hidden', 'true');
       const nodes = [];
       /* Cinco masas de luz con fases distintas: el movimiento no depende del audio. */
@@ -113,11 +114,11 @@
          vuelven a sortear amplitudes y duración para que el fondo nunca repita
          exactamente la misma trayectoria. No se escribe en DOM cada fotograma. */
       if (!this.ambient || (!force && now < this.ambientAt)) return;
-      this.ambientAt = now + 18000 + Math.random() * 12000;
+      this.ambientAt = now + 10500 + Math.random() * 6500;
       this.ambient.forEach((el, i) => {
-        const slow = 26 + Math.random() * 22;
-        el.style.setProperty('--drift-x', `${(Math.random() * 16 + 7).toFixed(1)}vw`);
-        el.style.setProperty('--drift-y', `${(Math.random() * 15 + 6).toFixed(1)}vh`);
+        const slow = 16 + Math.random() * 10;
+        el.style.setProperty('--drift-x', `${(Math.random() * 22 + 10).toFixed(1)}vw`);
+        el.style.setProperty('--drift-y', `${(Math.random() * 19 + 8).toFixed(1)}vh`);
         el.style.setProperty('--drift-r', `${(Math.random() * 16 + 7).toFixed(1)}deg`);
         el.style.setProperty('--drift-scale', (1.04 + Math.random() * .12).toFixed(3));
         el.style.animationDuration = `${(slow + i * 2.4).toFixed(1)}s`;
@@ -142,7 +143,7 @@
     }
     _bind() {
       addEventListener('resize', () => this._resize(), { passive: true });
-      document.addEventListener('visibilitychange', () => { this.visible = !document.hidden; this.last = 0; if (this.visible) requestAnimationFrame(this._tick); });
+      document.addEventListener('visibilitychange', () => { this.visible = !document.hidden; this.last = this.lastRAF = this.lastRender = 0; if (this.visible) requestAnimationFrame(this._tick); });
       const stage = this.n.stage;
       if (stage && matchMedia('(hover:hover)').matches) {
         stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); this.pointerTo = [((e.clientX-r.left)/r.width-.5)*2, ((e.clientY-r.top)/r.height-.5)*2]; }, { passive: true });
@@ -151,7 +152,7 @@
       this.n.light?.addEventListener('webglcontextlost', e => { e.preventDefault(); this.gl = null; this.n.light.classList.add('fx-webgl-off'); });
     }
     _resize() {
-      const k = [.36,.28,.22,.18][this.q||0], gk = [.24,.18,.14,.1][this.q||0];
+      const k = [.46,.36,.26,.18][this.q||0], gk = [.16,.12,.085,.06][this.q||0];
       const cw = Math.max(2, Math.round(innerWidth*k)), ch = Math.max(2, Math.round(innerHeight*k));
       const gw = Math.max(2, Math.round(innerWidth*gk)), gh = Math.max(2, Math.round(innerHeight*gk));
       const cam = this.n.camera, li = this.n.light;
@@ -170,9 +171,9 @@
     _bake(img) {
       /* UNA vez por portada y reutilizando los mismos canvas (no se acumulan en memoria). Todo en escala de grises. */
       const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height; if (!iw || !ih) return;
-      const sc = Math.min(1, 640 / Math.max(iw, ih));
+      const sc = Math.min(1, 1100 / Math.max(iw, ih));
       const a = this._ba || (this._ba = document.createElement('canvas')); a.width = Math.round(iw*sc); a.height = Math.round(ih*sc);
-      const x = a.getContext('2d'); x.globalCompositeOperation = 'source-over'; x.filter = 'grayscale(1) contrast(1.08) brightness(.6)'; x.drawImage(img,0,0,a.width,a.height);
+      const x = a.getContext('2d'); x.globalCompositeOperation = 'source-over'; x.filter = 'grayscale(1) contrast(1.1) brightness(.66)'; x.drawImage(img,0,0,a.width,a.height);
       if (!('filter' in x)) { x.globalCompositeOperation = 'saturation'; x.fillStyle = '#808080'; x.fillRect(0,0,a.width,a.height); x.globalCompositeOperation = 'source-over'; }
       const b = this._bg || (this._bg = document.createElement('canvas')); b.width = Math.max(2, Math.round(a.width/5)); b.height = Math.max(2, Math.round(a.height/5));
       const y = b.getContext('2d'); y.filter = 'grayscale(1) blur(4px) brightness(1.3) contrast(1.9)'; y.drawImage(a,0,0,b.width,b.height);
@@ -187,17 +188,17 @@
       if (!this.ctx || !src) return;
       const c=this.n.camera,ctx=this.ctx,W=c.width,H=c.height,iw=src.width,ih=src.height;
       if (!W||!H||!iw) return;
-      const base=Math.max(W/iw,H/ih),zoom=1.62+Math.sin(this.time*.075)*.02+Math.sin(this.time*.027+1.2)*.01+st.bass*.03+st.hit*.02;
+      const base=Math.max(W/iw,H/ih),zoom=1.045+Math.sin(this.time*.17)*.014+Math.sin(this.time*.061+1.2)*.007+st.bass*.012+st.hit*.01;
       const scale=base*zoom,dw=iw*scale,dh=ih*scale;
-      const driftX=Math.sin(this.time*.17+.7)*W*.02+this.pointer[0]*W*.01;
-      const driftY=Math.cos(this.time*.14+.2)*H*.016-this.pointer[1]*H*.008;
-      const tilt=Math.sin(this.time*.13)*.12+st.hit*.03;
+      const driftX=Math.sin(this.time*.42+.7)*W*.032+this.pointer[0]*W*.012;
+      const driftY=Math.cos(this.time*.34+.2)*H*.025-this.pointer[1]*H*.01;
+      const tilt=Math.sin(this.time*.23)*.22+st.hit*.045;
       ctx.setTransform(1,0,0,1,0,0);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
       ctx.fillStyle='#030303';ctx.fillRect(0,0,W,H);
       ctx.translate(W/2+driftX,H/2+driftY);ctx.rotate(tilt*Math.PI/180);
-      ctx.globalAlpha=.55;ctx.drawImage(src,-dw/2,-dh/2,dw,dh);
+      ctx.globalAlpha=.74;ctx.drawImage(src,-dw/2,-dh/2,dw,dh);
       /* bloom: bright-pass borroso sumado (postproceso real, reactivo al bajo) */
-      if(this.glow){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.06+st.bass*.1+st.hit*.08;ctx.drawImage(this.glow,-dw*.52,-dh*.52,dw*1.04,dh*1.04);}
+      if(this.glow){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.02+st.bass*.045+st.hit*.045;ctx.drawImage(this.glow,-dw*.52,-dh*.52,dw*1.04,dh*1.04);}
       ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.setTransform(1,0,0,1,0,0);
     }
     _drawLight(st, playing) {
@@ -225,12 +226,18 @@
     _tick(now) {
       if (!this.visible) return;
       requestAnimationFrame(this._tick);
-      const raw = this.last ? (now - this.last) : 16.7; const dt = clamp(raw/1000,.001,.05); this.last = now;
+      /* Adaptive cadence: full 60 Hz with audio, 42 Hz while idle. The CSS
+         ambience remains compositor-driven at display refresh rate. */
+      const raw = this.lastRAF ? (now - this.lastRAF) : 16.7; this.lastRAF = now;
+      const playing = !this.audio.paused && !this.audio.ended;
+      const cadence = playing ? 1000/60 : 1000/42;
+      if (this.lastRender && now - this.lastRender < cadence) return;
+      const elapsed = this.lastRender ? now - this.lastRender : cadence; this.lastRender = now; this.last = now;
+      const dt = clamp(elapsed/1000,.001,.05);
       this._moveAmbient(now);
       if (this.last0) this._govern(raw); this.last0 = 1;
-      const playing = !this.audio.paused && !this.audio.ended;
       const st = this.reactor.update(dt, playing);
-      this.time += dt*(playing?1:.42); this.pz = follow(this.pz, playing?0:.09, dt, .75, .95);
+      this.time += dt*(playing?1:.92); this.pz = follow(this.pz, playing?0:.09, dt, .75, .95);
       const kp = 1-Math.exp(-dt/.55);
       this.pointer[0] += (this.pointerTo[0]-this.pointer[0])*kp; this.pointer[1] += (this.pointerTo[1]-this.pointer[1])*kp;
       this.flash = Math.max(0, this.flash-dt*1.65);
