@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="es" data-root=""><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#050505"><link rel="icon" type="image/png" href="favicon.png"><title>Panel · RONALL PROD</title>
-<link rel="stylesheet" href="assets/css/base.css"><script src="config/site-config.js"></script>
+<link rel="stylesheet" href="assets/css/base.css"><script src="config/site-config.js?v=RONALL-VISUAL-2026-11-11-V18"></script>
 <style>body{padding:0}.pw{width:min(1080px,100% - 28px);margin:0 auto;padding:26px 0 80px}
 h1.t{margin:0 0 18px;font:34px/1 var(--disp);letter-spacing:.12em;display:flex;align-items:center;gap:12px}h1.t img{width:34px;height:34px;border-radius:50%}
 .tabs{display:flex;gap:6px;margin:6px 0 20px;border-bottom:1px solid var(--ln);overflow-x:auto}.tabs button{padding:12px 18px;font:12px 'Courier New',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);border-bottom:2px solid transparent;transition:all .3s}.tabs button.on{color:var(--fg);border-color:var(--fg)}
@@ -31,7 +31,7 @@ pre{white-space:pre-wrap;background:#0b0b0c;border:1px solid var(--ln);border-ra
 </style></head><body>
 <div class="pw"><h1 class="t"><img src="favicon.png" alt="">PANEL</h1>
 <div id="login"><div class="fld"><input class="inp" id="pw" type="password" placeholder="Clave de administrador" autocomplete="current-password"></div>
-<details style="margin:10px 0;color:var(--dim)"><summary style="cursor:pointer;margin-bottom:8px">Ajustes de conexión</summary><div class="fld"><input class="inp" id="u" placeholder="URL de Supabase"></div><div class="fld" style="margin-top:8px"><input class="inp" id="k" placeholder="Clave pública"></div></details>
+<details style="margin:10px 0;color:var(--dim)"><summary style="cursor:pointer;margin-bottom:8px">Ajustes del catálogo privado</summary><div class="fld"><input class="inp" id="u" placeholder="URL de Supabase privada"></div><div class="fld" style="margin-top:8px"><input class="inp" id="k" placeholder="Clave pública privada"></div><small class="note">La tienda, las ventas y la analítica pública usan automáticamente la conexión configurada en site-config.js.</small></details>
 <button class="btn fill" id="go">Entrar</button><div id="msg"></div></div>
 <div id="app" style="display:none"><div class="top"><div id="cnt" class="eyebrow"></div><button class="btn sm" id="out">Salir</button></div>
 <div class="tabs"><button data-t="ana" class="on">Analítica</button><button data-t="usr">Usuarios</button><button data-t="beats">Beats</button><button data-t="ven">Ventas</button><button data-t="cfg">Ajustes</button></div>
@@ -56,12 +56,24 @@ pre{white-space:pre-wrap;background:#0b0b0c;border:1px solid var(--ln);border-ra
 <script>
 const S=window.SITE;
 // Todo queda guardado en este navegador: no vuelves a escribir nada. Para olvidarlo, pulsa "Salir".
-const DEF={u:S.supabase.url,k:S.supabase.key};
+// Dos proyectos Supabase con responsabilidades separadas:
+// privado = accesos, clave AES y estadísticas .bin; tienda = ventas y analítica pública.
+const PRIVATE={u:S.privateSupabase.url.replace(/\/+$/,''),k:S.privateSupabase.key};
+const STORE={u:S.supabase.url.replace(/\/+$/,''),k:S.supabase.key};
+const PRIVATE_FNS=new Set(['admin_listar','admin_set','admin_ip']);
+const STORE_FNS=new Set(['admin_ventas_listar','admin_venta_set','admin_venta_pdf','admin_analitica']);
 const $=id=>document.getElementById(id),L=localStorage;
-let U=L.pU||DEF.u,K=L.pK||DEF.k,PW=L.pP||'',T;
+const savedU=(L.pU||'').replace(/\/+$/,'');
+// Migra automáticamente el ajuste guardado por versiones que usaban la URL pública
+// para todo. La lista de accesos sigue estando en el proyecto privado original.
+const migrateSaved=savedU===STORE.u;
+let U=(migrateSaved?PRIVATE.u:(savedU||PRIVATE.u)).replace(/\/+$/,''),K=migrateSaved?PRIVATE.k:(L.pK||PRIVATE.k),PW=L.pP||'',T;
+if(migrateSaved){L.pU=U;L.pK=K;}
 $('u').value=U;$('k').value=K;
-async function rpc(f,b){const h={apikey:K,'Content-Type':'application/json'};if(/^eyJ/.test(K))h.Authorization='Bearer '+K;
- const r=await fetch(U+'/rest/v1/rpc/'+f,{method:'POST',headers:{...h,'Accept':'application/json'},body:JSON.stringify(b),cache:'no-store'});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;e.body=await r.text().catch(()=>'');throw e}return r.status===204?null:r.json()}
+async function rpc(f,b){
+ const db=STORE_FNS.has(f)?STORE:PRIVATE_FNS.has(f)?{u:U,k:K}:STORE;
+ const h={apikey:db.k,'Content-Type':'application/json'};if(/^eyJ/.test(db.k))h.Authorization='Bearer '+db.k;
+ const r=await fetch(db.u+'/rest/v1/rpc/'+f,{method:'POST',headers:{...h,'Accept':'application/json'},body:JSON.stringify(b),cache:'no-store'});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;e.body=await r.text().catch(()=>'');throw e}return r.status===204?null:r.json()}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=(n,c=S.currency)=>new Intl.NumberFormat('en-US',{style:'currency',currency:c,maximumFractionDigits:2}).format(n);
 const toast=m=>{let t=document.querySelector('.toast')||document.body.appendChild(Object.assign(document.createElement('div'),{className:'toast'}));t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)};
@@ -79,7 +91,7 @@ function start(){load();clearInterval(T);T=setInterval(load,6000)}
 function stop(){clearInterval(T);if(window.__anaReady)anaStop();L.removeItem('pP');PW=''}
 window.st=async(id,s)=>{await rpc('admin_set',{p_pass:PW,p_id:id,p_status:s});load()};
 window.ip=async(i,s)=>{if(confirm((s==='approved'?'Aceptar':'Bloquear')+' a TODOS los de la IP '+i+'?')){await rpc('admin_ip',{p_pass:PW,p_ip:i,p_status:s});load()}};
-$('go').onclick=()=>{U=$('u').value.trim().replace(/\/$/,'')||DEF.u;K=$('k').value.trim()||DEF.k;PW=$('pw').value;L.pU=U;L.pK=K;L.pP=PW;if(L.ronCountMe!=='1')L.ronNoTrack='1';$('msg').textContent='';start()};
+$('go').onclick=()=>{U=$('u').value.trim().replace(/\/+$/,'')||PRIVATE.u;K=$('k').value.trim()||PRIVATE.k;PW=$('pw').value;L.pU=U;L.pK=K;L.pP=PW;if(L.ronCountMe!=='1')L.ronNoTrack='1';$('msg').textContent='';start()};
 $('pw').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
 $('out').onclick=()=>{stop();L.removeItem('pLast');location.reload()};
 if(PW){try{draw(JSON.parse(L.pLast||'[]'))}catch(e){}start()}
@@ -207,11 +219,15 @@ function anaDraw(){
  $('a-upd').textContent='Actualizado '+new Date(d.generado).toLocaleTimeString()+' · se refresca solo cada 8 s'}
 async function anaPrivate(force){
  if(!force&&Date.now()-AN.privT<60000)return;AN.privT=Date.now();
- try{const r=await fetch(U+'/rest/v1/beat_stats?select=*',{headers:{apikey:K}});if(!r.ok)throw 0;const rows=(await r.json()).filter(x=>x&&x.slug);
+ try{
+  const PDB=S.privateSupabase;
+  if(!PDB||!PDB.url||!PDB.key)throw new Error('Falta configurar privateSupabase');
+  const ph={apikey:PDB.key,'Accept':'application/json'};if(/^eyJ/.test(PDB.key))ph.Authorization='Bearer '+PDB.key;
+  const r=await fetch(PDB.url.replace(/\/$/,'')+'/rest/v1/beat_stats?select=*',{headers:ph,cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const rows=(await r.json()).filter(x=>x&&x.slug);
   const tot=f=>rows.reduce((s,x)=>s+(+x[f]||0),0);rows.sort((a,b)=>(+b.plays||0)-(+a.plays||0));
   const t=s=>{s=Math.round(+s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
   $('a-priv').innerHTML=rows.length?`<p class="mut" style="margin:0 0 8px"><b>${num(tot('plays'))}</b> reproducciones · <b>${num(tot('likes'))}</b> likes · <b>${num(tot('shares'))}</b> compartidos · <b>${num(tot('searches'))}</b> búsquedas</p><div class="tw"><table class="tb"><thead><tr><th>Pista</th><th>Reprod.</th><th>Likes</th><th>Comp.</th><th>Prom. escucha</th><th>Completa</th></tr></thead><tbody>${rows.slice(0,15).map(x=>`<tr><td><b>${esc(String(x.slug).replace(/-/g,' ').toUpperCase())}</b></td><td>${num(x.plays)}</td><td>${num(x.likes)}</td><td>${num(x.shares)}</td><td>${(+x.plays)?t((+x.listen_secs||0)/(+x.plays)):'—'}</td><td>${(+x.plays)?pc(+x.completes||0,+x.plays):'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="mut">Sin estadísticas del catálogo privado todavía.</p>'}
- catch(e){$('a-priv').innerHTML='<p class="mut">No se pudieron leer las estadísticas del catálogo privado.</p>'}}
+ catch(e){$('a-priv').innerHTML='<p class="mut">No se pudieron leer las estadísticas del catálogo privado: '+esc(e&&e.message||'Error de conexión')+'. Comprueba que <code>sql/00_base_acceso.sql</code> esté instalado en el proyecto privado.</p>'}}
 document.querySelectorAll('#a-rng button').forEach(b=>b.onclick=()=>{AN.d=+b.dataset.d;L.pAnaD=AN.d;anaLoad()});
 $('a-beats').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;const s=b.dataset.s;AN.dir=AN.sort===s?-AN.dir:-1;AN.sort=s;anaDraw()});
 $('a-ref').onclick=()=>{anaLoad();anaPrivate(true)};
