@@ -300,3 +300,9 @@
 /* Keep the film texture, but avoid a full-screen animated repaint every second. */
 .fx-grain{opacity:.045!important;animation-duration:3.2s!important;}
 @media(prefers-reduced-motion:reduce){.fx-ambient:before,.fx-ambient:after,.fx-scene:before,.fx-scene:after{animation-duration:42s!important;}.fx-ambient i{animation-duration:36s!important;}}
+
+
+/* V19 · rendimiento: conserva capas y transiciones, evita filtros/animaciones de entrada por tarjeta. */
+.fx-ambient i{filter:blur(4px) saturate(1.06)!important;}
+.card,.tile,.lic{animation:none!important;}
+.fx-grain{opacity:.035!important;animation:none!important;}

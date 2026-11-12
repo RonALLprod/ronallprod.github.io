@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="es" data-root=""><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#050505"><link rel="icon" type="image/png" href="favicon.png"><title>Panel · RONALL PROD</title>
-<link rel="stylesheet" href="assets/css/base.css"><script src="config/site-config.js?v=RONALL-VISUAL-2026-11-11-V18"></script>
+<link rel="stylesheet" href="assets/css/base.css"><script src="config/site-config.js?v=RONALL-VISUAL-2026-11-11-V19"></script>
 <style>body{padding:0}.pw{width:min(1080px,100% - 28px);margin:0 auto;padding:26px 0 80px}
 h1.t{margin:0 0 18px;font:34px/1 var(--disp);letter-spacing:.12em;display:flex;align-items:center;gap:12px}h1.t img{width:34px;height:34px;border-radius:50%}
 .tabs{display:flex;gap:6px;margin:6px 0 20px;border-bottom:1px solid var(--ln);overflow-x:auto}.tabs button{padding:12px 18px;font:12px 'Courier New',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);border-bottom:2px solid transparent;transition:all .3s}.tabs button.on{color:var(--fg);border-color:var(--fg)}
@@ -31,7 +31,7 @@ pre{white-space:pre-wrap;background:#0b0b0c;border:1px solid var(--ln);border-ra
 </style></head><body>
 <div class="pw"><h1 class="t"><img src="favicon.png" alt="">PANEL</h1>
 <div id="login"><div class="fld"><input class="inp" id="pw" type="password" placeholder="Clave de administrador" autocomplete="current-password"></div>
-<details style="margin:10px 0;color:var(--dim)"><summary style="cursor:pointer;margin-bottom:8px">Ajustes del catálogo privado</summary><div class="fld"><input class="inp" id="u" placeholder="URL de Supabase privada"></div><div class="fld" style="margin-top:8px"><input class="inp" id="k" placeholder="Clave pública privada"></div><small class="note">La tienda, las ventas y la analítica pública usan automáticamente la conexión configurada en site-config.js.</small></details>
+<details style="margin:10px 0;color:var(--dim)"><summary style="cursor:pointer;margin-bottom:8px">Ajustes del catálogo privado</summary><div class="fld"><input class="inp" id="u" placeholder="URL de Supabase privada"></div><div class="fld" style="margin-top:8px"><input class="inp" id="k" placeholder="Clave pública privada"></div><small class="note">El panel busca el acceso en la base principal y en la privada. Ventas y visitas usan la base principal; las métricas del catálogo privado usan la base privada.</small></details>
 <button class="btn fill" id="go">Entrar</button><div id="msg"></div></div>
 <div id="app" style="display:none"><div class="top"><div id="cnt" class="eyebrow"></div><button class="btn sm" id="out">Salir</button></div>
 <div class="tabs"><button data-t="ana" class="on">Analítica</button><button data-t="usr">Usuarios</button><button data-t="beats">Beats</button><button data-t="ven">Ventas</button><button data-t="cfg">Ajustes</button></div>
@@ -60,41 +60,96 @@ const S=window.SITE;
 // privado = accesos, clave AES y estadísticas .bin; tienda = ventas y analítica pública.
 const PRIVATE={u:S.privateSupabase.url.replace(/\/+$/,''),k:S.privateSupabase.key};
 const STORE={u:S.supabase.url.replace(/\/+$/,''),k:S.supabase.key};
-const PRIVATE_FNS=new Set(['admin_listar','admin_set','admin_ip']);
 const STORE_FNS=new Set(['admin_ventas_listar','admin_venta_set','admin_venta_pdf','admin_analitica']);
+const ACCESS_FNS=new Set(['admin_listar','admin_set','admin_ip']);
 const $=id=>document.getElementById(id),L=localStorage;
 const savedU=(L.pU||'').replace(/\/+$/,'');
-// Migra automáticamente el ajuste guardado por versiones que usaban la URL pública
-// para todo. La lista de accesos sigue estando en el proyecto privado original.
-const migrateSaved=savedU===STORE.u;
-let U=(migrateSaved?PRIVATE.u:(savedU||PRIVATE.u)).replace(/\/+$/,''),K=migrateSaved?PRIVATE.k:(L.pK||PRIVATE.k),PW=L.pP||'',T;
-if(migrateSaved){L.pU=U;L.pK=K;}
-$('u').value=U;$('k').value=K;
+let U=(savedU||PRIVATE.u).replace(/\/+$/,''),K=L.pK||PRIVATE.k,PW=L.pP||'',T=null,ADMIN_DB=null,loadingUsers=false;
+$('u').value=U;$('k').value=K;$('pw').value=PW;
+function makeHeaders(db){const h={apikey:db.k,'Content-Type':'application/json','Accept':'application/json'};if(/^eyJ/.test(db.k))h.Authorization='Bearer '+db.k;return h}
+async function rpcAt(db,f,b,timeout=10000){
+ const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),timeout);
+ try{
+  const r=await fetch(db.u.replace(/\/+$/,'')+'/rest/v1/rpc/'+f,{method:'POST',headers:makeHeaders(db),body:JSON.stringify(b),cache:'no-store',signal:ctl.signal});
+  const body=await r.text();
+  if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;e.body=body;throw e}
+  if(!body)return null;try{return JSON.parse(body)}catch(_){return body}
+ }catch(e){if(e.name==='AbortError')e.message='Tiempo de espera agotado al conectar con Supabase';throw e}
+ finally{clearTimeout(timer)}
+}
 async function rpc(f,b){
- const db=STORE_FNS.has(f)?STORE:PRIVATE_FNS.has(f)?{u:U,k:K}:STORE;
- const h={apikey:db.k,'Content-Type':'application/json'};if(/^eyJ/.test(db.k))h.Authorization='Bearer '+db.k;
- const r=await fetch(db.u+'/rest/v1/rpc/'+f,{method:'POST',headers:{...h,'Accept':'application/json'},body:JSON.stringify(b),cache:'no-store'});if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;e.body=await r.text().catch(()=>'');throw e}return r.status===204?null:r.json()}
+ const db=STORE_FNS.has(f)?STORE:ACCESS_FNS.has(f)?(ADMIN_DB||STORE):STORE;
+ return rpcAt(db,f,b);
+}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=(n,c=S.currency)=>new Intl.NumberFormat('en-US',{style:'currency',currency:c,maximumFractionDigits:2}).format(n);
-const toast=m=>{let t=document.querySelector('.toast')||document.body.appendChild(Object.assign(document.createElement('div'),{className:'toast'}));t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)};
+const toast=m=>{let t=document.querySelector('.toast')||document.body.appendChild(Object.assign(document.createElement('div'),{className:'toast'}));t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)};
 const copy=async(t,m='Copiado')=>{try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast(m)};
-/* ===== USUARIOS (lógica original intacta: admin_listar / admin_set / admin_ip) ===== */
+/* ===== ACCESO: el panel prueba el proyecto de la tienda y, como respaldo, el privado. ===== */
+function authCandidates(){
+ const custom={u:( $('u').value.trim().replace(/\/+$/,'')||PRIVATE.u),k:$('k').value.trim()||PRIVATE.k};
+ const all=[STORE,custom,PRIVATE],seen=new Set();
+ return all.filter(x=>x.u&&x.k&&!seen.has(x.u)&&(seen.add(x.u),true));
+}
+function explainLogin(errors){
+ const last=errors[errors.length-1];
+ if(errors.length&&errors.every(e=>!e.status))return 'No se pudo conectar con Supabase. Comprueba internet, URL y clave pública.';
+ if(errors.some(e=>/"message"\s*:\s*"no"|\bclave\b|\bpassword\b/i.test(e.body||'')))return 'La clave no fue aceptada en los proyectos configurados. Verifica la clave de administrador.';
+ if(errors.some(e=>e.status===404||/PGRST202|Could not find/i.test(e.body||'')))return 'No se encontró admin_listar en uno de los proyectos. Comprueba que esté instalada la función de acceso.';
+ return 'No se pudo validar el acceso. '+(last&&last.status?'Supabase respondió HTTP '+last.status+'. ':'')+(last&&last.message||'Revisa la configuración del proyecto.');
+}
+let STORE_AUTH_OK=false;
+async function authenticate(pass){
+ const errors=[],success=[];
+ for(const db of authCandidates()){
+  try{const rows=await rpcAt(db,'admin_listar',{p_pass:pass});success.push({db,rows:Array.isArray(rows)?rows:[]})}
+  catch(e){errors.push(e)}
+ }
+ if(success.length){
+  /* Si las dos bases responden, usa la que contiene los usuarios reales; en empate prioriza la tienda. */
+  success.sort((a,b)=>b.rows.length-a.rows.length||(a.db.u===STORE.u?-1:1));
+  const chosen=success[0];ADMIN_DB=chosen.db;STORE_AUTH_OK=success.some(x=>x.db.u===STORE.u);U=ADMIN_DB.u;K=ADMIN_DB.k;L.pU=U;L.pK=K;
+  return chosen.rows;
+ }
+ const err=new Error(explainLogin(errors));err.errors=errors;throw err;
+}
+/* ===== USUARIOS ===== */
 function draw(rows){
- $('login').style.display='none';$('app').style.display='block';if(window.__anaReady)anaStart();
+ $('login').style.display='none';$('app').style.display='block';window.__panelAuthed=true;if(window.__anaReady)anaStart();
  const pend=rows.filter(x=>x.status==='pending').length;$('cnt').textContent=pend+' pendiente(s) · '+rows.length+' en total';document.title=(pend?'('+pend+') ':'')+'Panel';
  $('list').innerHTML=rows.map(x=>`<div class="r ${x.status==='pending'?'p':''}"><b>${esc(x.username)}</b><span class="${x.status==='approved'?'a':x.status==='denied'?'d':''}">${x.status==='pending'?'PENDIENTE':x.status==='approved'?'APROBADO':'RECHAZADO'}</span>
  <span class="s"><button onclick="st(${x.id},'approved')">Aceptar</button><button onclick="st(${x.id},'denied')">Rechazar</button><button onclick="ip('${esc(x.ip)}','approved')">Aceptar IP</button><button onclick="ip('${esc(x.ip)}','denied')">Bloquear IP</button><button onclick="st(${x.id},'delete')">✕</button></span>
- <small>IP ${esc(x.ip)} · pidió ${new Date(x.created_at).toLocaleString()} · última vez ${new Date(x.last_seen).toLocaleString()}</small></div>`).join('')||'<p>Nadie ha pedido acceso todavía.</p>'}
-async function load(){try{const rows=await rpc('admin_listar',{p_pass:PW});L.pLast=JSON.stringify(rows);draw(rows)}
- catch(e){if(navigator.onLine===false)return;$('msg').textContent='Clave o conexión incorrectas';stop();$('login').style.display='block';$('app').style.display='none'}}
-function start(){load();clearInterval(T);T=setInterval(load,6000)}
-function stop(){clearInterval(T);if(window.__anaReady)anaStop();L.removeItem('pP');PW=''}
-window.st=async(id,s)=>{await rpc('admin_set',{p_pass:PW,p_id:id,p_status:s});load()};
-window.ip=async(i,s)=>{if(confirm((s==='approved'?'Aceptar':'Bloquear')+' a TODOS los de la IP '+i+'?')){await rpc('admin_ip',{p_pass:PW,p_ip:i,p_status:s});load()}};
-$('go').onclick=()=>{U=$('u').value.trim().replace(/\/+$/,'')||PRIVATE.u;K=$('k').value.trim()||PRIVATE.k;PW=$('pw').value;L.pU=U;L.pK=K;L.pP=PW;if(L.ronCountMe!=='1')L.ronNoTrack='1';$('msg').textContent='';start()};
+ <small>IP ${esc(x.ip)} · pidió ${new Date(x.created_at).toLocaleString()} · última vez ${new Date(x.last_seen).toLocaleString()}</small></div>`).join('')||'<p>Nadie ha pedido acceso todavía.</p>';
+}
+async function loadUsers(silent=false){
+ if(loadingUsers||!PW||!ADMIN_DB)return;loadingUsers=true;
+ try{const rows=await rpc('admin_listar',{p_pass:PW});L.pLast=JSON.stringify(rows);draw(rows)}
+ catch(e){
+  const invalid=e.status===400&&/"message"\s*:\s*"no"|\bno\b/i.test(e.body||'');
+  if(invalid){window.__panelAuthed=false;clearInterval(T);T=null;ADMIN_DB=null;STORE_AUTH_OK=false;PW='';L.removeItem('pP');if(window.__anaReady)anaStop();$('app').style.display='none';$('login').style.display='block';$('msg').textContent='La sesión dejó de ser válida. Introduce de nuevo la clave.'}
+  else if(silent){$('cnt').textContent='Conexión interrumpida · reintentando…';console.warn('[RONALL panel] actualización de usuarios:',e)}
+  else{$('msg').textContent=e.message||'No se pudo cargar la lista de usuarios.'}
+ }finally{loadingUsers=false}
+}
+function start(){clearInterval(T);T=setInterval(()=>{if(!document.hidden)loadUsers(true)},15000)}
+function stop(clear=true){clearInterval(T);T=null;if(window.__anaReady)anaStop();window.__panelAuthed=false;ADMIN_DB=null;STORE_AUTH_OK=false;if(clear){L.removeItem('pP');L.removeItem('pLast');PW=''}}
+window.st=async(id,s)=>{try{await rpc('admin_set',{p_pass:PW,p_id:id,p_status:s});await loadUsers(true)}catch(e){toast('No se pudo actualizar: '+(e.status?'HTTP '+e.status:e.message))}};
+window.ip=async(i,s)=>{if(confirm((s==='approved'?'Aceptar':'Bloquear')+' a TODOS los de la IP '+i+'?')){try{await rpc('admin_ip',{p_pass:PW,p_ip:i,p_status:s});await loadUsers(true)}catch(e){toast('No se pudo actualizar: '+(e.status?'HTTP '+e.status:e.message))}}};
+async function doLogin(pass,automatic=false){
+ if(!pass){$('msg').textContent='Escribe la clave de administrador.';return}
+ const btn=$('go');btn.disabled=true;btn.textContent='Verificando…';$('msg').textContent=automatic?'Verificando sesión guardada…':'';
+ try{
+  PW=pass;const rows=await authenticate(pass);L.pP=pass;
+  if(L.ronCountMe!=='1')L.ronNoTrack='1';
+  $('pw').value=pass;$('msg').textContent='';draw(rows);start();
+ }catch(e){PW='';L.removeItem('pP');window.__panelAuthed=false;ADMIN_DB=null;$('login').style.display='block';$('app').style.display='none';$('msg').textContent=e.message||'No se pudo validar el acceso.';if(automatic)console.warn('[RONALL panel] auto-login:',e)}
+ finally{btn.disabled=false;btn.textContent='Entrar'}
+}
+$('go').onclick=()=>doLogin($('pw').value,false);
 $('pw').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
-$('out').onclick=()=>{stop();L.removeItem('pLast');location.reload()};
-if(PW){try{draw(JSON.parse(L.pLast||'[]'))}catch(e){}start()}
+$('out').onclick=()=>{stop(true);location.reload()};
+window.__panelAuthed=false;
+if(PW){$('msg').textContent='Verificando sesión guardada…';doLogin(PW,true)}
 /* ===== pestañas ===== */
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button,.pan').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('p-'+b.dataset.t).classList.add('on');if(b.dataset.t==='ana')anaLoad();if(b.dataset.t==='ven')loadV();if(b.dataset.t==='beats')loadB();if(b.dataset.t==='cfg')cfg()});
 /* ===== BEATS ===== */
@@ -160,11 +215,13 @@ const DEV={movil:'Móvil',pc:'Computador',tablet:'Tablet',otro:'Otro'};
 const src=r=>{r=(r||'').toLowerCase();if(!r||r==='directo')return'Directo / WhatsApp';if(/instagram|^ig$/.test(r))return'Instagram';if(/youtu/.test(r))return'YouTube';if(/tiktok/.test(r))return'TikTok';if(/facebook|^fb$|^l\.fb/.test(r))return'Facebook';if(/whatsapp|wa\.me/.test(r))return'WhatsApp';if(/google/.test(r))return'Google';if(/^t\.co$|twitter|^x\.com$/.test(r))return'X / Twitter';if(/spotify/.test(r))return'Spotify';return r};
 const EVN={view:['Visita',''],beat:['Vio un beat',''],play:['Escuchó',''],cart:['Al carrito',''],buy:['Pidió / compró','g'],share:['Compartió',''],wa:['Contacto WhatsApp','g']};
 async function ensureCat(){let c=CAT;if(!c){try{c=JSON.parse(L.pCat||'null')||await (await fetch('data/catalog.json',{cache:'no-cache'})).json()}catch(e){c={beats:[]}}}return c}
-function anaStart(){if(AT)return;anaLoad();AT=setInterval(()=>{if(!document.hidden&&$('p-ana').classList.contains('on'))anaLoad()},8000)}
+let anaBusy=false;
+function anaStart(){if(AT||!window.__panelAuthed)return;anaLoad();AT=setInterval(()=>{if(!document.hidden&&$('p-ana').classList.contains('on'))anaLoad()},15000)}
 function anaStop(){clearInterval(AT);AT=null}
 async function anaLoad(){
+ if(anaBusy||!window.__panelAuthed)return;anaBusy=true;
  try{const [d,c]=await Promise.all([rpc('admin_analitica',{p_pass:PW,p_dias:AN.d}),ensureCat()]);AN.data=d;AN.cat=c;$('a-err').hidden=true;anaDraw();anaPrivate()}
- catch(e){const body=String(e&&e.body||''),miss=e&&(e.status===404||/PGRST202|Could not find|admin_analitica/i.test(body));$('a-err').hidden=false;$('a-err').innerHTML=miss?'La función de analítica no está instalada o Supabase aún no actualizó su esquema. Abre <b>Supabase → SQL Editor</b>, ejecuta completo <code>sql/02_analitica.sql</code> y vuelve a pulsar <b>Actualizar</b>.':(e&&e.status===401||e&&e.status===403)?'Supabase rechazó la consulta. Revisa que la clave pública de este panel corresponda al proyecto y que la función <code>admin_analitica</code> permita ejecutar al rol anon.':'No se pudo consultar la analítica. '+(e&&e.status?'HTTP '+e.status+'. ':'')+'Comprueba la conexión, la clave de administrador y que <code>sql/02_analitica.sql</code> se haya ejecutado. <details style="margin-top:8px"><summary>Ver detalle técnico</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(body||String(e&&e.message||'Error desconocido'))+'</pre></details>';if($('a-health'))$('a-health').textContent='No hay confirmación de lectura de la base de datos. El panel de usuarios puede funcionar aunque la analítica todavía no esté instalada.';console.error('RONALL panel analytics:',e)}}
+ catch(e){const body=String(e&&e.body||''),miss=e&&(e.status===404||/PGRST202|Could not find|admin_analitica/i.test(body)),denied=/\"message\"\s*:\s*\"no\"|P0001/i.test(body);$('a-err').hidden=false;$('a-err').innerHTML=miss?'La función de analítica no está instalada o Supabase aún no actualizó su esquema. Abre <b>Supabase → SQL Editor</b>, ejecuta completo <code>sql/02_analitica.sql</code> y vuelve a pulsar <b>Actualizar</b>.':denied&&!STORE_AUTH_OK?'El acceso se validó en el catálogo privado, pero la analítica pública usa el proyecto de la tienda. Configura la misma clave de administrador en la base pública ejecutando el paso final de <code>sql/02_analitica.sql</code> (reemplaza <code>TU_CLAVE</code>) y vuelve a actualizar.':(e&&e.status===401||e&&e.status===403)?'Supabase rechazó la consulta. Revisa la clave pública del proyecto de tienda y los permisos de <code>admin_analitica</code>.':'No se pudo consultar la analítica. '+(e&&e.status?'HTTP '+e.status+'. ':'')+'Comprueba la conexión, la clave de administrador y que <code>sql/02_analitica.sql</code> se haya ejecutado. <details style="margin-top:8px"><summary>Ver detalle técnico</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(body||String(e&&e.message||'Error desconocido'))+'</pre></details>';if($('a-health'))$('a-health').textContent='No hay confirmación de lectura de la base de datos. El panel de usuarios puede funcionar aunque la analítica todavía no esté instalada.';console.error('RONALL panel analytics:',e)}finally{anaBusy=false}}
 function bars(items,lab,key='n'){const m=Math.max(1,...items.map(x=>x[key])),t=items.reduce((s,x)=>s+x[key],0)||1;return items.length?items.map(x=>`<div class="hb"><span>${esc(lab(x))}</span><em><i style="width:${Math.max(3,x[key]/m*100)}%"></i></em><b>${num(x[key])} <small>${Math.round(x[key]/t*100)}%</small></b></div>`).join(''):'<p class="mut">Sin datos todavía.</p>'}
 function chart(sr){
  const W=640,H=210,pl=32,pr=8,pt=16,pb=26,n=sr.length||1,max=Math.max(1,...sr.map(x=>Math.max(x.visitantes,x.plays)));
@@ -216,7 +273,7 @@ function anaDraw(){
  const ls=d.licencias||[],lm=Math.max(1,...ls.map(y=>y.compras));
  $('a-lic').innerHTML=Object.keys(S.licenses).map(kk=>{const x=ls.find(y=>y.lic===kk)||{carrito:0,compras:0};return`<div class="hb"><span>${S.licenses[kk].name}</span><em><i style="width:${Math.max(3,x.compras/lm*100)}%"></i></em><b>${x.compras} <small>${x.carrito} al carrito</small></b></div>`}).join('')+'<p class="mut">Pedidos creados por licencia.</p>';
  $('a-rec').innerHTML=(d.recientes||[]).map(x=>{const e=EVN[x.ev]||[x.ev,''];return`<div class="ev"><span class="pill ${e[1]==='g'?'g':''}">${e[0]}</span><span>${x.beat?esc(bn(x.beat))+(x.lic?' · '+esc(x.lic.toUpperCase()):''):'tienda'}</span><small>${esc(DEV[x.dev]||'')} · ${esc(where(x.tz))} · ${ago(x.t)}</small></div>`}).join('')||'<p class="mut">Aún no hay actividad. Se registra en cuanto alguien visite la web.</p>';
- $('a-upd').textContent='Actualizado '+new Date(d.generado).toLocaleTimeString()+' · se refresca solo cada 8 s'}
+ $('a-upd').textContent='Actualizado '+new Date(d.generado).toLocaleTimeString()+' · actualización automática cada 15 s'}
 async function anaPrivate(force){
  if(!force&&Date.now()-AN.privT<60000)return;AN.privT=Date.now();
  try{
@@ -231,8 +288,7 @@ async function anaPrivate(force){
 document.querySelectorAll('#a-rng button').forEach(b=>b.onclick=()=>{AN.d=+b.dataset.d;L.pAnaD=AN.d;anaLoad()});
 $('a-beats').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;const s=b.dataset.s;AN.dir=AN.sort===s?-AN.dir:-1;AN.sort=s;anaDraw()});
 $('a-ref').onclick=()=>{anaLoad();anaPrivate(true)};
-/* tus propias visitas no cuentan (este navegador) */
-if(PW&&L.ronCountMe!=='1')L.ronNoTrack='1';
+/* Por defecto se excluye el navegador del administrador al iniciar sesión. */
 const _cfg=cfg;cfg=function(){_cfg();const on=L.ronCountMe==='1';$('cfgbox').insertAdjacentHTML('beforeend',`<div class="fld"><label>Analítica</label><p class="note">Se registra de forma anónima (sin IP, nombre ni correo). Por defecto <b>tus visitas desde este navegador no cuentan</b>.</p><button class="btn sm" id="cnt-me">${on?'Dejar de contar mis visitas':'Contar mis visitas en este navegador'}</button></div>`);$('cnt-me').onclick=()=>{if(L.ronCountMe==='1'){L.removeItem('ronCountMe');L.ronNoTrack='1'}else{L.ronCountMe='1';L.removeItem('ronNoTrack')}cfg()}};
-window.__anaReady=true;if(PW)anaStart();
+window.__anaReady=true;if(window.__panelAuthed)anaStart();
 </script></body></html>

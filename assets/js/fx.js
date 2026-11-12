@@ -1,4 +1,4 @@
-/* Build: RONALL-VISUAL-2026-11-11-V18 */
+/* Build: RONALL-VISUAL-2026-11-11-V19 */
 /* RONALL PROD V10 · FX ENGINE · V17
    Reactor del motor original v5 + escena de fondo basada en la arquitectura REAL
    del Private Catalog: cover + cámara 2D + bloom independiente + luz WebGL + scan/flash.
@@ -152,7 +152,7 @@
       this.n.light?.addEventListener('webglcontextlost', e => { e.preventDefault(); this.gl = null; this.n.light.classList.add('fx-webgl-off'); });
     }
     _resize() {
-      const k = [.46,.36,.26,.18][this.q||0], gk = [.16,.12,.085,.06][this.q||0];
+      const k = [.34,.27,.20,.14][this.q||0], gk = [.12,.09,.065,.045][this.q||0];
       const cw = Math.max(2, Math.round(innerWidth*k)), ch = Math.max(2, Math.round(innerHeight*k));
       const gw = Math.max(2, Math.round(innerWidth*gk)), gh = Math.max(2, Math.round(innerHeight*gk));
       const cam = this.n.camera, li = this.n.light;
@@ -171,7 +171,7 @@
     _bake(img) {
       /* UNA vez por portada y reutilizando los mismos canvas (no se acumulan en memoria). Todo en escala de grises. */
       const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height; if (!iw || !ih) return;
-      const sc = Math.min(1, 1100 / Math.max(iw, ih));
+      const sc = Math.min(1, 860 / Math.max(iw, ih));
       const a = this._ba || (this._ba = document.createElement('canvas')); a.width = Math.round(iw*sc); a.height = Math.round(ih*sc);
       const x = a.getContext('2d'); x.globalCompositeOperation = 'source-over'; x.filter = 'grayscale(1) contrast(1.1) brightness(.66)'; x.drawImage(img,0,0,a.width,a.height);
       if (!('filter' in x)) { x.globalCompositeOperation = 'saturation'; x.fillStyle = '#808080'; x.fillRect(0,0,a.width,a.height); x.globalCompositeOperation = 'source-over'; }
@@ -226,11 +226,10 @@
     _tick(now) {
       if (!this.visible) return;
       requestAnimationFrame(this._tick);
-      /* Adaptive cadence: full 60 Hz with audio, 42 Hz while idle. The CSS
-         ambience remains compositor-driven at display refresh rate. */
+      /* Cadencia limitada: conserva el movimiento y la respuesta musical sin saturar CPU/GPU. */
       const raw = this.lastRAF ? (now - this.lastRAF) : 16.7; this.lastRAF = now;
       const playing = !this.audio.paused && !this.audio.ended;
-      const cadence = playing ? 1000/60 : 1000/42;
+      const cadence = playing ? 1000/36 : 1000/28;
       if (this.lastRender && now - this.lastRender < cadence) return;
       const elapsed = this.lastRender ? now - this.lastRender : cadence; this.lastRender = now; this.last = now;
       const dt = clamp(elapsed/1000,.001,.05);

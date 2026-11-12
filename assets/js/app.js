@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V18 · app.js — tienda pública (reutiliza core.js y lic.js) */
+/* RONALL-VISUAL-2026-11-11-V19 · app.js — catálogo rápido, datos remotos sin bloqueo */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
@@ -25,7 +25,7 @@ $('#in-t').innerHTML = [...'ronall prod'].map((c, i) => `<span class="l" style="
 let prog = 0, target = .1, introDone = false; const bump = v => { target = Math.max(target, v); };
 (function ip() { if (introDone) return; prog += (target - prog) * .07; if (target - prog < .002) prog = target; ifill.style.transform = `scaleX(${prog.toFixed(4)})`; ipct.textContent = Math.round(prog * 100) + '%'; istat.textContent = prog < .35 ? 'Cargando' : prog < .7 ? 'Afinando' : prog < .98 ? 'Casi listo' : 'Listo'; requestAnimationFrame(ip); })();
 (D.fonts && D.fonts.ready || Promise.resolve()).then(() => bump(.4)).catch(() => {});
-const hideIntro = async () => { const w = 1700 - (performance.now() - t0); if (w > 0) await new Promise(r => setTimeout(r, w)); introDone = true; ifill.style.transform = 'scaleX(1)'; ipct.textContent = '100%'; istat.textContent = 'Listo'; setTimeout(() => { intro.classList.add('out'); setTimeout(() => intro.remove(), 1500); }, 380); };
+const hideIntro = async () => { const w = 520 - (performance.now() - t0); if (w > 0) await new Promise(r => setTimeout(r, w)); introDone = true; ifill.style.transform = 'scaleX(1)'; ipct.textContent = '100%'; istat.textContent = 'Listo'; setTimeout(() => { intro.classList.add('out'); setTimeout(() => intro.remove(), 650); }, 100); };
 
 /* ───────── Imágenes y acento ───────── */
 const imgs = new Map();
@@ -39,9 +39,14 @@ const setAccent = () => {};   /* V12: el bloom es siempre blanco; no se extrae c
 
 /* ───────── Datos ───────── */
 let beats = [];
-bump(.55); try { const r = await fetch('data/beats.public.json', { cache: 'no-cache' }); beats = (await r.json()).beats.filter(b => b.active !== false); } catch (e) {}
-const sold = await Promise.race([Promise.resolve().then(() => R.sold()).catch(() => []), new Promise(ok => setTimeout(() => ok([]), 2200))]);
-beats.forEach(b => { if (sold.includes(b.id)) b.exclusiveSold = true; });
+bump(.58);
+/* El JSON es estático: deja que el navegador/CDN lo almacene. La consulta de ventas jamás bloquea el catálogo. */
+try {
+  const r = await fetch('data/beats.public.json?v=RONALL-VISUAL-2026-11-11-V19', { cache: 'default' });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const data = await r.json(); beats = (data.beats || []).filter(b => b.active !== false);
+} catch (e) { console.warn('[RONALL] No se pudo cargar el catálogo público:', e); }
+const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArray(x) ? x : []).catch(() => []);
 const st = { q: '', g: '', sort: 'new' };
 let cur = [], sel = null, ui = null, shown = 0, coverP = Promise.resolve();
 const sub = b => [b.type, b.bpm && b.bpm + ' BPM', b.key].filter(Boolean).map(esc).join(' · ');
@@ -56,8 +61,8 @@ function refreshBuy(key) {
   btn.innerHTML = inCart ? `${R.svg('check', 18)}En el carrito · Ver` : `${R.svg('cart', 18)}Añadir al carrito`;
   btn.classList.toggle('in', !!inCart);
 }
-function select(b, first) {
-  sel = b; R.track('beat', { beat: b.id });
+function select(b, first, track = true) {
+  sel = b; if (track) R.track('beat', { beat: b.id });
   $('#ty').textContent = b.type || 'Beat';
   sway.hero = wrap($('#ttl'), b.name); $('#top-t').textContent = b.name;
   $('#meta').innerHTML = [b.genre, b.bpm && b.bpm + ' BPM', b.key, b.duration && R.fmt(b.duration)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
@@ -181,6 +186,14 @@ M.reveal($('#v-cats'), '.tile');
 if (!beats.length) { $('#ttl').textContent = 'Sin beats'; $('#meta').innerHTML = '<span>No se pudieron cargar los beats. Si estás en local, abre el sitio con un servidor (python3 -m http.server), no con doble clic.</span>'; draw(); await hideIntro(); return; }
 const h0 = location.hash.slice(1); if (h0 === 'categorias') go('cats');
 draw(); select(beats.find(b => b.slug === h0) || cur[0] || beats[0], true);
-await Promise.race([coverP, new Promise(r => setTimeout(r, 2500))]);
+/* Las exclusividades se aplican cuando responda Supabase; el primer render nunca espera esta consulta. */
+soldPromise.then(sold => {
+  if (!sold.length) return;
+  let changed = false;
+  const ids = new Set(sold);
+  for (const b of beats) if (ids.has(b.id) && !b.exclusiveSold) { b.exclusiveSold = true; changed = true; }
+  if (changed) { if (sel && ids.has(sel.id)) select(sel, false, false); shelf(); }
+}).catch(() => {});
+await Promise.race([coverP, new Promise(r => setTimeout(r, 800))]);
 hideIntro();
 })();

@@ -5,7 +5,7 @@ import fs from 'fs';import path from 'path';import {fileURLToPath} from 'url';
 const R=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const S=new Function('window',fs.readFileSync(R+'/config/site-config.js','utf8')+';return window.SITE')({});
 const cat=JSON.parse(fs.readFileSync(R+'/data/catalog.json','utf8'));
-const BUILD='RONALL-VISUAL-2026-11-11-V18';
+const BUILD='RONALL-VISUAL-2026-11-11-V19';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const live=cat.beats.filter(b=>b.visibility==='public'&&b.active!==false);
 // 1) JSON público (solo beats publicados y activos)
@@ -30,7 +30,7 @@ for(const b of live){
 <link rel="preload" href="../../assets/fonts/kosmos.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../../assets/css/app.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/v12.css?v=${BUILD}">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g,'\\u003c')}</script>
-<script src="../../config/site-config.js?v=RONALL-VISUAL-2026-11-11-V18"></script></head><body class="pg beat-product">
+<script src="../../config/site-config.js?v=RONALL-VISUAL-2026-11-11-V19"></script></head><body class="pg beat-product">
 <div class="glow" id="glow" aria-hidden="true"></div>
 <div class="pgw">
 <header class="pgtop"><a class="brand" href="../../index.html"><img src="../../favicon.png" alt="" width="28" height="28"><b>${esc(S.brand.name)}</b></a><span class="sp"></span><a class="back" href="../../index.html#beats">Todos los beats</a><button class="cartb" id="cartb" aria-label="Carrito"><span data-i="cart" data-s="18"></span><span class="cl">Carrito</span><span class="cnt">0</span></button></header>
