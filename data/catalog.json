@@ -21,7 +21,12 @@
     "unlimited",
     "exclusive"
    ],
-   "prices": {},
+   "prices": {
+    "basic": 20,
+    "premium": 35,
+    "unlimited": 70,
+    "exclusive": 500
+   },
    "created": "2026-11-12",
    "tags": []
   },
