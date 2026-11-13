@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V20 · app.js — catálogo rápido, datos remotos sin bloqueo */
+/* RONALL-VISUAL-2026-11-11-V22 · app.js — catálogo rápido, datos remotos sin bloqueo */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
@@ -42,10 +42,15 @@ let beats = [];
 bump(.58);
 /* El JSON es estático: deja que el navegador/CDN lo almacene. La consulta de ventas jamás bloquea el catálogo. */
 try {
-  const r = await fetch('data/beats.public.json?t=' + Date.now(), { cache: 'no-store' });  /* siempre el catálogo más reciente */
+  const r = (await window.__cat) || await fetch('data/beats.public.json?t=' + Date.now(), { cache: 'no-store' });  /* siempre el catálogo más reciente */
   if (!r.ok) throw new Error('HTTP ' + r.status);
   const data = await r.json(); beats = (data.beats || []).filter(b => b.active !== false);
-} catch (e) { console.warn('[RONALL] No se pudo cargar el catálogo público:', e); }
+} catch (e) {
+  console.warn('[RONALL] No se pudo cargar el catálogo público:', e);
+  const off = document.createElement('div'); off.className = 'offline'; off.setAttribute('role', 'alert');
+  off.innerHTML = '<span>No se pudo cargar el catálogo.</span><button class="btn" type="button">Reintentar</button>';
+  off.querySelector('button').onclick = () => location.reload(); document.body.appendChild(off);
+}
 const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArray(x) ? x : []).catch(() => []);
 const st = { q: '', g: '', sort: 'new' };
 let cur = [], sel = null, ui = null, shown = 0, coverP = Promise.resolve();
@@ -194,3 +199,14 @@ soldPromise.then(sold => {
 await Promise.race([coverP, new Promise(r => setTimeout(r, 800))]);
 hideIntro();
 })();
+
+/* ───────── Atajos de teclado: ←/→ ±5 s · N/P siguiente/anterior · M silencio · / buscar ───────── */
+addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  const a = R.P.audio, k = e.key.toLowerCase();
+  if ((k === 'arrowright' || k === 'arrowleft') && R.P.cur && a.duration) a.currentTime = Math.max(0, Math.min(a.duration, a.currentTime + (k === 'arrowright' ? 5 : -5)));
+  else if (k === 'n') R.P.step(1);
+  else if (k === 'p') R.P.step(-1);
+  else if (k === 'm') a.muted = !a.muted;
+  else if (k === '/') { const q = $('#f-q'); if (q) { e.preventDefault(); q.focus(); } }
+});
