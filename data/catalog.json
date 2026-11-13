@@ -1,6 +1,31 @@
 {
  "beats": [
   {
+   "id": "click-clack",
+   "slug": "click-clack",
+   "name": "CLICK CLACK",
+   "type": "YN Jay Type Beat",
+   "genre": "Detroit",
+   "bpm": null,
+   "key": null,
+   "duration": 171.6,
+   "preview": "public-audio/click-clack.bin",
+   "cover": "public-img/click-clack-1200.jpg",
+   "thumb": "public-img/click-clack-640.jpg",
+   "visibility": "public",
+   "active": true,
+   "exclusiveSold": false,
+   "licenses": [
+    "basic",
+    "premium",
+    "unlimited",
+    "exclusive"
+   ],
+   "prices": {},
+   "created": "2026-11-12",
+   "tags": []
+  },
+  {
    "id": "cambio-de-pareja",
    "slug": "cambio-de-pareja",
    "name": "CAMBIO DE PAREJA",
