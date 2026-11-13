@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V19 · app.js — catálogo rápido, datos remotos sin bloqueo */
+/* RONALL-VISUAL-2026-11-11-V20 · app.js — catálogo rápido, datos remotos sin bloqueo */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
@@ -42,7 +42,7 @@ let beats = [];
 bump(.58);
 /* El JSON es estático: deja que el navegador/CDN lo almacene. La consulta de ventas jamás bloquea el catálogo. */
 try {
-  const r = await fetch('data/beats.public.json?v=RONALL-VISUAL-2026-11-11-V19', { cache: 'default' });
+  const r = await fetch('data/beats.public.json?t=' + Date.now(), { cache: 'no-store' });  /* siempre el catálogo más reciente */
   if (!r.ok) throw new Error('HTTP ' + r.status);
   const data = await r.json(); beats = (data.beats || []).filter(b => b.active !== false);
 } catch (e) { console.warn('[RONALL] No se pudo cargar el catálogo público:', e); }
@@ -162,7 +162,7 @@ main.addEventListener('pointermove', e => { const r = main.getBoundingClientRect
 /* ───────── Motion graphics: resortes, magnetismo y tilt 3D ───────── */
 const M = RonMotion;
 const MAG = '.btn,.play,.ctl button,.cartb,.ib,.chip,.snav button,.tabs button,.lnk,.lic-info summary';
-const TILT = '.card,.tile,.lic,.row';
+const TILT = '.card,.tile,.lic';
 function bindMotion(root) {
   if (!root || root.nodeType !== 1) return;
   const bind = el => {
