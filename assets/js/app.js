@@ -148,11 +148,8 @@ addEventListener('keydown', e => { if (/INPUT|SELECT|TEXTAREA/.test(e.target.tag
 let lastSc = 1, fr = 0, hx = 0, hy = 0, tx = 0, ty = 0, ox = 0, oy = 0; const meters = $$('.meter i'), heroEl = $('.hero'), artw = $('#artw'), aglow = $('#aglow'), hglow = $('#hglow'), swing = RonMotion.idleSwing(artw, { a: 1.1, y: 4, t: 11 });
 fx && fx.onFrame((dt, s, time) => {
   const now = performance.now() / 1000, k = 1 + s.bass * .5 + s.hit * .3;
-  for (const o of sway[viewKey[curView]] || []) o.el.style.transform = `translate3d(${(o.ax * Math.sin(o.wx * now + o.px)).toFixed(2)}px,${(o.ay * Math.sin(o.wy * now + o.py)).toFixed(2)}px,0) rotate(${((o.a1 * Math.sin(o.w1 * now + o.p1) + o.a2 * Math.sin(o.w2 * now + o.p2)) * k).toFixed(3)}deg)`;
-  if (curView === 'beats') for (const o of metaSway) o.el.style.transform = `translate3d(${(o.x * Math.sin(o.wx * now + o.px)).toFixed(2)}px,${(o.y * Math.sin(o.wy * now + o.py)).toFixed(2)}px,0) rotate(${(o.a * Math.sin(o.w * now + o.p)).toFixed(3)}deg)`;
   hx += (tx - hx) * (1 - Math.exp(-dt / .5)); hy += (ty - hy) * (1 - Math.exp(-dt / .5));
   if (Math.abs(hx - ox) + Math.abs(hy - oy) > .002) { ox = hx; oy = hy; heroEl.style.transform = `translate3d(${(hx * -9).toFixed(2)}px,${(hy * -6).toFixed(2)}px,0)`; }
-  swing && swing(now);
   { const sc = 1 + s.bass * .035 + s.hit * .02; if (Math.abs(sc - lastSc) > .0007) { lastSc = sc; artw.style.scale = sc.toFixed(4); } }
     if ((fr++ & 1) === 0) for (let i = 0; i < 5; i++) meters[i].style.transform = `scaleY(${(.16 + .84 * s.bins[i]).toFixed(3)})`;
 });

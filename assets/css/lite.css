@@ -13,5 +13,5 @@
 /* sin desenfoques costosos: paneles sólidos y revelados solo con opacidad/transform */
 *,*::before,*::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .side,.main,.mini,.top,.tabs{background:rgba(8,8,10,.9)!important;box-shadow:none!important}
-.rv2{filter:none!important}
+.rv2,.rv2.in{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}
 @media(prefers-reduced-motion:reduce){#fx-camera,.fx-ambient i{transition:none}}
