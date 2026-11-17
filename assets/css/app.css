@@ -335,3 +335,7 @@ body.pg .mini .bar{display:block;position:absolute;left:18px;right:18px;top:0;he
 @media(max-width:899px){.nfb{width:38px;height:38px}.nfp{position:fixed;top:calc(60px + env(safe-area-inset-top));right:12px}}
 @media(prefers-reduced-motion:reduce){.nfb.has svg,.nfp{animation:none}}
 .chip.tg{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:var(--dim,#a0a0a6);font-weight:500}.chip.tg:hover{color:#fff}.chip.tg.on{background:#fff;color:#000;box-shadow:none}
+
+/* RONALL · Mismo fondo que el catálogo público */
+:root{--bg:#151518;--panel:#1d1d21;--panel2:#26262b;--public-backdrop:radial-gradient(ellipse 110% 68% at 50% 0%,rgba(255,255,255,.065) 0%,transparent 66%),linear-gradient(180deg,#202024 0%,#19191d 54%,#151518 100%)}
+body.pg{background:var(--public-backdrop)}
