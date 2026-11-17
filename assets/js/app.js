@@ -2,6 +2,11 @@
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
+D.addEventListener('selectstart', () => D.body.classList.add('text-selecting'));
+D.addEventListener('selectionchange', () => {
+  const selection = D.getSelection();
+  if (!selection || selection.isCollapsed) D.body.classList.remove('text-selecting');
+});
 R.boot();
 const fx = window.RonFX ? RonFX.create({ root: $('#fx-scene'), stage: main, cover: $('#fx-cover'), streak: $('#fx-streak'), camera: $('#fx-camera'), light: $('#gl'), flash: $('#fx-flash') }, P.audio) : null;
 
@@ -9,14 +14,15 @@ $('#ct-wa').href = $('#ft-wa').href = R.wa('Hola Ronall Prod 👋 Quiero más in
 ['#ct-wa', '#ft-wa'].forEach(q => $(q).addEventListener('click', () => R.track('wa')));
 const isM = () => matchMedia('(max-width:899px)').matches;
 
-const animateTitle = (el, value) => {
-  const text = String(value ?? el.textContent).trim();
-  if (!text) return;
-  el.dataset.titleText = text;
-  el.setAttribute('aria-label', text);
-  let i = 0;
-  el.innerHTML = text.split(/\s+/u).map(word => `<span class="w">${[...word].map(char => `<span class="l" style="--i:${i++}">${esc(char)}</span>`).join('')}</span>`).join(' ');
-};
+const rnd = (a, b) => a + Math.random() * (b - a), TAU = Math.PI * 2;
+function wrap(el, text) {
+  el.innerHTML = text.split(' ').map((w, wi) => `<span class="w">${[...w].map((c, i) => `<span class="l" style="--i:${i + wi * 3}">${esc(c)}</span>`).join('')}</span>`).join(' ');
+  return [...el.querySelectorAll('.w')].map(e => ({ el: e, a1: rnd(.55, 1.25) * (Math.random() < .5 ? -1 : 1), w1: TAU / rnd(8, 13), p1: rnd(0, TAU), a2: rnd(.16, .42), w2: TAU / rnd(4.2, 7.2), p2: rnd(0, TAU), ax: rnd(1.8, 5), wx: TAU / rnd(8, 15), px: rnd(0, TAU), ay: rnd(1.2, 3.8), wy: TAU / rnd(9, 16), py: rnd(0, TAU) }));
+}
+const sway = { hero: [], cats: [], priv: [], ct: [] }, viewKey = { beats: 'hero', cats: 'cats', priv: 'priv', ct: 'ct' };
+['cats', 'priv', 'ct'].forEach(k => { const h = $('#v-' + k + ' h2'); if (h) sway[k] = wrap(h, h.textContent.trim()); });
+let metaSway = [];
+const seedMeta = () => { metaSway = [...$('#meta').children].map(el => ({ el, a: rnd(.12, .36) * (Math.random() < .5 ? -1 : 1), w: TAU / rnd(6.5, 12), p: rnd(0, TAU), x: rnd(.5, 1.8), wx: TAU / rnd(8, 14), px: rnd(0, TAU), y: rnd(.3, 1.1), wy: TAU / rnd(9, 15), py: rnd(0, TAU) })); };
 
 const intro = $('#intro'), t0 = performance.now(), ifill = $('#in-f'), ipct = $('#in-p'), istat = $('#in-s');
 $('#in-t').innerHTML = [...'ronall prod'].map((c, i) => `<span class="l" style="--i:${i}">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
@@ -65,8 +71,9 @@ function refreshBuy(key) {
 function select(b, first, track = true) {
   sel = b; if (track) R.track('beat', { beat: b.id });
   $('#ty').textContent = b.type || 'Beat';
-  animateTitle($('#ttl'), b.name); $('#top-t').textContent = b.name;
+  sway.hero = wrap($('#ttl'), b.name); $('#top-t').textContent = b.name;
   $('#meta').innerHTML = [b.genre, b.bpm && b.bpm + ' BPM', b.key, b.duration && R.fmt(b.duration), R.ago && R.ago(b)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
+  seedMeta();
   $('#tgs').innerHTML = heroTags(b).map(x => `<button type="button" data-t="${esc(x)}">#${esc(x)}</button>`).join('');
   const im = $('#cimg'); $('#aglow').style.backgroundImage = `url("${b.thumb || b.cover}")`; im.src = b.cover || b.thumb; im.alt = 'Portada de ' + b.name;
   const h = $('.hero'); h.classList.remove('swap'); void h.offsetWidth; h.classList.add('swap');
@@ -142,7 +149,7 @@ const go = v => {
   $$('.view').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
   $('[data-v]').forEach(x => x.classList.toggle('on', x.dataset.v === v));
   const heading = $('#v-' + v + ' h2');
-  if (heading) animateTitle(heading, heading.dataset.titleText || heading.textContent);
+
   main.scrollTo({ top: 0 });
 };
 $$('[data-v]').forEach(x => x.onclick = () => go(x.dataset.v));
@@ -196,7 +203,7 @@ motionObserver.observe(D.body, { childList: true, subtree: true });
 { let lt = 0; new MutationObserver(() => { const b = $('.drawer .tr b'); if (!b || b._m) return; b._m = 1; const to = +b.textContent.replace(/\D/g, ''); M.count(b, lt, to, { dur: 900 }); lt = to; }).observe($('.drawer'), { childList: true }); }
 M.reveal($('#v-cats'), '.tile');
 
-if (!beats.length) { animateTitle($('#ttl'), 'Sin beats'); $('#meta').innerHTML = '<span>No se pudieron cargar los beats. Si estás en local, abre el sitio con un servidor (python3 -m http.server), no con doble clic.</span>'; draw(); await hideIntro(); return; }
+if (!beats.length) { $('#ttl').textContent = 'Sin beats'; $('#meta').innerHTML = '<span>No se pudieron cargar los beats. Si estás en local, abre el sitio con un servidor (python3 -m http.server), no con doble clic.</span>'; draw(); await hideIntro(); return; }
 const h0 = location.hash.slice(1); if (h0 === 'categorias') go('cats');
 draw(); select(beats.find(b => b.slug === h0) || cur[0] || beats[0], true);
 
