@@ -55,7 +55,7 @@
       const playing=!!(audio&&!audio.paused&&!audio.ended);
       if(!playing&&t>activeUntil){raf=0;return;}
       raf=requestAnimationFrame(tick);
-      if(t-last<1000/60)return;
+      if(t-last<1000/30)return;
       const dt=Math.min(.1,(t-last)/1000||.05);last=t;const k=t*.001;
       for(let i=0;i<5;i++){
         const g=playing ? (.2+.7*Math.abs(Math.sin(k*(1.1+i*.53)+i*2.1)*Math.cos(k*.7*(i+1)))):0;
