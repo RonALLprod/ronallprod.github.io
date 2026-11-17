@@ -22,7 +22,7 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 .hero h1,.page h2,.page-h h2{hyphens:manual}
 
 .fx-scene{background:#020203!important}
-#fx-camera{filter:brightness(.76) contrast(1.08) saturate(.46) blur(5px)!important;mix-blend-mode:screen!important}
+#fx-camera{filter:brightness(.76) contrast(1.08) saturate(.46)!important;mix-blend-mode:screen!important}
 #fx-camera.on{opacity:.46!important}
 #gl{opacity:.12!important}
 .shade{
@@ -35,7 +35,7 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 .fx-scene:before{opacity:.39!important;animation:ronAmbientHaze 34s ease-in-out infinite alternate!important}
 .fx-scene:after{opacity:.27!important;animation:ronAmbientHaze2 42s ease-in-out infinite alternate!important}
 .fx-ambient{display:block!important;opacity:.82!important;animation-play-state:running!important}
-.fx-ambient i{display:block!important;animation-play-state:running!important}
+.fx-ambient i{display:block!important;filter:blur(3px) saturate(1.02)!important;animation-play-state:running!important}
 .fx-ambient i:nth-child(1){animation:ronOrbA 31s ease-in-out infinite alternate!important}
 .fx-ambient i:nth-child(2){animation:ronOrbB 37s ease-in-out infinite alternate!important}
 .fx-ambient i:nth-child(3){animation:ronOrbC 43s ease-in-out infinite alternate!important}
@@ -56,7 +56,7 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 .marq,.marq div{backface-visibility:hidden}
 .marq div{will-change:transform;animation:mq 42s linear infinite!important}
 @media(max-width:899px){
- #fx-camera{filter:brightness(.72) contrast(1.08) saturate(.42) blur(5px)!important}
+ #fx-camera{filter:brightness(.72) contrast(1.08) saturate(.42)!important}
  .fx-ambient{opacity:.76!important}
  .mini,.drawer,.tabs{-webkit-backdrop-filter:blur(8px)!important;backdrop-filter:blur(8px)!important}
 }
