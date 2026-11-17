@@ -85,7 +85,7 @@
     h._lt = 1;
     let items = [], cached = 0;
     const build = () => {
-      items = $('.l', h).map(el => {
+      items = $$('.l', h).map(el => {
         const r = el.getBoundingClientRect();
         return { el, cx: r.left + r.width / 2, cy: r.top + r.height / 2, x: new Spring(120, 8), y: new Spring(120, 8), r: new Spring(90, 6), s: new Spring(170, 10) };
       });
