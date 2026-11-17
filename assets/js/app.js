@@ -112,8 +112,6 @@ $('#more-l').onclick = e => { const c = e.target.closest('.card'); if (!c) retur
 /* ───────── Catálogo (lista lateral) ───────── */
 const genres = [...new Set(beats.map(b => b.genre).filter(Boolean))].sort();
 $('#chips').innerHTML = ['Todos', ...genres].map((g, i) => `<button class="chip ${i ? '' : 'on'}" data-g="${i ? esc(g) : ''}">${esc(g)}</button>`).join('');
-/* Tags más usados como chips: un clic busca ese tag, otro clic lo quita */
-const tagTop = (() => { const c = {}, gl = new Set(genres.map(g => String(g).toLowerCase())); beats.forEach(b => (b.tags || []).forEach(t => { const k = String(t).trim(); if (k && !gl.has(k.toLowerCase())) c[k] = (c[k] || 0) + 1; })); return Object.entries(c).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 10).map(x => x[0]); })();
 /* Tags internos: no renderizar chips públicos. El buscador sigue consultando b.tags. */
 /* Buscador: sin tildes, por palabras sueltas, prefijos, tags/sobrenombres y tolerancia a 1 error de tecleo */
 const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9# ]+/g, ' ').replace(/\s+/g, ' ').trim();
