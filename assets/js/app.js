@@ -1,4 +1,4 @@
-/* RONALL-PERF-2026-11-17-V27 · app.js — catálogo rápido, datos remotos sin bloqueo */
+/* RONALL-PERF-2026-11-17-V28 · app.js — catálogo rápido, datos remotos sin bloqueo */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
@@ -42,7 +42,7 @@ let beats = [];
 bump(.58);
 /* El JSON es estático: deja que el navegador/CDN lo almacene. La consulta de ventas jamás bloquea el catálogo. */
 try {
-  const r = (await window.__cat) || await fetch('data/beats.public.json?t=' + Date.now(), { cache: 'no-store' });  /* siempre el catálogo más reciente */
+  const r = (await window.__cat) || await fetch('data/beats.public.json', { cache: 'default' });  /* siempre el catálogo más reciente */
   if (!r.ok) throw new Error('HTTP ' + r.status);
   const data = await r.json(); beats = (data.beats || []).filter(b => b.active !== false);
 } catch (e) {
