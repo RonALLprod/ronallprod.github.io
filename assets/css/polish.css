@@ -1,6 +1,6 @@
 :root{color-scheme:dark}
-#main{scroll-behavior:auto!important;overscroll-behavior:auto!important}
-.list{overscroll-behavior:contain}
+html,body{overscroll-behavior-y:none}
+#main,.side,.lib,.list{overscroll-behavior:contain}
 button,a,summary{touch-action:manipulation}
 h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 :where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:2px solid rgba(255,255,255,.9);outline-offset:3px}
@@ -22,7 +22,7 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 .hero h1,.page h2,.page-h h2{hyphens:manual}
 
 .fx-scene{background:#020203!important}
-#fx-camera{filter:brightness(.76) contrast(1.08) saturate(.46)!important;mix-blend-mode:screen!important}
+#fx-camera{filter:brightness(.76) contrast(1.08) saturate(.46) blur(5px)!important;mix-blend-mode:screen!important}
 #fx-camera.on{opacity:.46!important}
 #gl{opacity:.12!important}
 .shade{
@@ -35,7 +35,7 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 .fx-scene:before{opacity:.39!important;animation:ronAmbientHaze 34s ease-in-out infinite alternate!important}
 .fx-scene:after{opacity:.27!important;animation:ronAmbientHaze2 42s ease-in-out infinite alternate!important}
 .fx-ambient{display:block!important;opacity:.82!important;animation-play-state:running!important}
-.fx-ambient i{display:block!important;filter:blur(3px) saturate(1.02)!important;animation-play-state:running!important}
+.fx-ambient i{display:block!important;animation-play-state:running!important}
 .fx-ambient i:nth-child(1){animation:ronOrbA 31s ease-in-out infinite alternate!important}
 .fx-ambient i:nth-child(2){animation:ronOrbB 37s ease-in-out infinite alternate!important}
 .fx-ambient i:nth-child(3){animation:ronOrbC 43s ease-in-out infinite alternate!important}
@@ -43,24 +43,20 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 .hero .info{will-change:transform;animation:ronallTextFloat 8s ease-in-out infinite}
 .page-h h2,.page h2{will-change:transform;animation:ronallTextFloat 9s ease-in-out infinite}
 @keyframes ronallTextFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-2px,0)}}
-.w{display:inline-block;white-space:nowrap}
-.w+.w{margin-left:.18em}
-.w .l{display:inline-block;transform-origin:50% 100%;animation:ronallGlyphEntry 1.3s cubic-bezier(.2,.8,.2,1) both!important;animation-delay:calc(var(--i)*45ms + .05s)!important;filter:none!important}
-@keyframes ronallGlyphEntry{from{opacity:0;transform:translate3d(0,.6em,0) rotateX(-75deg) scale(.94)}60%{opacity:1}to{opacity:1;transform:none}}
-body.text-selecting .hero .info,body.text-selecting .page-h h2,body.text-selecting .page h2,body.text-selecting .w .l{animation-play-state:paused!important}
 .hero.swap .info>*{animation:ronallTextEnter .34s cubic-bezier(.2,.8,.2,1) both!important;filter:none!important}
 .hero.swap .kicker{animation-delay:0s!important}
 .hero.swap h1{animation-delay:.035s!important}
 .hero.swap .meta{animation-delay:.07s!important}
 @keyframes ronallTextEnter{from{opacity:.5;transform:translate3d(0,6px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
-#list .row{animation:none!important;filter:none!important}
+#list .row{animation:ronallRowIn .24s ease-out both!important;animation-delay:calc(var(--i,0)*15ms)!important;filter:none!important}
+@keyframes ronallRowIn{from{opacity:0;transform:translate3d(-6px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
 .view.on{animation:ronallViewIn .28s ease-out both!important;filter:none!important}
 @keyframes ronallViewIn{from{opacity:.72;transform:translate3d(0,5px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
 .rv2{filter:none!important;transition:opacity .3s ease,transform .3s cubic-bezier(.2,.8,.2,1)!important}
 .marq,.marq div{backface-visibility:hidden}
 .marq div{will-change:transform;animation:mq 42s linear infinite!important}
 @media(max-width:899px){
- #fx-camera{filter:brightness(.72) contrast(1.08) saturate(.42)!important}
+ #fx-camera{filter:brightness(.72) contrast(1.08) saturate(.42) blur(5px)!important}
  .fx-ambient{opacity:.76!important}
  .mini,.drawer,.tabs{-webkit-backdrop-filter:blur(8px)!important;backdrop-filter:blur(8px)!important}
 }
@@ -74,18 +70,8 @@ body.text-selecting .hero .info,body.text-selecting .page-h h2,body.text-selecti
 }
 
 
-/* Movimiento ligero de palabras; el fondo sigue usando una sola capa ambiental. */
-#ttl .w,.page-h h2 .w,.page h2 .w{
- animation:ronTitleWordDrift 6.8s ease-in-out infinite;
- animation-delay:calc(var(--wi,0)*-.73s);
-}
-@keyframes ronTitleWordDrift{
- 0%,100%{transform:translate3d(0,0,0) rotate(0)}
- 50%{transform:translate3d(0,-2.5px,0) rotate(.35deg)}
-}
-body.text-selecting #ttl .w,
-body.text-selecting .page-h h2 .w,
-body.text-selecting .page h2 .w{animation-play-state:paused!important}
-@media(prefers-reduced-motion:reduce){
- #ttl .w,.page-h h2 .w,.page h2 .w{animation-duration:12s}
-}
+/* Compatibilidad: scroll nativo y selección de texto sin animaciones encima. */
+#main,.main{scroll-behavior:auto!important}
+body.text-selecting .hero .info,
+body.text-selecting .page-h h2,
+body.text-selecting .page h2{animation-play-state:paused!important}

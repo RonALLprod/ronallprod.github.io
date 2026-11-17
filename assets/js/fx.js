@@ -1,8 +1,9 @@
-
+/* RONALL-SMOOTH-MOTION-2026-11-17-V38 · FX adaptive: anima solo cuando hace falta */
 (() => {
   'use strict';
   const rnd = (a, b) => a + Math.random() * (b - a);
-  
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   function create(n, audio) {
     const state = { an:false, bass:0, mid:0, high:0, hit:0, energy:0, bins:new Float32Array(5) };
     const cbs = [], cam = n.camera, cx = cam && cam.getContext('2d');
