@@ -55,7 +55,8 @@ const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArr
 const st = { q: '', g: '', sort: 'new' };
 let cur = [], sel = null, ui = null, shown = 0, coverP = Promise.resolve();
 const sub = b => [b.type, b.bpm && b.bpm + ' BPM', b.key].filter(Boolean).map(esc).concat(R.ago ? [`<span class="ag">${esc(R.ago(b))}</span>`] : []).join(' · ');
-const tagsOf = b => (b.tags || []).slice(0, 3), heroTags = b => (b.tags || []).slice(0, 6);
+/* Los tags siguen indexados para búsqueda, pero nunca se exponen como hashtags en la tienda pública. */
+const tagsOf = () => [], heroTags = () => [];
 
 /* ───────── Vista de beat ───────── */
 const tot = $('#tot');
@@ -113,7 +114,7 @@ const genres = [...new Set(beats.map(b => b.genre).filter(Boolean))].sort();
 $('#chips').innerHTML = ['Todos', ...genres].map((g, i) => `<button class="chip ${i ? '' : 'on'}" data-g="${i ? esc(g) : ''}">${esc(g)}</button>`).join('');
 /* Tags más usados como chips: un clic busca ese tag, otro clic lo quita */
 const tagTop = (() => { const c = {}, gl = new Set(genres.map(g => String(g).toLowerCase())); beats.forEach(b => (b.tags || []).forEach(t => { const k = String(t).trim(); if (k && !gl.has(k.toLowerCase())) c[k] = (c[k] || 0) + 1; })); return Object.entries(c).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 10).map(x => x[0]); })();
-$('#chips').insertAdjacentHTML('beforeend', tagTop.map(t => `<button class="chip tg" data-tg="${esc(t)}">#${esc(t)}</button>`).join(''));
+/* Tags internos: no renderizar chips públicos. El buscador sigue consultando b.tags. */
 /* Buscador: sin tildes, por palabras sueltas, prefijos, tags/sobrenombres y tolerancia a 1 error de tecleo */
 const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9# ]+/g, ' ').replace(/\s+/g, ' ').trim();
 const near = (a, b) => { if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, e = 0; while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++e > 1) return false; if (a.length > b.length) i++; else if (a.length < b.length) j++; else { i++; j++; } } return e + (a.length - i) + (b.length - j) <= 1; };
@@ -132,7 +133,7 @@ const view = () => { const qt = norm(st.q).split(' ').filter(Boolean), srt = { n
   return l.sort((a, b) => b[1] - a[1] || srt(a[0], b[0])).map(x => x[0]); };
 const draw = () => {
   cur = view(); $('#count').textContent = cur.length + ' beat' + (cur.length === 1 ? '' : 's'); P.setList(cur);
-  $('#list').innerHTML = cur.length ? cur.map((b, i) => { const fp = R.fromPrice(b); return `<button class="row ${sel && sel.id === b.id ? 'on' : ''}" data-id="${esc(b.id)}" style="--i:${Math.min(i, 10)}"><span class="n"><em>${i + 1}</em><i class="eq"><b></b><b></b><b></b></i></span><img src="${esc(b.thumb)}" alt="" loading="lazy" width="44" height="44"><span class="t"><b>${esc(b.name)}</b><small>${sub(b) || 'Beat'}</small>${tagsOf(b).length ? `<em class="tg">${tagsOf(b).map(x => '#' + esc(x)).join(' ')}</em>` : ''}</span><span class="p">${fp == null ? '—' : money(fp)}</span></button>`; }).join('') : '<div class="none">Sin resultados. Prueba otra búsqueda.</div>';
+  $('#list').innerHTML = cur.length ? cur.map((b, i) => { const fp = R.fromPrice(b); return `<button class="row ${sel && sel.id === b.id ? 'on' : ''}" data-id="${esc(b.id)}" style="--i:${Math.min(i, 10)}"><span class="n"><em>${i + 1}</em><i class="eq"><b></b><b></b><b></b></i></span><img src="${esc(b.thumb)}" alt="" loading="lazy" width="44" height="44"><span class="t"><b>${esc(b.name)}</b><small>${sub(b) || 'Beat'}</small></span><span class="p">${fp == null ? '—' : money(fp)}</span></button>`; }).join('') : '<div class="none">Sin resultados. Prueba otra búsqueda.</div>';
   sync();
 };
 $('#list').onclick = e => { const r = e.target.closest('.row'); if (!r) return; const b = beats.find(x => x.id === r.dataset.id); if (!sel || sel.id !== b.id) select(b); P.play(b, cur); if (isM()) go('beats'); };
