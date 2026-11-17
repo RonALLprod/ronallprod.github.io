@@ -1,0 +1,72 @@
+#ron-bg{
+ position:fixed;
+ inset:0;
+ z-index:0;
+ overflow:hidden;
+ pointer-events:none;
+ isolation:isolate;
+ background:
+  radial-gradient(ellipse 100% 74% at 50% -5%,#171a21 0%,#0b0d12 48%,#050609 100%);
+}
+#ron-bg:before,#ron-bg:after{
+ content:"";
+ position:absolute;
+ inset:-16%;
+ pointer-events:none;
+ will-change:transform;
+}
+#ron-bg:before{
+ opacity:.92;
+ background:
+  radial-gradient(ellipse 32% 34% at 17% 29%,rgba(174,185,207,.25),transparent 73%),
+  radial-gradient(ellipse 39% 34% at 83% 65%,rgba(135,151,181,.22),transparent 74%),
+  radial-gradient(ellipse 43% 28% at 52% 97%,rgba(124,139,170,.18),transparent 76%),
+  radial-gradient(ellipse 23% 26% at 58% 23%,rgba(196,201,215,.10),transparent 76%);
+ animation:ronBackgroundDriftA 24s ease-in-out infinite alternate;
+}
+#ron-bg:after{
+ opacity:.75;
+ background:
+  radial-gradient(ellipse 26% 36% at 78% 18%,rgba(191,199,218,.20),transparent 72%),
+  radial-gradient(ellipse 36% 29% at 11% 82%,rgba(127,143,177,.19),transparent 74%),
+  radial-gradient(ellipse 25% 32% at 49% 50%,rgba(160,169,191,.12),transparent 76%);
+ animation:ronBackgroundDriftB 32s ease-in-out infinite alternate;
+}
+.fx-scene,.shade{display:none!important}
+.app{position:relative;z-index:7}
+.side{background:rgba(8,9,12,.54)!important}
+.main{background:rgba(8,9,12,.34)!important}
+.mini{background:rgba(8,9,12,.48)!important}
+#ttl .w,.page-h h2 .w,.page h2 .w{
+ display:inline-block;
+ white-space:nowrap;
+ transform-origin:50% 55%;
+ animation:ronTitleWordDrift 6.8s ease-in-out infinite;
+ animation-delay:calc(var(--wi,0)*-.73s);
+}
+#ttl .w .l,.page-h h2 .w .l,.page h2 .w .l{filter:none!important}
+@keyframes ronTitleWordDrift{
+ 0%,100%{transform:translate3d(0,0,0) rotate(0)}
+ 50%{transform:translate3d(0,-2.5px,0) rotate(.35deg)}
+}
+body.text-selecting #ttl .w,
+body.text-selecting .page-h h2 .w,
+body.text-selecting .page h2 .w{animation-play-state:paused!important}
+@keyframes ronBackgroundDriftA{
+ 0%{transform:translate3d(-4.2vw,1.5vh,0) scale(.98)}
+ 100%{transform:translate3d(4.6vw,-2.8vh,0) scale(1.07)}
+}
+@keyframes ronBackgroundDriftB{
+ 0%{transform:translate3d(3.4vw,2.1vh,0) scale(1.05)}
+ 100%{transform:translate3d(-4vw,-2.4vh,0) scale(.97)}
+}
+@media(max-width:899px){
+ #ron-bg:before{opacity:.76}
+ #ron-bg:after{opacity:.60}
+ .main{background:rgba(8,9,12,.26)!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #ron-bg:before{animation-duration:48s}
+ #ron-bg:after{animation-duration:60s}
+ #ttl .w,.page-h h2 .w,.page h2 .w{animation-duration:12s}
+}
