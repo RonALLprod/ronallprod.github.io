@@ -28,7 +28,7 @@ for(const b of live){
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${img}">
 <link rel="icon" type="image/png" href="../../favicon.png"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><link rel="manifest" href="../../manifest.webmanifest">
 <link rel="preload" href="../../assets/fonts/kosmos.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../assets/css/app.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/v12.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/polish.css?v=POLISH-4">
+<link rel="stylesheet" href="../../assets/css/app.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/v12.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/polish.css?v=POLISH-5">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g,'\\u003c')}</script>
 <script>document.write('<script src="../../config/site-config.js?t='+Date.now()+'"></'+'script>')</script></head><body class="pg beat-product">
 <div class="glow" id="glow" aria-hidden="true"></div>
