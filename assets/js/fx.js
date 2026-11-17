@@ -23,7 +23,7 @@
           tx.drawImage(img,(W-w)/2,(H-h)*.4,w,h);
           const d=tx.getImageData(0,0,W,H),p=d.data;
           for(let i=0;i<p.length;i+=4){
-            const y=(p[i]*.3+p[i+1]*.59+p[i+2]*.11)*.48;
+            const y=(p[i]*.3+p[i+1]*.59+p[i+2]*.11)*.76;
             p[i]=p[i+1]=p[i+2]=y;
           }
           tx.putImageData(d,0,0);
@@ -44,10 +44,10 @@
         b.style.opacity=rnd(.5,.82).toFixed(2);
       });
     };
-    const go=()=>{if(still||timer||document.hidden)return;drift();timer=setInterval(drift,19000);};
+    const go=()=>{if(timer||document.hidden)return;drift();timer=setInterval(drift,24000);};
     const stop=()=>{clearInterval(timer);timer=0;};
     function wake(){
-      if(still||document.hidden)return;
+      if(document.hidden)return;
       activeUntil=performance.now()+500;
       if(!raf){last=0;raf=requestAnimationFrame(tick);}
     }
