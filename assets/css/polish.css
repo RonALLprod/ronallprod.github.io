@@ -1,6 +1,6 @@
 :root{color-scheme:dark}
-html,body{overscroll-behavior-y:none}
-#main,.side,.lib,.list{overscroll-behavior:contain}
+#main{scroll-behavior:auto!important;overscroll-behavior:auto!important}
+.list{overscroll-behavior:contain}
 button,a,summary{touch-action:manipulation}
 h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 :where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:2px solid rgba(255,255,255,.9);outline-offset:3px}
@@ -40,16 +40,17 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 .fx-ambient i:nth-child(2){animation:ronOrbB 37s ease-in-out infinite alternate!important}
 .fx-ambient i:nth-child(3){animation:ronOrbC 43s ease-in-out infinite alternate!important}
 
-.hero .info{will-change:transform;animation:ronallTextFloat 8s ease-in-out infinite}
-.page-h h2,.page h2{will-change:transform;animation:ronallTextFloat 9s ease-in-out infinite}
-@keyframes ronallTextFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-2px,0)}}
+.hero .info,.page-h h2,.page h2{will-change:auto!important;animation:none!important}
+.w{display:inline-block;white-space:nowrap;will-change:auto!important}
+.w+.w{margin-left:.18em}
+.w .l{display:inline-block;transform-origin:50% 100%;animation:ronallGlyphIn .52s cubic-bezier(.2,.8,.2,1) both!important;animation-delay:calc(var(--i)*24ms)!important;filter:none!important}
+@keyframes ronallGlyphIn{from{opacity:0;transform:translate3d(0,.48em,0) rotateX(-55deg) scale(.96)}to{opacity:1;transform:translate3d(0,0,0) rotateX(0) scale(1)}}
 .hero.swap .info>*{animation:ronallTextEnter .34s cubic-bezier(.2,.8,.2,1) both!important;filter:none!important}
 .hero.swap .kicker{animation-delay:0s!important}
 .hero.swap h1{animation-delay:.035s!important}
 .hero.swap .meta{animation-delay:.07s!important}
 @keyframes ronallTextEnter{from{opacity:.5;transform:translate3d(0,6px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
-#list .row{animation:ronallRowIn .24s ease-out both!important;animation-delay:calc(var(--i,0)*15ms)!important;filter:none!important}
-@keyframes ronallRowIn{from{opacity:0;transform:translate3d(-6px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+#list .row{animation:none!important;filter:none!important}
 .view.on{animation:ronallViewIn .28s ease-out both!important;filter:none!important}
 @keyframes ronallViewIn{from{opacity:.72;transform:translate3d(0,5px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
 .rv2{filter:none!important;transition:opacity .3s ease,transform .3s cubic-bezier(.2,.8,.2,1)!important}
