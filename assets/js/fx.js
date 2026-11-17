@@ -37,10 +37,10 @@
     const blobs=[0,1,2].map(()=>field.appendChild(document.createElement('i')));
     n.root&&n.root.appendChild(field);
     const drift=()=>{
-      if(cam)cam.style.transform=\`translate3d(\${rnd(-2,2).toFixed(2)}%,\${rnd(-1.7,1.7).toFixed(2)}%,0) scale(\${rnd(1.02,1.06).toFixed(3)})\`;
+      if(cam)cam.style.transform=`translate3d(${rnd(-2,2).toFixed(2)}%,${rnd(-1.7,1.7).toFixed(2)}%,0) scale(${rnd(1.02,1.06).toFixed(3)})`;
       blobs.forEach(b=>{
         b.style.transitionDuration=rnd(18,28).toFixed(1)+'s';
-        b.style.transform=\`translate3d(\${rnd(-10,10).toFixed(1)}vw,\${rnd(-9,9).toFixed(1)}vh,0) scale(\${rnd(.94,1.12).toFixed(2)})\`;
+        b.style.transform=`translate3d(${rnd(-10,10).toFixed(1)}vw,${rnd(-9,9).toFixed(1)}vh,0) scale(${rnd(.94,1.12).toFixed(2)})`;
         b.style.opacity=rnd(.5,.82).toFixed(2);
       });
     };
