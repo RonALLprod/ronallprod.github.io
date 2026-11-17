@@ -75,3 +75,19 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 body.text-selecting .hero .info,
 body.text-selecting .page-h h2,
 body.text-selecting .page h2{animation-play-state:paused!important}
+
+
+/* Keep motion alive, but release decorative compositing work during interaction. */
+body.is-scrolling .fx-scene:before,
+body.is-scrolling .fx-scene:after,
+body.is-scrolling .fx-ambient i,
+body.is-scrolling .marq div,
+body.is-scrolling .hero .info,
+body.is-scrolling .page-h h2,
+body.is-scrolling .page h2,
+body.text-selecting .fx-scene:before,
+body.text-selecting .fx-scene:after,
+body.text-selecting .fx-ambient i,
+body.text-selecting .marq div {
+  animation-play-state: paused !important;
+}

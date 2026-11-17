@@ -83,18 +83,34 @@
     if (!fine || reduce) return;
     if (h._lt) { h._ltRefresh?.(); return; }
     h._lt = 1;
-    let items = [];
+
+    const scrollRoot = h.closest('#main') || D.getElementById('main');
+    const scrollPos = () => scrollRoot
+      ? [scrollRoot.scrollLeft, scrollRoot.scrollTop]
+      : [window.scrollX, window.scrollY];
+    let items = [], baseX = 0, baseY = 0, selecting = false;
+
     const build = () => {
+      [baseX, baseY] = scrollPos();
       items = $$('.l', h).map(el => {
         const r = el.getBoundingClientRect();
-        return { el, cx: r.left + r.width / 2, cy: r.top + r.height / 2, x: new Spring(120, 8), y: new Spring(120, 8), r: new Spring(90, 6), s: new Spring(170, 10) };
+        return {
+          el,
+          cx: r.left + r.width / 2,
+          cy: r.top + r.height / 2,
+          x: new Spring(120, 8),
+          y: new Spring(120, 8),
+          r: new Spring(90, 6),
+          s: new Spring(170, 10)
+        };
       });
     };
+
     const obj = {
       tick(dt) {
         for (const it of items) {
           it.x.step(dt); it.y.step(dt); it.r.step(dt); it.s.step(dt);
-          it.el.style.translate = `${it.x.x.toFixed(2)}px ${it.y.x.toFixed(2)}px`;
+          it.el.style.translate = it.x.x.toFixed(2) + 'px ' + it.y.x.toFixed(2) + 'px';
           it.el.style.rotate = it.r.x.toFixed(2) + 'deg';
           it.el.style.scale = it.s.x.toFixed(3);
         }
@@ -102,30 +118,70 @@
       done() { return items.every(it => it.x.rest && it.y.rest && it.r.rest && it.s.rest); },
       end() { for (const it of items) it.el.style.translate = it.el.style.rotate = it.el.style.scale = ''; }
     };
+
     const settle = () => {
-      for (const it of items) { it.x.t = it.y.t = it.r.t = 0; it.s.t = 1; }
-      wake(obj);
+      for (const it of items) {
+        it.x.t = it.y.t = it.r.t = 0;
+        it.s.t = 1;
+      }
+      if (!obj.done()) wake(obj);
+      else obj.end();
     };
+
+    const onSelectionChange = () => {
+      const selection = D.getSelection();
+      const active = !!(selection && !selection.isCollapsed);
+      if (active === selecting) return;
+      selecting = active;
+      h._ltSelecting = active;
+      if (active) settle();
+    };
+
     h._ltRefresh = build;
+    h._ltSelecting = false;
+    D.addEventListener('selectionchange', onSelectionChange);
     h.addEventListener('pointerenter', build);
     h.addEventListener('pointermove', e => {
-      if (!items.length) build();
+      if (selecting) return;
+
+      /* Fallback for browsers that dispatch pointermove before selectionchange. */
       const selection = D.getSelection();
-      if (selection && !selection.isCollapsed) { settle(); return; }
+      if (selection && !selection.isCollapsed) {
+        selecting = true;
+        h._ltSelecting = true;
+        settle();
+        return;
+      }
+
+      /* Keep cached glyph centers aligned with the scrolling container without
+         forcing a layout read for every letter or rebuilding during scroll. */
+      const [sx, sy] = scrollPos();
+      const scrollDX = sx - baseX, scrollDY = sy - baseY;
       for (const it of items) {
-        const dx = it.cx - e.clientX, dy = it.cy - e.clientY, d = Math.hypot(dx, dy), R = 170;
+        const dx = it.cx - scrollDX - e.clientX;
+        const dy = it.cy - scrollDY - e.clientY;
+        const d = Math.hypot(dx, dy), R = 170;
         if (d < R) {
           const f = (1 - d / R) ** 2;
           it.x.t = dx / (d || 1) * f * 44;
           it.y.t = dy / (d || 1) * f * 26 - f * 14;
           it.r.t = (dx > 0 ? 1 : -1) * f * 24;
           it.s.t = 1 + f * .3;
-        } else { it.x.t = it.y.t = it.r.t = 0; it.s.t = 1; }
+        } else {
+          it.x.t = it.y.t = it.r.t = 0;
+          it.s.t = 1;
+        }
       }
       wake(obj);
     }, { passive: true });
+
     h.addEventListener('pointerleave', () => {
-      for (const it of items) { it.x.t = it.y.t = it.r.t = 0; it.s.t = 1; it.r.v += (Math.random() - .5) * 60; }
+      if (selecting) return;
+      for (const it of items) {
+        it.x.t = it.y.t = it.r.t = 0;
+        it.s.t = 1;
+        it.r.v += (Math.random() - .5) * 60;
+      }
       wake(obj);
     });
   }

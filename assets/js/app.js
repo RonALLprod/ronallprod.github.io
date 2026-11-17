@@ -161,7 +161,13 @@ const go = v => {
 };
 $$('[data-v]').forEach(x => x.onclick = () => go(x.dataset.v));
 addEventListener('resize', () => { if (!isM() && curView === 'lib') go('beats'); });
-main.addEventListener('scroll', () => main.classList.toggle('sc', main.scrollTop > 200), { passive: true });
+let scrollIdleTimer = 0;
+main.addEventListener('scroll', () => {
+  main.classList.toggle('sc', main.scrollTop > 200);
+  D.body.classList.add('is-scrolling');
+  clearTimeout(scrollIdleTimer);
+  scrollIdleTimer = setTimeout(() => D.body.classList.remove('is-scrolling'), 160);
+}, { passive: true });
 $('#cats').innerHTML = genres.map((g, i) => `<button class="tile" style="--h:${(i * 53 + 210) % 360}" data-g="${esc(g)}"><b>${esc(g)}</b><small>${beats.filter(b => b.genre === g).length} beat(s)</small></button>`).join('') || '<p class="mute">Los géneros aparecerán con los primeros beats.</p>';
 $('#cats').onclick = e => { const t = e.target.closest('.tile'); if (t) { setG(t.dataset.g); go(isM() ? 'lib' : 'beats'); } };
 
