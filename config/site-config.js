@@ -22,11 +22,12 @@ window.SITE = {
     key: "sb_publishable_HL_vNXAUhonkIgq7RRaPmQ_ojk54lmW"   // tienda, pedidos y analítica pública
   },
 
-  // El catálogo privado conserva su backend original: allí vive la clave AES
-  // con la que se cifraron los .bin. No mezclarlo con el backend de la tienda.
+  // UNIFICADO: el catálogo privado (accesos, clave AES de los .bin y métricas) vive en el MISMO
+  // proyecto que la tienda. privateSupabase apunta al mismo proyecto que supabase.
+  // La clave AES de ese proyecto (tabla ron_secret) debe ser la que cifró los .bin: ver sql/03_unificar_proyecto.sql
   privateSupabase: {
-    url: "https://kwxbdckegbyivcrekevv.supabase.co",
-    key: "sb_publishable_80B-AoZBWu7crLRcjANK_Q_jk7QTzwK"
+    url: "https://kwmofbiiwvpojtkvlmxz.supabase.co",
+    key: "sb_publishable_HL_vNXAUhonkIgq7RRaPmQ_ojk54lmW"
   },
 
   producer: { name: "RONALL PROD", legalName: "[Nombre legal del productor — por definir]", country: "[por definir]", email: "[por definir]" },
