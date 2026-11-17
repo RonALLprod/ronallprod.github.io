@@ -1,7 +1,6 @@
 :root{color-scheme:dark}
-html,body,#main,.main,.list{scroll-behavior:auto!important;overscroll-behavior:auto!important}
-#main,.main,.list{contain:none!important}
-.row,.card,.tile{content-visibility:visible!important;contain:none!important;contain-intrinsic-size:none!important}
+#main{scroll-behavior:auto!important;overscroll-behavior:auto!important}
+.list{overscroll-behavior:contain}
 button,a,summary{touch-action:manipulation}
 h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 :where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:2px solid rgba(255,255,255,.9);outline-offset:3px}
@@ -72,4 +71,21 @@ body.text-selecting .hero .info,body.text-selecting .page-h h2,body.text-selecti
  .marq div{animation-duration:90s!important}
  .hero .info,.page-h h2,.page h2{animation-duration:14s!important}
  .btn,.chip,.cartb,.ib,.play,.ctl button,.tile,.card,.lic,.row,.snav button,.tabs button{transition-duration:.16s!important}
+}
+
+
+/* Movimiento ligero de palabras; el fondo sigue usando una sola capa ambiental. */
+#ttl .w,.page-h h2 .w,.page h2 .w{
+ animation:ronTitleWordDrift 6.8s ease-in-out infinite;
+ animation-delay:calc(var(--wi,0)*-.73s);
+}
+@keyframes ronTitleWordDrift{
+ 0%,100%{transform:translate3d(0,0,0) rotate(0)}
+ 50%{transform:translate3d(0,-2.5px,0) rotate(.35deg)}
+}
+body.text-selecting #ttl .w,
+body.text-selecting .page-h h2 .w,
+body.text-selecting .page h2 .w{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+ #ttl .w,.page-h h2 .w,.page h2 .w{animation-duration:12s}
 }
