@@ -186,8 +186,8 @@ fx && fx.onFrame((dt, s, time) => {
   { const sc = 1 + s.bass * .035 + s.hit * .02; if (Math.abs(sc - lastSc) > .0007) { lastSc = sc; artw.style.scale = sc.toFixed(4); } }
     if ((fr++ & 1) === 0) for (let i = 0; i < 5; i++) meters[i].style.transform = `scaleY(${(.16 + .84 * s.bins[i]).toFixed(3)})`;
 });
-main.addEventListener('pointerleave', () => { tx = ty = 0; fx && fx.wake(); });
-main.addEventListener('pointermove', e => { const r = main.getBoundingClientRect(); tx = ((e.clientX - r.left) / r.width) * 2 - 1; ty = ((e.clientY - r.top) / r.height) * 2 - 1; if (!fx) return; fx.wake(); fx.pointerTo = [((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1)]; }, { passive: true });
+main.addEventListener('pointerleave', () => { tx = ty = 0; });
+main.addEventListener('pointermove', e => { const r = main.getBoundingClientRect(); tx = ((e.clientX - r.left) / r.width) * 2 - 1; ty = ((e.clientY - r.top) / r.height) * 2 - 1; }, { passive: true });
 
 /* ───────── Motion graphics: resortes, magnetismo y tilt 3D ───────── */
 const M = RonMotion;
