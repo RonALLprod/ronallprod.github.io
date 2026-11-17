@@ -51,7 +51,7 @@ test('scroll y selección suspenden efectos pesados y luego los reanudan', async
 
   const main = page.locator('#main');
   await expect.poll(() => main.evaluate(el => el.scrollHeight - el.clientHeight)).toBeGreaterThan(0);
-  await main.evaluate(el => el.scrollTo({ top: Math.min(420, el.scrollHeight), behavior: 'instant' }));
+  await main.evaluate(el => el.scrollTo({ top: Math.min(420, el.scrollHeight), behavior: 'auto' }));
   await expect.poll(() => main.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
   await expect(page.locator('body')).toHaveClass(/is-scrolling/);
   await expect.poll(() => page.locator('.fx-scene').evaluate(el =>
@@ -64,6 +64,7 @@ test('scroll y selección suspenden efectos pesados y luego los reanudan', async
 
   await page.evaluate(() => {
     const heading = document.querySelector('#ttl');
+    heading.dispatchEvent(new Event('selectstart', { bubbles: true }));
     const range = document.createRange();
     range.selectNodeContents(heading);
     const selection = window.getSelection();
