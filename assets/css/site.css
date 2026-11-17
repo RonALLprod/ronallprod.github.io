@@ -10,33 +10,68 @@
 .drawer{background:rgba(29,29,33,.96)}
 @media(max-width:899px){.tabs{background:rgba(29,29,33,.94)}}
 
-/* RONALL · PERFORMANCE: fondo vectorial, sin canvas ampliado ni capas animadas */
-.fx-scene{background:var(--public-backdrop);contain:strict;isolation:isolate}
-#fx-camera,#fx-bloom,#fx-cover,#gl,.fx-grain,.fx-ambient,.fx-scene:before,.fx-scene:after{display:none!important}
-.shade{background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.16));contain:strict}
-.side,.main,.mini{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:0 12px 34px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.04)}
-.main.sc .top,.drawer,.nfp{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-.main{background-image:none!important;scroll-behavior:auto}
-@media(max-width:899px){.side,.main,.mini,.tabs{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 
 
-
-
-/* RONALL · FX RESTORE + TRUE GLASS PANELS */
-:root{--panel:#202025;--panel2:#29292f}
-.fx-scene{background:var(--public-backdrop)!important;contain:paint!important;isolation:isolate!important}
+/* RONALL · RESTORE REAL: ambient FX, motion and translucent glass */
+:root{
+  --panel:#1d1d21;
+  --panel2:#26262b;
+  --public-backdrop:radial-gradient(ellipse 110% 68% at 50% 0%,rgba(255,255,255,.065) 0%,transparent 66%),linear-gradient(180deg,#202024 0%,#19191d 54%,#151518 100%);
+}
+.fx-scene{
+  background:var(--public-backdrop)!important;
+  contain:paint!important;
+  isolation:isolate!important;
+}
 .fx-scene:before,.fx-scene:after{display:block!important;visibility:visible!important}
-#fx-camera{display:block!important;mix-blend-mode:screen!important;filter:saturate(.62) contrast(1.06) brightness(.9)!important}
-#fx-camera.on{opacity:.42!important}
-.fx-ambient{display:block!important;opacity:.82!important}
-.fx-ambient i{display:block!important;filter:blur(6px) saturate(1.12)!important}
-.fx-grain,.marq,.art-glow,.hglow{display:block!important}
-.side,.main,.mini{background:rgba(27,27,32,.70)!important;backdrop-filter:blur(18px) saturate(1.16)!important;-webkit-backdrop-filter:blur(18px) saturate(1.16)!important;border:1px solid rgba(255,255,255,.105)!important;box-shadow:0 14px 42px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.055)!important}
-.main.sc .top,.top{background:rgba(20,20,24,.58)!important;backdrop-filter:blur(20px) saturate(1.18)!important;-webkit-backdrop-filter:blur(20px) saturate(1.18)!important}
-.drawer,.tabs{background:rgba(29,29,34,.78)!important;backdrop-filter:blur(20px) saturate(1.16)!important;-webkit-backdrop-filter:blur(20px) saturate(1.16)!important}
+#fx-camera{
+  display:block!important;
+  position:absolute!important;
+  inset:-8%!important;
+  width:116%!important;
+  height:116%!important;
+  z-index:1!important;
+  opacity:0;
+  filter:saturate(.62) contrast(1.06) brightness(.9)!important;
+  mix-blend-mode:screen!important;
+  will-change:opacity,transform!important;
+}
+#fx-camera.on{opacity:.48!important}
+.fx-ambient{
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:2!important;
+  opacity:.84!important;
+  visibility:visible!important;
+}
+.fx-ambient i{
+  display:block!important;
+  filter:blur(6px) saturate(1.12)!important;
+  will-change:transform,opacity!important;
+}
+#gl,#fx-bloom,#fx-cover,.fx-scan,.fx-streak,#fx-streak,#fx-flash,.fx-grain,.marq,.art-glow,.hglow{
+  display:block!important;
+}
+.fx-grain{opacity:.045!important;mix-blend-mode:soft-light}
+.side,.main,.mini{
+  background:rgba(26,26,30,.64)!important;
+  backdrop-filter:blur(18px) saturate(1.16)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.16)!important;
+  border:1px solid rgba(255,255,255,.105)!important;
+  box-shadow:0 14px 42px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.055)!important;
+}
+.top,.main.sc .top{
+  background:rgba(20,20,24,.58)!important;
+  backdrop-filter:blur(20px) saturate(1.18)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.18)!important;
+}
+.drawer,.tabs{
+  background:rgba(29,29,34,.78)!important;
+  backdrop-filter:blur(20px) saturate(1.16)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.16)!important;
+}
 .scrim{backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
-.lib{border-top-color:rgba(255,255,255,.12)}
 .snav button.on,.row.on{background:rgba(255,255,255,.095)}
 .sbx input,.qf select,.chip{background:rgba(255,255,255,.075)}
 .lic{background:rgba(255,255,255,.035)!important;border-color:rgba(255,255,255,.11)!important}
@@ -44,4 +79,11 @@
 .lic.sel{background:rgba(255,255,255,.105)!important;border-color:rgba(255,255,255,.8)!important}
 .buy,.card{background:rgba(255,255,255,.045)!important;border-color:rgba(255,255,255,.11)!important}
 .row:hover,.chip:hover{background:rgba(255,255,255,.09)}
-@media(max-width:899px){.side,.main,.mini,.tabs{background:rgba(27,27,32,.72)!important;backdrop-filter:blur(16px) saturate(1.12)!important;-webkit-backdrop-filter:blur(16px) saturate(1.12)!important}}
+.hero,.artw,.fx-ambient i,#fx-camera{will-change:transform,opacity!important}
+@media(max-width:899px){
+  .side,.main,.mini,.tabs{
+    background:rgba(26,26,30,.68)!important;
+    backdrop-filter:blur(16px) saturate(1.12)!important;
+    -webkit-backdrop-filter:blur(16px) saturate(1.12)!important;
+  }
+}
