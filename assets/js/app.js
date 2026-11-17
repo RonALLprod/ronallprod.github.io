@@ -1,16 +1,16 @@
-/* RONALL-SMOOTH-MOTION-2026-11-17-V38 · app.js — catálogo rápido, datos remotos sin bloqueo */
+
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
 R.boot();
 const fx = window.RonFX ? RonFX.create({ root: $('#fx-scene'), stage: main, cover: $('#fx-cover'), streak: $('#fx-streak'), camera: $('#fx-camera'), light: $('#gl'), flash: $('#fx-flash') }, P.audio) : null;
 
-/* Texto estable: evitamos envolver cada letra en spans animados. */
+
 $('#ct-wa').href = $('#ft-wa').href = R.wa('Hola Ronall Prod 👋 Quiero más información.');
 ['#ct-wa', '#ft-wa'].forEach(q => $(q).addEventListener('click', () => R.track('wa')));
 const isM = () => matchMedia('(max-width:899px)').matches;
 
-/* ───────── Intro corto ───────── */
+
 const intro = $('#intro'), t0 = performance.now(), ifill = $('#in-f'), ipct = $('#in-p'), istat = $('#in-s');
 $('#in-t').innerHTML = [...'ronall prod'].map((c, i) => `<span class="l" style="--i:${i}">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
 let prog = 0, target = .1, introDone = false; const bump = v => { target = Math.max(target, v); };
@@ -18,22 +18,22 @@ let prog = 0, target = .1, introDone = false; const bump = v => { target = Math.
 (D.fonts && D.fonts.ready || Promise.resolve()).then(() => bump(.4)).catch(() => {});
 const hideIntro = async () => { const w = 520 - (performance.now() - t0); if (w > 0) await new Promise(r => setTimeout(r, w)); introDone = true; ifill.style.transform = 'scaleX(1)'; ipct.textContent = '100%'; istat.textContent = 'Listo'; setTimeout(() => { intro.classList.add('out'); setTimeout(() => intro.remove(), 650); }, 100); };
 
-/* ───────── Imágenes y acento ───────── */
+
 const imgs = new Map();
 const loadImg = u => {
   if (imgs.has(u)) { const p = imgs.get(u); imgs.delete(u); imgs.set(u, p); return p; }
   const p = new Promise((ok, no) => { const i = new Image(); i.decoding = 'async'; i.onload = () => ok(i); i.onerror = no; i.src = u; });
-  imgs.set(u, p); while (imgs.size > 3) imgs.delete(imgs.keys().next().value);   /* LRU: libera portadas viejas */
+  imgs.set(u, p); while (imgs.size > 3) imgs.delete(imgs.keys().next().value);   
   return p;
 };
-const setAccent = () => {};   /* V12: el bloom es siempre blanco; no se extrae color de la portada */
 
-/* ───────── Datos ───────── */
+
+
 let beats = [];
 bump(.58);
-/* El JSON es estático: deja que el navegador/CDN lo almacene. La consulta de ventas jamás bloquea el catálogo. */
+
 try {
-  const r = (await window.__cat) || await fetch('data/beats.public.json', { cache: 'default' });  /* siempre el catálogo más reciente */
+  const r = (await window.__cat) || await fetch('data/beats.public.json', { cache: 'default' });  
   if (!r.ok) throw new Error('HTTP ' + r.status);
   const data = await r.json(); beats = (data.beats || []).filter(b => b.active !== false);
 } catch (e) {
@@ -46,10 +46,10 @@ const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArr
 const st = { q: '', g: '', sort: 'new' };
 let cur = [], sel = null, ui = null, shown = 0, coverP = Promise.resolve();
 const sub = b => [b.type, b.bpm && b.bpm + ' BPM', b.key].filter(Boolean).map(esc).concat(R.ago ? [`<span class="ag">${esc(R.ago(b))}</span>`] : []).join(' · ');
-/* Los tags siguen indexados para búsqueda, pero nunca se exponen como hashtags en la tienda pública. */
+
 const tagsOf = () => [], heroTags = () => [];
 
-/* ───────── Vista de beat ───────── */
+
 const tot = $('#tot');
 const count = to => { const f = shown; shown = to; RonMotion.count(tot, f, to, { dur: 1000 }); };
 function refreshBuy(key) {
@@ -91,7 +91,7 @@ $('#b-buy').onclick = () => { if (!sel || !ui || !ui.value) return; R.track('wa'
 $('#b-sh').onclick = () => sel && R.share(sel);
 R.Cart.ev.addEventListener('change', () => refreshBuy());
 
-/* ───────── Más beats (estantería) ───────── */
+
 function shelf() {
   const o = beats.filter(b => sel && b.id !== sel.id).slice(0, 12), box = $('#more');
   box.hidden = !o.length; if (!o.length) return;
@@ -99,11 +99,11 @@ function shelf() {
 }
 $('#more-l').onclick = e => { const c = e.target.closest('.card'); if (!c) return; select(beats.find(x => x.id === c.dataset.id)); main.scrollTo({ top: 0, behavior: 'smooth' }); };
 
-/* ───────── Catálogo (lista lateral) ───────── */
+
 const genres = [...new Set(beats.map(b => b.genre).filter(Boolean))].sort();
 $('#chips').innerHTML = ['Todos', ...genres].map((g, i) => `<button class="chip ${i ? '' : 'on'}" data-g="${i ? esc(g) : ''}">${esc(g)}</button>`).join('');
-/* Tags internos: no renderizar chips públicos. El buscador sigue consultando b.tags. */
-/* Buscador: sin tildes, por palabras sueltas, prefijos, tags/sobrenombres y tolerancia a 1 error de tecleo */
+
+
 const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9# ]+/g, ' ').replace(/\s+/g, ' ').trim();
 const near = (a, b) => { if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, e = 0; while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++e > 1) return false; if (a.length > b.length) i++; else if (a.length < b.length) j++; else { i++; j++; } } return e + (a.length - i) + (b.length - j) <= 1; };
 const idx = b => { const f = (a, w) => ({ w, t: norm(a) }); const tg = (b.tags || []).map(x => norm(x)).filter(Boolean);
@@ -135,7 +135,7 @@ $('#f-sort').onchange = e => { st.sort = e.target.value; draw(); };
 
 addEventListener('ron:newbeats', e => { const ids = new Set(beats.map(b => b.id)), nb = (e.detail || []).filter(b => !ids.has(b.id)); if (!nb.length) return; beats.unshift(...nb); draw(); shelf(); });
 
-/* ───────── Navegación ───────── */
+
 let curView = 'beats';
 const go = v => {
   if (v === 'lib' && !isM()) { v = 'beats'; setTimeout(() => $('#f-q').focus(), 0); }
@@ -150,7 +150,7 @@ main.addEventListener('scroll', () => main.classList.toggle('sc', main.scrollTop
 $('#cats').innerHTML = genres.map((g, i) => `<button class="tile" style="--h:${(i * 53 + 210) % 360}" data-g="${esc(g)}"><b>${esc(g)}</b><small>${beats.filter(b => b.genre === g).length} beat(s)</small></button>`).join('') || '<p class="mute">Los géneros aparecerán con los primeros beats.</p>';
 $('#cats').onclick = e => { const t = e.target.closest('.tile'); if (t) { setG(t.dataset.g); go(isM() ? 'lib' : 'beats'); } };
 
-/* ───────── Sincronía con el reproductor ───────── */
+
 function sync() {
   const on = P.cur && !P.audio.paused ? P.cur.id : null;
   $$('.row').forEach(r => r.classList.toggle('pl', r.dataset.id === on)); app.classList.toggle('live', !!on); document.documentElement.classList.toggle('live', !!on);
@@ -162,7 +162,7 @@ P.ev.addEventListener('state', () => { sync(); fx && fx.state.an && fx.wake(); }
 P.ev.addEventListener('load', e => { const b = beats.find(x => x.id === e.detail.id); if (b && (!sel || sel.id !== b.id)) select(b); sync(); });
 addEventListener('keydown', e => { if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { if (e.key === 'Escape') e.target.blur(); return; } if (e.key === ' ') { e.preventDefault(); $('#cplay').click(); } });
 
-/* ───────── Bucle visual ligero: solo portada y medidor de audio ───────── */
+
 let lastSc = 1;
 const meters = $('.meter i'), artw = $('#artw');
 fx && fx.onFrame((dt, s) => {
@@ -176,7 +176,7 @@ fx && fx.onFrame((dt, s) => {
   }
 });
 
-/* ───────── Motion graphics: resortes, magnetismo y tilt 3D ───────── */
+
 const M = RonMotion;
 const MAG = '.btn,.play,.ctl button,.cartb,.ib,.chip,.snav button,.tabs button,.lnk,.lic-info summary';
 const TILT = '.card,.tile,.lic';
@@ -189,7 +189,7 @@ function bindMotion(root) {
   bind(root);
   root.querySelectorAll(`${MAG},${TILT}`).forEach(bind);
 }
-/* El observador cubre filas, licencias, tarjetas y drawer que se crean después del load. */
+
 bindMotion(D.body);
 const motionObserver = new MutationObserver(records => {
   for (const record of records) for (const node of record.addedNodes) if (node.nodeType === 1) bindMotion(node);
@@ -198,11 +198,11 @@ motionObserver.observe(D.body, { childList: true, subtree: true });
 { let lt = 0; new MutationObserver(() => { const b = $('.drawer .tr b'); if (!b || b._m) return; b._m = 1; const to = +b.textContent.replace(/\D/g, ''); M.count(b, lt, to, { dur: 900 }); lt = to; }).observe($('.drawer'), { childList: true }); }
 M.reveal($('#v-cats'), '.tile');
 
-/* ───────── Arranque ───────── */
+
 if (!beats.length) { $('#ttl').textContent = 'Sin beats'; $('#meta').innerHTML = '<span>No se pudieron cargar los beats. Si estás en local, abre el sitio con un servidor (python3 -m http.server), no con doble clic.</span>'; draw(); await hideIntro(); return; }
 const h0 = location.hash.slice(1); if (h0 === 'categorias') go('cats');
 draw(); select(beats.find(b => b.slug === h0) || cur[0] || beats[0], true);
-/* Las exclusividades se aplican cuando responda Supabase; el primer render nunca espera esta consulta. */
+
 soldPromise.then(sold => {
   if (!sold.length) return;
   let changed = false;
@@ -214,7 +214,7 @@ await Promise.race([coverP, new Promise(r => setTimeout(r, 800))]);
 hideIntro();
 })();
 
-/* ───────── Atajos de teclado: ←/→ ±5 s · N/P siguiente/anterior · M silencio · / buscar ───────── */
+
 addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey || e.altKey || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
   const a = R.P.audio, k = e.key.toLowerCase();
