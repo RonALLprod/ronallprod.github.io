@@ -152,7 +152,7 @@ P.ev.addEventListener('load', e => { const b = beats.find(x => x.id === e.detail
 addEventListener('keydown', e => { if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { if (e.key === 'Escape') e.target.blur(); return; } if (e.key === ' ') { e.preventDefault(); $('#cplay').click(); } });
 
 let lastSc = 1;
-const meters = $('.meter i'), artw = $('#artw');
+const meters = $$('.meter i'), artw = $('#artw');
 fx && fx.onFrame((dt, s) => {
   const sc = 1 + s.bass * .024 + s.hit * .012;
   if (Math.abs(sc - lastSc) > .0012) {
