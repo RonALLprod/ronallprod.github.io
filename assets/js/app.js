@@ -16,7 +16,7 @@ const isM = () => matchMedia('(max-width:899px)').matches;
 
 const rnd = (a, b) => a + Math.random() * (b - a), TAU = Math.PI * 2;
 function wrap(el, text) {
-  el.innerHTML = text.split(' ').map((w, wi) => `<span class="w">${[...w].map((c, i) => `<span class="l" style="--i:${i + wi * 3}">${esc(c)}</span>`).join('')}</span>`).join(' ');
+  el.innerHTML = text.split(' ').map((w, wi) => `<span class="w" style="--wi:${wi}">${[...w].map((c, i) => `<span class="l" style="--i:${i + wi * 3}">${esc(c)}</span>`).join('')}</span>`).join(' ');
   return [...el.querySelectorAll('.w')].map(e => ({ el: e, a1: rnd(.55, 1.25) * (Math.random() < .5 ? -1 : 1), w1: TAU / rnd(8, 13), p1: rnd(0, TAU), a2: rnd(.16, .42), w2: TAU / rnd(4.2, 7.2), p2: rnd(0, TAU), ax: rnd(1.8, 5), wx: TAU / rnd(8, 15), px: rnd(0, TAU), ay: rnd(1.2, 3.8), wy: TAU / rnd(9, 16), py: rnd(0, TAU) }));
 }
 const sway = { hero: [], cats: [], priv: [], ct: [] }, viewKey = { beats: 'hero', cats: 'cats', priv: 'priv', ct: 'ct' };
