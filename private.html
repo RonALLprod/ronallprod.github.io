@@ -522,27 +522,6 @@ html,body{touch-action:auto}
 @media (prefers-reduced-motion:reduce){#enter .lg,#enter .lgi i{animation:none!important}}
 </style>
 
-
-<style id="ronall-private-search-tags">
-#tagbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:-13px 0 14px;padding:0 0 2px;min-height:0}
-#tagbar:empty{display:none}
-#tagbar .tagbar-label{font:700 8px var(--ui,Arial,sans-serif);letter-spacing:.2em;color:var(--mute,#888);margin-right:3px}
-#tagbar .quickTag,.itTag{appearance:none;border:1px solid #ffffff20;border-radius:99px;background:#ffffff08;color:#a7a7a7;font:500 9px var(--ui,Arial,sans-serif);letter-spacing:.04em;padding:5px 9px;cursor:pointer;transition:color .2s,border-color .2s,background .2s}
-#tagbar .quickTag:hover,.itTag:hover{color:#fff;border-color:#ffffff55;background:#ffffff12}
-.it{align-items:center}
-.itTxt{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:5px}
-.itTxt em{display:block;width:100%;min-width:0;flex:none}
-.itTags{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.itTag{font-size:8px;padding:3px 7px;line-height:1.2;letter-spacing:.02em}
-.itTag:focus-visible,#tagbar .quickTag:focus-visible,#ipanel .info-search-tags button:focus-visible{outline:1px solid #fff;outline-offset:2px}
-#ipanel .ig .info-search-tags{grid-column:1/-1;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;padding:13px 14px}
-#ipanel .ig .info-search-tags>b{font:700 9px var(--ui,Arial,sans-serif);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:5px;text-shadow:none}
-#ipanel .ig .info-search-tags>span{display:flex;flex:1;flex-wrap:wrap;gap:6px;margin:0}
-#ipanel .ig .info-search-tags button{width:auto;margin:0;padding:5px 9px;border-radius:99px;border:1px solid var(--ln2);background:#ffffff08;color:var(--tx);font:500 10px var(--ui,Arial,sans-serif);letter-spacing:.02em;text-transform:none}
-#ipanel .ig .info-search-tags button:hover{background:#fff;color:#000}
-@media(max-width:760px){#tagbar{margin:-10px 0 12px;gap:6px}.it{align-items:center;gap:10px}.itTxt{gap:4px}.itTag{font-size:8px}.itTags{max-width:100%}}
-</style>
-
 </head><body><div id="gate"><div id="gbox"><img class="av" src="pfp.jpg" alt=""><p class="pl">Cargando</p></div></div>
 <svg width="0" height="0" style="position:absolute"><filter id="fx" color-interpolation-filters="sRGB" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur in="SourceGraphic" id="gb" stdDeviation="0 0" result="b"/><feColorMatrix in="b" values="1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" result="r"/><feColorMatrix in="b" values="0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0" result="g"/><feColorMatrix in="b" values="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0" result="bl"/><feOffset in="r" id="or" dx="0" dy="0" result="r2"/><feOffset in="bl" id="ob" dx="0" dy="0" result="b2"/><feBlend in="r2" in2="g" mode="screen" result="rg"/><feBlend in="rg" in2="b2" mode="screen"/></filter><filter id="fxt" x="-10%" y="-25%" width="120%" height="150%"><feGaussianBlur id="gbt" stdDeviation="0 0"/></filter></svg>
 <svg width="0" height="0" style="position:absolute"><filter id="hmb" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB"><feGaussianBlur id="hmbg" stdDeviation="0 0"/></filter></svg><div id="stage"><div id="cover"><canvas id="mbc"></canvas></div><div id="bloom"></div><canvas id="c"></canvas><div class="scan"></div><div id="flash"></div>
@@ -553,7 +532,7 @@ html,body{touch-action:auto}
 </div>
 <div class="hint" id="hint" aria-hidden="true"><span class="ht" id="ht">DESLIZA</span><span class="ar"></span></div>
 <div id="pz">PAUSA</div><div id="toast"></div><div id="lhero"><div class="bd"></div><div class="rg"></div><div class="lh lh-g lh-r"></div><div class="lh lh-g lh-c"></div><div class="lh lh-m"></div></div>
-<div id="menu"><div class="mh"><input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Buscar beats… (tag:&quot;boom bap&quot;)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Buscar beats"><button id="qclear" type="button" aria-label="Limpiar búsqueda" title="Limpiar búsqueda">×</button><button id="mc" type="button">Cerrar</button></div><div class="tabs"><button id="tAll" class="on">Todos</button><button id="tFav">★ Premium<b id="fc"></b></button><button id="tExp">⚗ Experimento<b id="ec"></b></button><button id="tNew">✦ Recientes<b id="nc"></b></button><button id="tLk">♥ Likes<b id="lc"></b></button></div><div id="tagbar" aria-label="Explorar sonidos"></div><div id="lab">Zona experimental · beats en prueba</div><div id="list"></div></div>
+<div id="menu"><div class="mh"><input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Buscar beats..." autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Buscar beats"><button id="qclear" type="button" aria-label="Limpiar búsqueda" title="Limpiar búsqueda">×</button><button id="mc" type="button">Cerrar</button></div><div class="tabs"><button id="tAll" class="on">Todos</button><button id="tFav">★ Premium<b id="fc"></b></button><button id="tExp">⚗ Experimento<b id="ec"></b></button><button id="tNew">✦ Recientes<b id="nc"></b></button><button id="tLk">♥ Likes<b id="lc"></b></button></div><div id="lab">Zona experimental · beats en prueba</div><div id="list"></div></div>
 <div id="aviso"><div class="pn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><h2>Beats protegidos</h2><p>Estos beats son <b>propiedad de RonALL prod</b>.</p><p>Prohibido descargar, grabar, subir o reutilizar sin permiso. Si lo robas, te reportamos.</p><p>¿Lo quieres? Escríbeme y lo hablamos.</p><button id="avOk">Entendido</button></div></div><div id="cpanel"><div class="pn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.6-4.7A8.5 8.5 0 1 1 8 19.5z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-1 .8c-.9-.4-1.7-1.2-2.1-2.1l.8-1-1-2z"/></svg><h2>Contacto</h2><span class="num"></span><span class="nb">No compartir sin autorización</span><p>Este número es privado.</p><a class="go" id="cgo" href="#" target="_blank" rel="noopener noreferrer">Abrir WhatsApp</a><button id="cx">Cerrar</button></div></div><div id="ipanel"><div class="pn"><h2 id="ih"></h2><div class="ig" id="ig"></div><p class="inote">BPM y tonalidad son aproximados</p><a class="go" id="igo" href="#" target="_blank" rel="noopener noreferrer">Solicitar este beat</a><button id="ix">Cerrar</button></div></div><div id="enter"><div class="lg"></div><div class="lgi"><i></i></div><b id="lb">RonALL prod</b><div class="ld"><i id="lf"></i></div><div class="lr"><span id="lt">Cargando</span><span id="lp">0%</span></div></div></div>
 <script id="halofx">
 // ====== HALO FX — pipeline de post-procesado de imagen 100% en el navegador ======
@@ -997,7 +976,8 @@ html,body{touch-action:auto}
   function remapChannel(src, w, h, mapX, mapY) {
     const out = new Float32Array(w * h);
     for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {        const i = y * w + x;
+      for (let x = 0; x < w; x++) {
+        const i = y * w + x;
         let sx = mapX[i], sy = mapY[i];
         // BORDER_REPLICATE: clamp a los bordes de la imagen origen.
         if (sx < 0) sx = 0; else if (sx > w - 1) sx = w - 1;
@@ -1687,7 +1667,7 @@ html,body{touch-action:auto}
     img: _0xc229af[24],
     c: [0.1, 0.9, 0.9],
     fog: 1.1,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "CORILLO",
     g: "beat",
@@ -1714,7 +1694,7 @@ html,body{touch-action:auto}
     img: _0xc229af[6],
     c: [1, 0.04, 0.07],
     fog: 1.1,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "Alors",
     g: "trap",
@@ -1723,7 +1703,7 @@ html,body{touch-action:auto}
     img: _0xc229af[5],
     c: [0.3, 0.5, 1],
     fog: 1.6,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "CLICK CLACK",
     g: "trap",
@@ -1732,7 +1712,7 @@ html,body{touch-action:auto}
     img: _0xc229af[2],
     c: [0.15, 0.9, 0.35],
     fog: 0.9,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "A LAS 2 de la mañana",
     g: "beat",
@@ -1849,7 +1829,7 @@ html,body{touch-action:auto}
     img: _0xc229af[19],
     c: [1, 0.3, 0.6],
     fog: 1.3,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "DRIPPING",
     g: "beat",
@@ -1867,7 +1847,7 @@ html,body{touch-action:auto}
     img: _0xc229af[14],
     c: [0.3, 0.5, 1],
     fog: 1.1,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "Cambio de Pareja",
     g: "beat",
@@ -1894,7 +1874,7 @@ html,body{touch-action:auto}
     img: _0xc229af[0],
     c: [0.8, 0.2, 1],
     fog: 0.9,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "RSAMPLE BEATT",
     g: "beat",
@@ -1968,7 +1948,7 @@ html,body{touch-action:auto}
     img: _0xc229af[29],
     c: [0.8, 0.2, 1],
     fog: 0.9,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "NOS ENVIDIAN",
     g: "trap",
@@ -1977,7 +1957,7 @@ html,body{touch-action:auto}
     img: _0xc229af[30],
     c: [0.1, 0.9, 0.9],
     fog: 1.1,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "TURA TYPE BEAT",
     g: "beat",
@@ -1995,15 +1975,16 @@ html,body{touch-action:auto}
     img: _0xc229af[33],
     c: [1, 0.04, 0.07],
     fog: 0.9,
-    tag: ["trap"]
-  }, {    n: "NANANANA",
+    tag: []
+  }, {
+    n: "NANANANA",
     g: "trap",
     d: "1:16",
     a: 38,
     img: _0xc229af[34],
     c: [0.3, 0.5, 1],
     fog: 1.1,
-    tag: ["trap"]
+    tag: []
   }, {
     n: "PROJECT",
     g: "beat",
@@ -2736,48 +2717,26 @@ html,body{touch-action:auto}
   function _0x47f319(_0x1078cc) {
     return _0xee41c === "all" || _0xee41c === "fav" && _0x3a6e14.includes(_0x1078cc) || _0xee41c === "exp" && _0x381584.includes(_0x1078cc) || _0xee41c === "new" && _0x4e7d65.includes(_0x1078cc) || _0xee41c === "like" && _0x38f35b.includes(_0x1078cc);
   }
-  const _pTagNorm = _v => String(_v || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
-  const _pTagEsc = _v => String(_v == null ? "" : _v).replace(/[&<>"']/g, _c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[_c]));
-  const _pTags = _b => Array.isArray(_b && _b.tag) ? _b.tag.filter(_t => typeof _t === "string" && _t.trim()).map(_t => _t.trim()).slice(0, 20) : [];
-  const _pGenericTags = new Set(["beat", "instrumental", "type beat"]);
-  function _renderPrivateTagBar() {
-    const _bar = _4543c0("tagbar");
-    if (!_bar) return;
-    const _counts = new Map();
-    _29200c.forEach(_b => [...new Set(_pTags(_b).map(_pTagNorm).filter(_t => _t && !_pGenericTags.has(_t)))].forEach(_t => _counts.set(_t, (_counts.get(_t) || 0) + 1)));
-    const _top = [..._counts.entries()].sort((_a, _b) => _b[1] - _a[1] || _a[0].localeCompare(_b[0])).slice(0, 8);
-    _bar.innerHTML = _top.length ? '<span class="tagbar-label">SONIDOS</span>' + _top.map(([_t]) => '<button type="button" class="quickTag" data-tag="' + _pTagEsc(_t) + '" aria-label="Buscar ' + _pTagEsc(_t) + '">#' + _pTagEsc(_t) + '</button>').join("") : "";
-  }
   function _0x4c2744() {
-    const _raw = _4543c0("q").value.trim();
-    const _requiredTags = [];
-    const _tagPattern = /(?:^|\s)(?:#|tag:)(?:"([^"]+)"|'([^']+)'|([^\s]+))/gi;
-    let _tagMatch;
-    while ((_tagMatch = _tagPattern.exec(_raw))) {
-      const _tag = _pTagNorm(_tagMatch[1] || _tagMatch[2] || _tagMatch[3]);
-      if (_tag) _requiredTags.push(_tag);
-    }
-    const _freeText = _raw.replace(/(?:^|\s)(?:#|tag:)(?:"[^"]+"|'[^']+'|[^\s]+)/gi, " ");
-    const _terms = _pTagNorm(_freeText).split(" ").filter(Boolean);
+    const _0x1a4d28 = _0x4543c0("q").value.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     let _0x406a99 = 0;
-    const _0x5196d1 = _29200c.map((_b, _i) => ({ b: _b, i: _i })).filter(({ b: _beat }) => {
-      const _tags = _pTags(_beat);
-      const _normalTags = _tags.map(_pTagNorm).filter(Boolean);
-      const _haystack = _pTagNorm([_beat.n, _beat.g, _beat.d, ..._tags,
-        _4e7d65.includes(_beat.n) ? "nuevo reciente new" : "",
-        _3a6e14.includes(_beat.n) ? "premium favorito fav" : "",
-        _381584.includes(_beat.n) ? "experimento experimental" : "",
-        _38f35b.includes(_beat.n) ? "like likes" : ""].join(" "));
-      return _terms.every(_term => _haystack.includes(_term)) &&
-        _requiredTags.every(_tag => _normalTags.some(_t => _t === _tag)) && _0x47f319(_beat.n);
-    }).sort((_a, _b) => _ee41c === "top" ? _148c52(_b.b) - _148c52(_a.b) : _ee41c === "fav" ? _3a6e14.indexOf(_a.b.n) - _3a6e14.indexOf(_b.b.n) : _ee41c === "exp" ? _381584.indexOf(_a.b.n) - _381584.indexOf(_b.b.n) : _ee41c === "new" ? _4e7d65.indexOf(_a.b.n) - _4e7d65.indexOf(_b.b.n) : 0).map(({ b: _beat, i: _idx }) => {
-      const _visibleTags = _pTags(_beat).filter(_t => !_pGenericTags.has(_pTagNorm(_t))).slice(0, 2);
-      const _tagsHtml = _visibleTags.length ? '<div class="itTags">' + _visibleTags.map(_t => '<button type="button" class="itTag" data-tag="' + _pTagEsc(_t) + '" aria-label="Buscar beats con ' + _pTagEsc(_t) + '">#' + _pTagEsc(_t) + '</button>').join("") + '</div>' : "";
-      return '<div class="it' + (_idx === _3b6904 ? ' cur' : '') + (_3a6e14.includes(_beat.n) ? ' fv' : '') + '" role="button" tabindex="0" aria-label="Reproducir ' + _pTagEsc(_beat.n) + '" data-i="' + _idx + '" style="--i:' + _0x406a99++ + '"><span>' + (_ee41c === "fav" ? _4d98be(_3a6e14.indexOf(_beat.n)) : _ee41c === "exp" ? "E" + _4d98be(_381584.indexOf(_beat.n)) : _4d98be(_idx)) + '</span><b class="th" style="background-image:url(&quot;' + _pTagEsc(_beat.img) + '&quot;)"></b><div class="itTxt"><em' + (_beat.n.length > 15 ? ' class="lg"' : '') + '>' + _pTagEsc(_beat.n) + '</em>' + _tagsHtml + '</div><small>' + _pTagEsc(_beat.d) + '</small>' + (_4e7d65.includes(_beat.n) ? '<i class="nw">RECIENTE</i>' : '') + (_3a6e14.includes(_beat.n) ? '<span class="st">★</span>' : '') + (_381584.includes(_beat.n) ? '<span class="ex">EXP</span>' : '') + (_38f35b.includes(_beat.n) ? '<span class="lh">♥</span>' : '') + '</div>';
-    }).join("");
-    _renderPrivateTagBar();
-    _4543c0("list").innerHTML = _0x5196d1 || '<div class="none">' + ({ fav: "Pronto: los beats premium de RonALL", exp: "Aún no hay experimentos", new: "Aún no hay recientes", like: "Toca ♥ en un beat para guardarlo", top: "El ranking mundial aparece cuando haya datos" }[_ee41c] || "Nada por aquí") + '</div>';
-    _4543c0("list").scrollTop = 0;
+    const _0x5196d1 = _0x29200c.map((_0x50291b, _0x3e8afc) => ({
+      b: _0x50291b,
+      i: _0x3e8afc
+    })).filter(({
+      b: _0x3e9ab8
+    }) => (_0x3e9ab8.n + " " + _0x3e9ab8.g + " " + _0x3e9ab8.d + (_0x4e7d65.includes(_0x3e9ab8.n) ? " nuevo reciente new" : "") + (_0x3a6e14.includes(_0x3e9ab8.n) ? " premium favorito fav" : "")).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes(_0x1a4d28) && _0x47f319(_0x3e9ab8.n)).sort((_0x851fb7, _0x4ee635) => _0xee41c === "top" ? _0x148c52(_0x4ee635.b) - _0x148c52(_0x851fb7.b) : _0xee41c === "fav" ? _0x3a6e14.indexOf(_0x851fb7.b.n) - _0x3a6e14.indexOf(_0x4ee635.b.n) : _0xee41c === "exp" ? _0x381584.indexOf(_0x851fb7.b.n) - _0x381584.indexOf(_0x4ee635.b.n) : _0xee41c === "new" ? _0x4e7d65.indexOf(_0x851fb7.b.n) - _0x4e7d65.indexOf(_0x4ee635.b.n) : 0).map(({
+      b: _0x1062f8,
+      i: _0x1503d7
+    }) => "<div class=\"it" + (_0x1503d7 === _0x3b6904 ? " cur" : "") + (_0x3a6e14.includes(_0x1062f8.n) ? " fv" : "") + "\" role=\"button\" tabindex=\"0\" aria-label=\"Reproducir " + _0x1062f8.n + "\" data-i=\"" + _0x1503d7 + "\" style=\"--i:" + _0x406a99++ + "\"><span>" + (_0xee41c === "fav" ? _0x4d98be(_0x3a6e14.indexOf(_0x1062f8.n)) : _0xee41c === "exp" ? "E" + _0x4d98be(_0x381584.indexOf(_0x1062f8.n)) : _0x4d98be(_0x1503d7)) + "</span><b class=\"th\" style=\"background-image:url('" + _0x1062f8.img + "')\"></b><em" + (_0x1062f8.n.length > 15 ? " class=\"lg\"" : "") + ">" + _0x1062f8.n + "</em><small>" + _0x1062f8.d + "</small>" + (_0x4e7d65.includes(_0x1062f8.n) ? "<i class=\"nw\">RECIENTE</i>" : "") + (_0x3a6e14.includes(_0x1062f8.n) ? "<span class=\"st\">★</span>" : "") + (_0x381584.includes(_0x1062f8.n) ? "<span class=\"ex\">EXP</span>" : "") + (_0x38f35b.includes(_0x1062f8.n) ? "<span class=\"lh\">♥</span>" : "") + "</div>").join("");
+    _0x4543c0("list").innerHTML = _0x5196d1 || "<div class=\"none\">" + ({
+      fav: "Pronto: los beats premium de RonALL",
+      exp: "Aún no hay experimentos",
+      new: "Aún no hay recientes",
+      like: "Toca ♥ en un beat para guardarlo",
+      top: "El ranking mundial aparece cuando haya datos"
+    }[_0xee41c] || "Nada por aquí") + "</div>";
+    _0x4543c0("list").scrollTop = 0;
   }
   function _0x1554e5(_0x370228) {
     _0x1d965e = _0x370228;
@@ -2809,18 +2768,6 @@ html,body{touch-action:auto}
   function _0xsyncSearchClear() {
     _0xsearchClear.classList.toggle("show", _0xsearchInput.value.length > 0);
   }
-  function _applyPrivateTag(_tag) {
-    if (!_tag) return;
-    _0x1554e5(true);
-    _0xsearchInput.value = 'tag:"' + String(_tag).replace(/["\r\n]/g, "") + '"';
-    _0x4c2744();
-    _0xsyncSearchClear();
-    _0xsearchInput.focus({ preventScroll: true });
-  }
-  _4543c0("tagbar").addEventListener("click", _event => {
-    const _button = _event.target.closest("[data-tag]");
-    if (_button) _applyPrivateTag(_button.dataset.tag);
-  });
   _0xsearchInput.oninput = () => {
     _0x4c2744();
     _0xsyncSearchClear();
@@ -2845,8 +2792,6 @@ html,body{touch-action:auto}
     if (_0xkey.key === "Enter") _0xsearchInput.blur();
   });
   _0x4543c0("list").onclick = _0x5ed4cd => {
-    const _tagButton = _0x5ed4cd.target.closest("[data-tag]");
-    if (_tagButton) { _0x5ed4cd.preventDefault(); _0x5ed4cd.stopPropagation(); _applyPrivateTag(_tagButton.dataset.tag); return; }
     const _0x472d4e = _0x5ed4cd.target.closest(".it");
     if (!_0x472d4e) {
       return;
@@ -2865,8 +2810,6 @@ html,body{touch-action:auto}
   };
   _0x4543c0("list").addEventListener("keydown", _0xrowKey => {
     if (_0xrowKey.key !== "Enter" && _0xrowKey.key !== " ") return;
-    const _tagButton = _0xrowKey.target.closest("[data-tag]");
-    if (_tagButton) { _0xrowKey.preventDefault(); _0xrowKey.stopPropagation(); _applyPrivateTag(_tagButton.dataset.tag); return; }
     const _0xrow = _0xrowKey.target.closest(".it");
     if (!_0xrow) return;
     _0xrowKey.preventDefault();
@@ -2995,7 +2938,8 @@ html,body{touch-action:auto}
     }
     clearTimeout(_0x2d9afd);
     const _0x3d71e8 = _0x25e3f4.map(_0x4bb5f4 => 0.3 + (_0x36f911[_0x29200c[_0x4bb5f4].n] || 0));
-    const _0x49ded1 = _0x3d71e8.reduce((_0x3194c6, _0x3a6288) => _0x3194c6 + _0x3a6288, 0);    let _0x210363 = Math.random() * _0x49ded1;
+    const _0x49ded1 = _0x3d71e8.reduce((_0x3194c6, _0x3a6288) => _0x3194c6 + _0x3a6288, 0);
+    let _0x210363 = Math.random() * _0x49ded1;
     let _0x121ef5 = _0x25e3f4[_0x25e3f4.length - 1];
     for (let _0x55cbec = 0; _0x55cbec < _0x25e3f4.length; _0x55cbec++) {
       _0x210363 -= _0x3d71e8[_0x55cbec];
@@ -3994,7 +3938,8 @@ html,body{touch-action:auto}
         }, {
           opacity: 0,
           transform: "translate(" + (Math.cos(_0x3679ec) * _0x38a4d9).toFixed(1) + "px," + (Math.sin(_0x3679ec) * _0x38a4d9).toFixed(1) + "px) scale(0)"
-        }], {          duration: _0x340d12,
+        }], {
+          duration: _0x340d12,
           delay: _0x4db03b,
           easing: "cubic-bezier(.1,.8,.2,1)",
           fill: "both"
@@ -4857,10 +4802,8 @@ html,body{touch-action:auto}
       const _0x172e0d = _0x129b38[_0x1c4df7.s] || {};
       const _0x21dc26 = [_0x3a6e14.includes(_0x1c4df7.n) && "Premium", _0x381584.includes(_0x1c4df7.n) && "Experimento", _0x4e7d65.includes(_0x1c4df7.n) && "Reciente", _0x38f35b.includes(_0x1c4df7.n) && "En tus likes"].filter(Boolean);
       const _0x27aee9 = (_0x453fac, _0x75dba3, _0xcd0ac8) => "<div" + (_0xcd0ac8 ? " class=\"w2\"" : "") + "><b>" + _0x453fac + "</b><span>" + _0x75dba3 + "</span></div>";
-      const _soundTags = _pTags(_0x1c4df7).filter(_t => !_pGenericTags.has(_pTagNorm(_t)));
-      const _soundTagsHtml = _soundTags.length ? '<div class="w2 info-search-tags"><b>Sonido</b><span>' + _soundTags.map(_t => '<button type="button" data-tag="' + _pTagEsc(_t) + '">#' + _pTagEsc(_t) + '</button>').join("") + '</span></div>' : "";
       _0x4543c0("ih").textContent = _0x1c4df7.n;
-      _0x4543c0("ig").innerHTML = _0x27aee9(_0x2fc8d6 ? "~" + _0x2fc8d6.bpm : "—", "BPM") + _0x27aee9(_0x2fc8d6 ? _0x2fc8d6.key : "—", "Nota") + _0x27aee9(_0x1c4df7.d, "Duración") + _0x27aee9(_0x172e0d.plays || 0, "Escuchas") + _0x27aee9(_0x1c4df7.bd || "—", "808", 1) + (_0x21dc26.length ? _0x27aee9(_0x21dc26.join(" · "), "Estado", 1) : "") + _soundTagsHtml;
+      _0x4543c0("ig").innerHTML = _0x27aee9(_0x2fc8d6 ? "~" + _0x2fc8d6.bpm : "—", "BPM") + _0x27aee9(_0x2fc8d6 ? _0x2fc8d6.key : "—", "Nota") + _0x27aee9(_0x1c4df7.d, "Duración") + _0x27aee9(_0x172e0d.plays || 0, "Escuchas") + _0x27aee9(_0x1c4df7.bd || "—", "808", 1) + (_0x21dc26.length ? _0x27aee9(_0x21dc26.join(" · "), "Etiquetas", 1) : "");
       _0x4543c0("igo").href = _0x2bcc48(_0x1c4df7);
     }
     _0x4543c0("inb").onclick = _0x512ff9 => {
@@ -4869,14 +4812,6 @@ html,body{touch-action:auto}
       _0x5b2b25.classList.add("on");
     };
     _0x4543c0("ix").onclick = () => _0x5b2b25.classList.remove("on");
-    _0x4543c0("ig").addEventListener("click", _event => {
-      const _tagButton = _event.target.closest("[data-tag]");
-      if (!_tagButton) return;
-      _event.preventDefault(); _event.stopPropagation();
-      _5b2b25.classList.remove("on");
-      _1554e5(true);
-      _applyPrivateTag(_tagButton.dataset.tag);
-    });
     _0x5b2b25.addEventListener("click", _0x55eac4 => {
       if (_0x55eac4.target === _0x5b2b25) {
         _0x5b2b25.classList.remove("on");
@@ -4993,7 +4928,8 @@ var ua=navigator.userAgent||'';
 var wl=null,vid=null;
 function lock(){
  try{if('wakeLock' in navigator&&!document.hidden&&!wl){navigator.wakeLock.request('screen').then(function(l){wl=l;l.addEventListener('release',function(){wl=null})}).catch(function(){})}}catch(e){}
- if(!('wakeLock' in navigator)){try{if(!vid){vid=document.createElement('video');vid.setAttribute('playsinline','');vid.setAttribute('muted','');vid.muted=true;vid.loop=true;vid.setAttribute('aria-hidden','true');vid.style.cssText='position:fixed;left:-9px;top:-9px;width:1px;height:1px;opacity:.01;pointer-events:none';vid.src='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAM3bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAmF0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAACAAAAAgAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAAAAABAAAAAAHZbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABhG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAURzdGJsAAAAuHN0c2QAAAAAAAAAAQAAAKhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAACAAIABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAALmF2Y0MBQsAK/+EAFmdCwArZCWwEQAAAAwBAAAADAoPEiZIBAAVoy4PLIAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAABVgAAAVYAAAABhzdHRzAAAAAAAAAAEAAAAFAAAIAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAHHN0c2MAAAAAAAAAAQAAAAEAAAAFAAAAAQAAAChzdHN6AAAAAAAAAAAAAAAFAAAChQAAAAoAAAAKAAAACgAAAAkAAAAUc3RjbwAAAAAAAAABAAADZwAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNjAuMTYuMTAwAAAACGZyZWUAAAK0bWRhdAAAAnAGBf//bNxF6b3m2Ui3lizYINkj7u94MjY0IC0gY29yZSAxNjQgcjMxMDggMzFlMTlmOSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMjMgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0wIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDE6MHgxMTEgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTAgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz0xIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MCB3ZWlnaHRwPTAga2V5aW50PTI1MCBrZXlpbnRfbWluPTUgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAANZYiEBHyYoAA2IyddeAAAAAZBmjgI+WAAAAAGQZpUAj5YAAAABkGaYBDywAAAAAVBmoA/yw==';document.body.appendChild(vid)}var p=vid.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}}
+ if(!('wakeLock' in navigator)){try{if(!vid){vid=document.createElement('video');vid.setAttribute('playsinline','');vid.setAttribute('muted','');vid.muted=true;vid.loop=true;vid.setAttribute('aria-hidden','true');vid.style.cssText='position:fixed;left:-9px;top:-9px;width:1px;height:1px;opacity:.01;pointer-events:none';vid.src='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAM3bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAmF0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAACAAAAAgAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAAAAABAAAAAAHZbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABhG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAURzdGJsAAAAuHN0c2QAAAAAAAAAAQAAAKhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAACAAIABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAALmF2Y0MBQsAK/+EAFmdCwArZCWwEQAAAAwBAAAADAoPEiZIBAAVoy4PLIAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAABVgAAAVYAAAABhzdHRzAAAAAAAAAAEAAAAFAAAIAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAHHN0c2MAAAAAAAAAAQAAAAEAAAAFAAAAAQAAAChzdHN6AAAAAAAAAAAAAAAFAAAChQAAAAoAAAAKAAAACgAAAAkAAAAUc3RjbwAAAAAAAAABAAADZwAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNjAuMTYuMTAwAAAACGZyZWUAAAK0bWRhdAAAAnAGBf//bNxF6b3m2Ui3lizYINkj7u94MjY0IC0gY29yZSAxNjQgcjMxMDggMzFlMTlmOSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMjMgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0wIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDE6MHgxMTEgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTAgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz0xIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MCB3ZWlnaHRwPTAga2V5aW50PTI1MCBrZXlpbnRfbWluPTUgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAANZYiEBHyYoAA2IyddeAAAAAZBmjgI+WAAAAAGQZpUAj5YAAAABkGaYBDywAAAAAVBmoA/yw==';document.body.appendChild(vid)}var p=vid.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}
+}
 lock();
 ['pointerdown','touchend','click','keydown'].forEach(function(n){document.addEventListener(n,lock,{passive:true})});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){wl=null;lock()}});
