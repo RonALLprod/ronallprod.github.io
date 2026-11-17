@@ -315,10 +315,10 @@ body.pg .mini .bar{display:block;position:absolute;left:18px;right:18px;top:0;he
 
 /* ── V23: edad relativa, tags discretos y campana de novedades ── */
 .row .t small .ag,.meta span:last-child:not(:first-child){opacity:.55}
-.row .t .tg{display:block;font:normal 10.5px/1.2 inherit;letter-spacing:.02em;color:var(--dim,#8a8a90);opacity:.5;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .25s}
+.row .t .tg{display:block;font:normal 10.5px/1.2 inherit;letter-spacing:.02em;color:var(--dim,#8a8a90);opacity:.72;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .25s}
 .row:hover .t .tg,.row.on .t .tg{opacity:.8}
 .tgs{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:10px}.tgs:empty{display:none}
-.tgs button{font-size:12px;color:var(--dim,#8a8a90);opacity:.55;padding:2px 0;transition:opacity .2s,color .2s}.tgs button:hover{opacity:1;color:#fff}
+.tgs button{font-size:12px;color:rgba(255,255,255,.66);opacity:1;padding:2px 0;transition:opacity .2s,color .2s}.tgs button:hover{opacity:1;color:#fff}
 .nf{position:relative}.nfb{position:relative;width:40px;height:40px;display:inline-grid;place-items:center;border-radius:99px;background:rgba(0,0,0,.35);border:1px solid var(--line2)}
 .nfb.has svg{animation:nfr 2.4s ease-in-out 1}
 .nfd{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#fff;color:#000;font:700 10px/17px system-ui;text-align:center;font-style:normal}
@@ -334,3 +334,4 @@ body.pg .mini .bar{display:block;position:absolute;left:18px;right:18px;top:0;he
 @keyframes nfi{from{opacity:0;transform:translateY(-6px) scale(.98)}}@keyframes nfr{0%,100%{transform:rotate(0)}15%{transform:rotate(14deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}}
 @media(max-width:899px){.nfb{width:38px;height:38px}.nfp{position:fixed;top:calc(60px + env(safe-area-inset-top));right:12px}}
 @media(prefers-reduced-motion:reduce){.nfb.has svg,.nfp{animation:none}}
+.chip.tg{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:var(--dim,#a0a0a6);font-weight:500}.chip.tg:hover{color:#fff}.chip.tg.on{background:#fff;color:#000;box-shadow:none}

@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-11-V22 · app.js — catálogo rápido, datos remotos sin bloqueo */
+/* RONALL-VISUAL-2026-11-17-V24 · app.js — catálogo rápido, datos remotos sin bloqueo */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
@@ -55,7 +55,7 @@ const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArr
 const st = { q: '', g: '', sort: 'new' };
 let cur = [], sel = null, ui = null, shown = 0, coverP = Promise.resolve();
 const sub = b => [b.type, b.bpm && b.bpm + ' BPM', b.key].filter(Boolean).map(esc).concat(R.ago ? [`<span class="ag">${esc(R.ago(b))}</span>`] : []).join(' · ');
-const tagsOf = b => (b.tags || []).slice(0, 3);
+const tagsOf = b => (b.tags || []).slice(0, 3), heroTags = b => (b.tags || []).slice(0, 6);
 
 /* ───────── Vista de beat ───────── */
 const tot = $('#tot');
@@ -73,7 +73,7 @@ function select(b, first, track = true) {
   sway.hero = wrap($('#ttl'), b.name); $('#top-t').textContent = b.name;
   $('#meta').innerHTML = [b.genre, b.bpm && b.bpm + ' BPM', b.key, b.duration && R.fmt(b.duration), R.ago && R.ago(b)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
   seedMeta();
-  $('#tgs').innerHTML = tagsOf(b).map(x => `<button type="button" data-t="${esc(x)}">#${esc(x)}</button>`).join('');
+  $('#tgs').innerHTML = heroTags(b).map(x => `<button type="button" data-t="${esc(x)}">#${esc(x)}</button>`).join('');
   const im = $('#cimg'); $('#aglow').style.backgroundImage = `url("${b.thumb || b.cover}")`; im.src = b.cover || b.thumb; im.alt = 'Portada de ' + b.name;
   const h = $('.hero'); h.classList.remove('swap'); void h.offsetWidth; h.classList.add('swap');
   $('#sold').hidden = !b.exclusiveSold; $('#b-pg').href = 'beats/' + b.slug + '/';
@@ -111,6 +111,9 @@ $('#more-l').onclick = e => { const c = e.target.closest('.card'); if (!c) retur
 /* ───────── Catálogo (lista lateral) ───────── */
 const genres = [...new Set(beats.map(b => b.genre).filter(Boolean))].sort();
 $('#chips').innerHTML = ['Todos', ...genres].map((g, i) => `<button class="chip ${i ? '' : 'on'}" data-g="${i ? esc(g) : ''}">${esc(g)}</button>`).join('');
+/* Tags más usados como chips: un clic busca ese tag, otro clic lo quita */
+const tagTop = (() => { const c = {}, gl = new Set(genres.map(g => String(g).toLowerCase())); beats.forEach(b => (b.tags || []).forEach(t => { const k = String(t).trim(); if (k && !gl.has(k.toLowerCase())) c[k] = (c[k] || 0) + 1; })); return Object.entries(c).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 10).map(x => x[0]); })();
+$('#chips').insertAdjacentHTML('beforeend', tagTop.map(t => `<button class="chip tg" data-tg="${esc(t)}">#${esc(t)}</button>`).join(''));
 /* Buscador: sin tildes, por palabras sueltas, prefijos, tags/sobrenombres y tolerancia a 1 error de tecleo */
 const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9# ]+/g, ' ').replace(/\s+/g, ' ').trim();
 const near = (a, b) => { if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, e = 0; while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++e > 1) return false; if (a.length > b.length) i++; else if (a.length < b.length) j++; else { i++; j++; } } return e + (a.length - i) + (b.length - j) <= 1; };
@@ -122,7 +125,7 @@ const score = (b, qt) => { const ix = b._ix || (b._ix = idx(b)); let s = 0;
     for (const tg of ix.tg) { if (tg === raw) best = Math.max(best, 7); else if (tg.split(' ').includes(raw)) best = Math.max(best, 5); else if (tg.startsWith(raw)) best = Math.max(best, 4.5); else if (raw.length > 3 && (tg.includes(raw) || tg.split(' ').some(w => near(w, raw)))) best = Math.max(best, 2); }
     if (!best) return 0; s += best; }
   const full = norm(qt.join(' ')); if (full && ix.tg.includes(full)) s += 4; return s; };
-const view = () => { const qt = norm(st.q).split(' ').filter(Boolean), srt = { new: (a, b) => R.at(b) - R.at(a) || b.created.localeCompare(a.created), pa: (a, b) => (R.fromPrice(a) ?? 1e9) - (R.fromPrice(b) ?? 1e9), pd: (a, b) => (R.fromPrice(b) ?? -1) - (R.fromPrice(a) ?? -1), bpm: (a, b) => (a.bpm || 0) - (b.bpm || 0), az: (a, b) => a.name.localeCompare(b.name) }[st.sort];
+const view = () => { const qt = norm(st.q).split(' ').filter(Boolean), srt = { new: (a, b) => (R.at ? R.at(b) - R.at(a) : 0) || String(b.created || '').localeCompare(String(a.created || '')), pa: (a, b) => (R.fromPrice(a) ?? 1e9) - (R.fromPrice(b) ?? 1e9), pd: (a, b) => (R.fromPrice(b) ?? -1) - (R.fromPrice(a) ?? -1), bpm: (a, b) => (a.bpm || 0) - (b.bpm || 0), az: (a, b) => a.name.localeCompare(b.name) }[st.sort];
   let l = beats.filter(b => !st.g || b.genre === st.g);
   if (!qt.length) return l.sort(srt);
   l = l.map(b => [b, score(b, qt)]).filter(x => x[1] > 0);
@@ -134,7 +137,9 @@ const draw = () => {
 };
 $('#list').onclick = e => { const r = e.target.closest('.row'); if (!r) return; const b = beats.find(x => x.id === r.dataset.id); if (!sel || sel.id !== b.id) select(b); P.play(b, cur); if (isM()) go('beats'); };
 const setG = g => { st.g = g; $$('#chips .chip').forEach(x => x.classList.toggle('on', x.dataset.g === g)); draw(); };
-$('#chips').onclick = e => { const c = e.target.closest('.chip'); c && setG(c.dataset.g); };
+const syncTags = () => $$('#chips .chip.tg').forEach(x => x.classList.toggle('on', norm(x.dataset.tg) === norm(st.q.replace(/^#/, ''))));
+$('#chips').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; if (c.dataset.tg) { const on = norm(st.q.replace(/^#/, '')) === norm(c.dataset.tg); st.q = on ? '' : c.dataset.tg; $('#f-q').value = st.q; draw(); syncTags(); return; } setG(c.dataset.g); };
+$('#f-q').addEventListener('input', () => setTimeout(syncTags));
 $('#f-q').oninput = e => { st.q = e.target.value.trim(); draw(); };
 $('#tgs').onclick = e => { const x = e.target.closest('[data-t]'); if (!x) return; const q = $('#f-q'); q.value = x.dataset.t; st.q = x.dataset.t; draw(); if (isM()) go('lib'); else q.focus(); };
 $('#f-sort').onchange = e => { st.sort = e.target.value; draw(); };
