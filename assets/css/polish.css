@@ -1,125 +1,70 @@
-/* RONALL PROD · polish.css v3 — capa final. Va DESPUÉS de site.css.
-   Objetivo: más fluidez (menos GPU) y mejor tacto, sin cambiar la identidad (blanco/negro + vidrio).
-   Regla de oro: nada de desenfoque de fondo sobre capas que se mueven; solo transform/opacity/translate/scale. */
-
-/* 1) RENDIMIENTO · el cristal solo donde se nota.
-   .main (63% de la pantalla), .scrim (100%) y .side re-desenfocaban el fondo animado en cada fotograma.
-   A 6px de desenfoque sobre orbes que ya están desenfocados no se ve diferencia, pero cuesta mucho. */
+:root{color-scheme:dark}
+html,body{overscroll-behavior-y:none}
+#main,.side,.lib,.list{overscroll-behavior:contain}
+button,a,summary{touch-action:manipulation}
+h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:2px solid rgba(255,255,255,.9);outline-offset:3px}
 .scrim,.scrim.on,.main,.side,.main .top,.main.sc .top{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .scrim{background:rgba(0,0,0,.74)!important}
 .side{background-color:rgba(10,10,12,.7)!important}
-
-/* 2) El ambiente despierta con la música (clase .live en <html>, sin :has() que es caro) */
-.fx-ambient,.fx-scene:before,.fx-scene:after{transition:opacity 1.6s ease}
-html.live .fx-ambient{opacity:1}
-html.live .fx-scene:before{opacity:.44}
-html.live .fx-scene:after{opacity:.36}
-
-/* 3) Reproductor: presencia cuando suena */
-.mini{transition:border-color .8s ease,box-shadow .8s ease}
-.mini .tk img{transition:box-shadow .8s ease,scale .8s cubic-bezier(.16,1,.3,1)}
-.app.live .mini{border-color:rgba(255,255,255,.17)!important}
-.app.live .mini .tk img{box-shadow:0 0 22px rgba(255,255,255,.26),0 6px 18px rgba(0,0,0,.6);scale:1.04}
-.app.live .mini .bar i{box-shadow:0 0 10px #fff,0 0 22px rgba(255,255,255,.5)}
-
-/* 4) Tacto: respuesta al pulsar y al pasar el mouse. Usa las propiedades individuales translate/scale,
-   que no chocan con los transform de las animaciones de entrada. */
-.btn,.chip,.row,.lic,.card,.tile,.tabs button,.snav button,.cartb,.ib,.play,.ctl button{touch-action:manipulation;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;transition:translate .35s cubic-bezier(.16,1,.3,1),scale .22s cubic-bezier(.16,1,.3,1),background-color .25s,border-color .25s,box-shadow .35s}
-.btn:active,.chip:active,.lic:active,.cartb:active,.ib:active,.ctl button:active,.tabs button:active{scale:.965;transition-duration:.08s}
-.play:active{scale:.93;transition-duration:.08s}
-@media (hover:hover) and (pointer:fine){
-  .row:hover{translate:3px 0}
-  .card:hover,.tile:hover,.lic:hover{translate:0 -3px}
-  .btn:hover,.chip:hover{translate:0 -1px}
-}
-
-/* 5) Lista y cards: menos brillo repetido (nitidez) y mejor scroll */
+.mini{transition:border-color .45s ease,box-shadow .45s ease}
+.mini .tk img{transition:box-shadow .45s ease,scale .45s cubic-bezier(.16,1,.3,1)}
+.app.live .mini{border-color:rgba(255,255,255,.2)!important;box-shadow:0 12px 34px rgba(0,0,0,.38),0 0 22px rgba(255,255,255,.045)!important}
+.app.live .mini .tk img{box-shadow:0 0 22px rgba(255,255,255,.24),0 6px 18px rgba(0,0,0,.6);scale:1.035}
+.app.live .mini .bar i{box-shadow:0 0 9px #fff,0 0 20px rgba(255,255,255,.45)}
+.btn,.chip,.row,.lic,.card,.tile,.tabs button,.snav button,.cartb,.ib,.play,.ctl button{touch-action:manipulation;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;transition:translate .3s cubic-bezier(.16,1,.3,1),scale .2s cubic-bezier(.16,1,.3,1),background-color .22s,border-color .22s,box-shadow .3s}
+.btn:active,.chip:active,.lic:active,.cartb:active,.ib:active,.ctl button:active,.tabs button:active{scale:.97;transition-duration:.08s}
+.play:active{scale:.94;transition-duration:.08s}
+@media(hover:hover) and (pointer:fine){.row:hover{translate:2px 0}.card:hover,.tile:hover,.lic:hover{translate:0 -2px}.btn:hover,.chip:hover{translate:0 -1px}}
 .row .t b,.row .p,.row .n,.card b,.ci-t b{text-shadow:var(--tb)}
-.main,.list,.db,.nfp{overscroll-behavior:contain}
 .main{scroll-padding-top:84px}
 .page p,.sold,.lead,.ld{text-wrap:pretty}
 .hero h1,.page h2,.page-h h2{hyphens:manual}
 
-/* 6) Foco visible con teclado */
-:focus-visible{outline:2px solid #fff!important;outline-offset:3px;box-shadow:0 0 0 5px rgba(0,0,0,.55)}
-
-/* 7) Móvil y ahorro: menos GPU, mismo look */
-@media (max-width:899px){
-  #fx-camera{filter:brightness(1.3) contrast(1.08) saturate(.6)!important}
-  .fx-ambient i:nth-child(n+3){display:none!important}
-  .mini,.drawer,.tabs{-webkit-backdrop-filter:blur(8px)!important;backdrop-filter:blur(8px)!important}
-}
-@media (prefers-reduced-data:reduce){#fx-camera{display:none!important}}
-@media (prefers-reduced-motion:reduce){
-  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
-}
-
-
-/* RONALL · fondo público más profundo y animación estable */
 .fx-scene{background:#020203!important}
-#fx-camera{filter:saturate(.42) contrast(1.08) brightness(.78)!important}
+#fx-camera{filter:brightness(.76) contrast(1.08) saturate(.46) blur(5px)!important;mix-blend-mode:screen!important}
+#fx-camera.on{opacity:.46!important}
+#gl{opacity:.12!important}
 .shade{
-  background:
-    linear-gradient(90deg,rgba(0,0,0,.56),rgba(0,0,0,.34) 52%,rgba(0,0,0,.6)),
-    linear-gradient(0deg,rgba(0,0,0,.78),rgba(0,0,0,.27) 48%,rgba(0,0,0,.43)),
-    radial-gradient(120% 90% at 50% 42%,transparent 26%,rgba(0,0,0,.58));
+ background:
+  linear-gradient(90deg,rgba(0,0,0,.48),rgba(0,0,0,.28) 52%,rgba(0,0,0,.5)),
+  linear-gradient(0deg,rgba(0,0,0,.58),rgba(0,0,0,.26) 48%,rgba(0,0,0,.36)),
+  radial-gradient(120% 90% at 50% 42%,transparent 24%,rgba(0,0,0,.44))!important;
 }
+.fx-scene:before,.fx-scene:after{display:block!important;animation-play-state:running!important}
+.fx-scene:before{opacity:.39!important;animation:ronAmbientHaze 34s ease-in-out infinite alternate!important}
+.fx-scene:after{opacity:.27!important;animation:ronAmbientHaze2 42s ease-in-out infinite alternate!important}
+.fx-ambient{display:block!important;opacity:.82!important;animation-play-state:running!important}
+.fx-ambient i{display:block!important;animation-play-state:running!important}
+.fx-ambient i:nth-child(1){animation:ronOrbA 31s ease-in-out infinite alternate!important}
+.fx-ambient i:nth-child(2){animation:ronOrbB 37s ease-in-out infinite alternate!important}
+.fx-ambient i:nth-child(3){animation:ronOrbC 43s ease-in-out infinite alternate!important}
 
-/* Evitar cambios de blur/background-position que fuerzan repintados */
-.fx-scene:before{
-  filter:none!important;
-  will-change:transform;
-  animation:ronallBackdropDrift 72s ease-in-out infinite alternate!important;
-}
-.fx-ambient:before,.fx-ambient:after{
-  will-change:transform;
-  animation:ronallAmbientDrift 76s ease-in-out infinite alternate!important;
-}
-.fx-ambient:after{animation-direction:alternate-reverse!important}
-@keyframes ronallBackdropDrift{
-  from{transform:translate3d(-1%,0,0) scale(1)}
-  to{transform:translate3d(1.5%,-1%,0) scale(1.04)}
-}
-@keyframes ronallAmbientDrift{
-  from{transform:translate3d(-1.5%,.5%,0) scale(1)}
-  to{transform:translate3d(1.5%,-1%,0) scale(1.045)}
-}
-
-/* Texto nítido: sin animaciones por letra, blur ni capas GPU innecesarias */
-.w,.w .l{animation:none!important;transform:none!important;will-change:auto!important}
-.meta>*{will-change:auto!important}
-#ttl,.hero h1,.page-h h2,.page h2,.top .tt{
-  filter:none!important;
-  will-change:auto!important;
-  text-shadow:0 4px 18px rgba(0,0,0,.86),0 1px 2px rgba(0,0,0,.95)!important;
-}
-.hero.swap .info>*{
-  animation:ronallTextEnter .34s cubic-bezier(.2,.8,.2,1) both!important;
-  filter:none!important;
-}
+.hero .info{will-change:transform;animation:ronallTextFloat 8s ease-in-out infinite}
+.page-h h2,.page h2{will-change:transform;animation:ronallTextFloat 9s ease-in-out infinite}
+@keyframes ronallTextFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-2px,0)}}
+.hero.swap .info>*{animation:ronallTextEnter .34s cubic-bezier(.2,.8,.2,1) both!important;filter:none!important}
 .hero.swap .kicker{animation-delay:0s!important}
 .hero.swap h1{animation-delay:.035s!important}
 .hero.swap .meta{animation-delay:.07s!important}
-@keyframes ronallTextEnter{
-  from{opacity:.45;transform:translate3d(0,7px,0)}
-  to{opacity:1;transform:translate3d(0,0,0)}
+@keyframes ronallTextEnter{from{opacity:.5;transform:translate3d(0,6px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+#list .row{animation:ronallRowIn .24s ease-out both!important;animation-delay:calc(var(--i,0)*15ms)!important;filter:none!important}
+@keyframes ronallRowIn{from{opacity:0;transform:translate3d(-6px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+.view.on{animation:ronallViewIn .28s ease-out both!important;filter:none!important}
+@keyframes ronallViewIn{from{opacity:.72;transform:translate3d(0,5px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+.rv2{filter:none!important;transition:opacity .3s ease,transform .3s cubic-bezier(.2,.8,.2,1)!important}
+.marq,.marq div{backface-visibility:hidden}
+.marq div{will-change:transform;animation:mq 42s linear infinite!important}
+@media(max-width:899px){
+ #fx-camera{filter:brightness(.72) contrast(1.08) saturate(.42) blur(5px)!important}
+ .fx-ambient{opacity:.76!important}
+ .mini,.drawer,.tabs{-webkit-backdrop-filter:blur(8px)!important;backdrop-filter:blur(8px)!important}
 }
-
-/* Listas y entradas más ligeras */
-#list .row{animation:none!important;filter:none!important}
-.view.on{animation:ronallViewEnter .28s ease-out both!important;filter:none!important}
-@keyframes ronallViewEnter{
-  from{opacity:.7;transform:translate3d(0,5px,0)}
-  to{opacity:1;transform:translate3d(0,0,0)}
-}
-.rv2,.rv2.in{
-  filter:none!important;
-  transition:opacity .28s ease,transform .28s cubic-bezier(.2,.8,.2,1)!important;
-}
-
-/* El texto de la marquesina se mueve solo por compositor; sin inclinación al hacer scroll */
-.marq,.marq div{
-  will-change:transform;
-  backface-visibility:hidden;
-  transform:translate3d(0,0,0);
+@media(prefers-reduced-motion:reduce){
+ .fx-scene:before{animation-duration:58s!important}
+ .fx-scene:after{animation-duration:66s!important}
+ .fx-ambient i{animation-duration:62s!important}
+ .marq div{animation-duration:90s!important}
+ .hero .info,.page-h h2,.page h2{animation-duration:14s!important}
+ .btn,.chip,.cartb,.ib,.play,.ctl button,.tile,.card,.lic,.row,.snav button,.tabs button{transition-duration:.16s!important}
 }
