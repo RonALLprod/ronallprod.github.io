@@ -21,18 +21,27 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 
 
-/* RONALL · PANEL SURFACES: más luz en la interfaz, sin alterar el fondo */
-:root{--bg:#151518;--panel:#242428;--panel2:#303036}
-.side,.main,.mini{background:rgba(35,35,40,.96)!important;border:1px solid rgba(255,255,255,.10)!important}
-.main.sc .top{background:rgba(35,35,40,.94)!important}
-.tabs{background:rgba(35,35,40,.97)!important}
-.drawer{background:rgba(39,39,44,.98)!important}
+
+
+/* RONALL · FX RESTORE + TRUE GLASS PANELS */
+:root{--panel:#202025;--panel2:#29292f}
+.fx-scene{background:var(--public-backdrop)!important;contain:paint!important;isolation:isolate!important}
+.fx-scene:before,.fx-scene:after{display:block!important;visibility:visible!important}
+#fx-camera{display:block!important;mix-blend-mode:screen!important;filter:saturate(.62) contrast(1.06) brightness(.9)!important}
+#fx-camera.on{opacity:.42!important}
+.fx-ambient{display:block!important;opacity:.82!important}
+.fx-ambient i{display:block!important;filter:blur(6px) saturate(1.12)!important}
+.fx-grain,.marq,.art-glow,.hglow{display:block!important}
+.side,.main,.mini{background:rgba(27,27,32,.70)!important;backdrop-filter:blur(18px) saturate(1.16)!important;-webkit-backdrop-filter:blur(18px) saturate(1.16)!important;border:1px solid rgba(255,255,255,.105)!important;box-shadow:0 14px 42px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.055)!important}
+.main.sc .top,.top{background:rgba(20,20,24,.58)!important;backdrop-filter:blur(20px) saturate(1.18)!important;-webkit-backdrop-filter:blur(20px) saturate(1.18)!important}
+.drawer,.tabs{background:rgba(29,29,34,.78)!important;backdrop-filter:blur(20px) saturate(1.16)!important;-webkit-backdrop-filter:blur(20px) saturate(1.16)!important}
+.scrim{backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
 .lib{border-top-color:rgba(255,255,255,.12)}
-.snav button.on,.row.on{background:rgba(255,255,255,.105)}
-.sbx input,.qf select,.chip{background:rgba(255,255,255,.085)}
-.lic{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.11)}
-.lic:hover{background:rgba(255,255,255,.085)}
-.lic.sel{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.8)}
-.buy,.card{background:rgba(255,255,255,.065);border-color:rgba(255,255,255,.11)}
-.row:hover,.chip:hover{background:rgba(255,255,255,.105)}
-@media(max-width:899px){.side,.main,.mini,.tabs{background:rgba(35,35,40,.97)!important}}
+.snav button.on,.row.on{background:rgba(255,255,255,.095)}
+.sbx input,.qf select,.chip{background:rgba(255,255,255,.075)}
+.lic{background:rgba(255,255,255,.035)!important;border-color:rgba(255,255,255,.11)!important}
+.lic:hover{background:rgba(255,255,255,.07)!important}
+.lic.sel{background:rgba(255,255,255,.105)!important;border-color:rgba(255,255,255,.8)!important}
+.buy,.card{background:rgba(255,255,255,.045)!important;border-color:rgba(255,255,255,.11)!important}
+.row:hover,.chip:hover{background:rgba(255,255,255,.09)}
+@media(max-width:899px){.side,.main,.mini,.tabs{background:rgba(27,27,32,.72)!important;backdrop-filter:blur(16px) saturate(1.12)!important;-webkit-backdrop-filter:blur(16px) saturate(1.12)!important}}
