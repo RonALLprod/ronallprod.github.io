@@ -106,7 +106,7 @@ function shelf() {
   box.hidden = !o.length; if (!o.length) return;
   $('#more-l').innerHTML = o.map(b => { const fp = R.fromPrice(b); return `<button class="card" data-id="${esc(b.id)}"><img src="${esc(b.thumb)}" alt="" loading="lazy" width="160" height="160"><b>${esc(b.name)}</b><small>${fp == null ? 'No disponible' : 'Desde ' + money(fp)}</small></button>`; }).join('');
 }
-$('#more-l').onclick = e => { const c = e.target.closest('.card'); if (!c) return; select(beats.find(x => x.id === c.dataset.id)); main.scrollTo({ top: 0, behavior: 'smooth' }); };
+$('#more-l').onclick = e => { const c = e.target.closest('.card'); if (!c) return; select(beats.find(x => x.id === c.dataset.id)); main.scrollTo({ top: 0, behavior: 'auto' }); };
 
 const genres = [...new Set(beats.map(b => b.genre).filter(Boolean))].sort();
 $('#chips').innerHTML = ['Todos', ...genres].map((g, i) => `<button class="chip ${i ? '' : 'on'}" data-g="${i ? esc(g) : ''}">${esc(g)}</button>`).join('');
