@@ -1,20 +1,11 @@
-/* RONALL-PERF-2026-11-17-V28 · app.js — catálogo rápido, datos remotos sin bloqueo */
+/* RONALL-SMOOTH-MOTION-2026-11-17-V38 · app.js — catálogo rápido, datos remotos sin bloqueo */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
 R.boot();
 const fx = window.RonFX ? RonFX.create({ root: $('#fx-scene'), stage: main, cover: $('#fx-cover'), streak: $('#fx-streak'), camera: $('#fx-camera'), light: $('#gl'), flash: $('#fx-flash') }, P.audio) : null;
 
-/* Texto: palabras con péndulo suave + letras que entran */
-const rnd = (a, b) => a + Math.random() * (b - a), TAU = Math.PI * 2;
-function wrap(el, text) {
-  el.innerHTML = text.split(' ').map((w, wi) => `<span class="w">${[...w].map((c, i) => `<span class="l" style="--i:${i + wi * 3}">${esc(c)}</span>`).join('')}</span>`).join(' ');
-  return [...el.querySelectorAll('.w')].map(e => ({ el: e, a1: rnd(.55, 1.25) * (Math.random() < .5 ? -1 : 1), w1: TAU / rnd(8, 13), p1: rnd(0, TAU), a2: rnd(.16, .42), w2: TAU / rnd(4.2, 7.2), p2: rnd(0, TAU), ax: rnd(1.8, 5), wx: TAU / rnd(8, 15), px: rnd(0, TAU), ay: rnd(1.2, 3.8), wy: TAU / rnd(9, 16), py: rnd(0, TAU) }));
-}
-const sway = { hero: [], cats: [], priv: [], ct: [] }, viewKey = { beats: 'hero', cats: 'cats', priv: 'priv', ct: 'ct' };
-['cats', 'priv', 'ct'].forEach(k => { const h = $('#v-' + k + ' h2'); if (h) sway[k] = wrap(h, h.textContent.trim()); });
-let metaSway = [];
-const seedMeta = () => { metaSway = [...$('#meta').children].map(el => ({ el, a: rnd(.12, .36) * (Math.random() < .5 ? -1 : 1), w: TAU / rnd(6.5, 12), p: rnd(0, TAU), x: rnd(.5, 1.8), wx: TAU / rnd(8, 14), px: rnd(0, TAU), y: rnd(.3, 1.1), wy: TAU / rnd(9, 15), py: rnd(0, TAU) })); };
+/* Texto estable: evitamos envolver cada letra en spans animados. */
 $('#ct-wa').href = $('#ft-wa').href = R.wa('Hola Ronall Prod 👋 Quiero más información.');
 ['#ct-wa', '#ft-wa'].forEach(q => $(q).addEventListener('click', () => R.track('wa')));
 const isM = () => matchMedia('(max-width:899px)').matches;
@@ -71,9 +62,8 @@ function refreshBuy(key) {
 function select(b, first, track = true) {
   sel = b; if (track) R.track('beat', { beat: b.id });
   $('#ty').textContent = b.type || 'Beat';
-  sway.hero = wrap($('#ttl'), b.name); $('#top-t').textContent = b.name;
+  $('#ttl').textContent = b.name; $('#top-t').textContent = b.name;
   $('#meta').innerHTML = [b.genre, b.bpm && b.bpm + ' BPM', b.key, b.duration && R.fmt(b.duration), R.ago && R.ago(b)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
-  seedMeta();
   $('#tgs').innerHTML = heroTags(b).map(x => `<button type="button" data-t="${esc(x)}">#${esc(x)}</button>`).join('');
   const im = $('#cimg'); $('#aglow').style.backgroundImage = `url("${b.thumb || b.cover}")`; im.src = b.cover || b.thumb; im.alt = 'Portada de ' + b.name;
   const h = $('.hero'); h.classList.remove('swap'); void h.offsetWidth; h.classList.add('swap');
@@ -172,17 +162,19 @@ P.ev.addEventListener('state', () => { sync(); fx && fx.state.an && fx.wake(); }
 P.ev.addEventListener('load', e => { const b = beats.find(x => x.id === e.detail.id); if (b && (!sel || sel.id !== b.id)) select(b); sync(); });
 addEventListener('keydown', e => { if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { if (e.key === 'Escape') e.target.blur(); return; } if (e.key === ' ') { e.preventDefault(); $('#cplay').click(); } });
 
-/* ───────── Bucle único: todo lo reactivo lee valores ya suavizados del motor ───────── */
-let lastSc = 1, fr = 0, hx = 0, hy = 0, tx = 0, ty = 0, ox = 0, oy = 0; const meters = $$('.meter i'), heroEl = $('.hero'), artw = $('#artw'), aglow = $('#aglow'), hglow = $('#hglow'), swing = RonMotion.idleSwing(artw, { a: 1.1, y: 4, t: 11 });
-fx && fx.onFrame((dt, s, time) => {
-  const now = performance.now() / 1000, k = 1 + s.bass * .5 + s.hit * .3;
-  hx += (tx - hx) * (1 - Math.exp(-dt / .5)); hy += (ty - hy) * (1 - Math.exp(-dt / .5));
-  if (Math.abs(hx - ox) + Math.abs(hy - oy) > .002) { ox = hx; oy = hy; heroEl.style.transform = `translate3d(${(hx * -9).toFixed(2)}px,${(hy * -6).toFixed(2)}px,0)`; }
-  { const sc = 1 + s.bass * .035 + s.hit * .02; if (Math.abs(sc - lastSc) > .0007) { lastSc = sc; artw.style.scale = sc.toFixed(4); } }
-    if ((fr++ & 1) === 0) for (let i = 0; i < 5; i++) meters[i].style.transform = `scaleY(${(.16 + .84 * s.bins[i]).toFixed(3)})`;
+/* ───────── Bucle visual ligero: solo portada y medidor de audio ───────── */
+let lastSc = 1;
+const meters = $('.meter i'), artw = $('#artw');
+fx && fx.onFrame((dt, s) => {
+  const sc = 1 + s.bass * .024 + s.hit * .012;
+  if (Math.abs(sc - lastSc) > .0012) {
+    lastSc = sc;
+    artw.style.scale = sc.toFixed(4);
+  }
+  for (let i = 0; i < meters.length; i++) {
+    meters[i].style.transform = `scaleY(${(.16 + .84 * s.bins[i]).toFixed(3)})`;
+  }
 });
-main.addEventListener('pointerleave', () => { tx = ty = 0; fx && fx.wake(); });
-main.addEventListener('pointermove', e => { const r = main.getBoundingClientRect(); tx = ((e.clientX - r.left) / r.width) * 2 - 1; ty = ((e.clientY - r.top) / r.height) * 2 - 1; if (!fx) return; fx.wake(); fx.pointerTo = [((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1)]; }, { passive: true });
 
 /* ───────── Motion graphics: resortes, magnetismo y tilt 3D ───────── */
 const M = RonMotion;
@@ -203,7 +195,6 @@ const motionObserver = new MutationObserver(records => {
   for (const record of records) for (const node of record.addedNodes) if (node.nodeType === 1) bindMotion(node);
 });
 motionObserver.observe(D.body, { childList: true, subtree: true });
-M.scrollSkew(main, $('.marq'));
 { let lt = 0; new MutationObserver(() => { const b = $('.drawer .tr b'); if (!b || b._m) return; b._m = 1; const to = +b.textContent.replace(/\D/g, ''); M.count(b, lt, to, { dur: 900 }); lt = to; }).observe($('.drawer'), { childList: true }); }
 M.reveal($('#v-cats'), '.tile');
 
