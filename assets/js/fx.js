@@ -59,7 +59,7 @@
       if(t-last<50)return;
       const dt=Math.min(.1,(t-last)/1000||.05);last=t;const k=t*.001;
       for(let i=0;i<5;i++){
-        const g=playing?.2+.7*Math.abs(Math.sin(k*(1.1+i*.53)+i*2.1)*Math.cos(k*.7*(i+1))):0;
+        const g=playing ? (.2+.7*Math.abs(Math.sin(k*(1.1+i*.53)+i*2.1)*Math.cos(k*.7*(i+1)))):0;
         state.bins[i]+=(g-state.bins[i])*.2;
       }
       for(const f of cbs)f(dt,state,k);
