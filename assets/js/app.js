@@ -1,4 +1,4 @@
-/* RONALL-VISUAL-2026-11-17-V24 · app.js — catálogo rápido, datos remotos sin bloqueo */
+/* RONALL-PERF-2026-11-17-V27 · app.js — catálogo rápido, datos remotos sin bloqueo */
 (async () => {
 const R = RON, { $, $$, esc, money, S, P } = R, D = document;
 const app = $('#app'), main = $('#main');
