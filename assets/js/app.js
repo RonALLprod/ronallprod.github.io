@@ -9,6 +9,15 @@ $('#ct-wa').href = $('#ft-wa').href = R.wa('Hola Ronall Prod 👋 Quiero más in
 ['#ct-wa', '#ft-wa'].forEach(q => $(q).addEventListener('click', () => R.track('wa')));
 const isM = () => matchMedia('(max-width:899px)').matches;
 
+const animateTitle = (el, value) => {
+  const text = String(value ?? el.textContent).trim();
+  if (!text) return;
+  el.dataset.titleText = text;
+  el.setAttribute('aria-label', text);
+  let i = 0;
+  el.innerHTML = text.split(/\\s+/u).map(word => `<span class="w">${[...word].map(char => `<span class="l" style="--i:${i++}">${esc(char)}</span>`).join('')}</span>`).join(' ');
+};
+
 const intro = $('#intro'), t0 = performance.now(), ifill = $('#in-f'), ipct = $('#in-p'), istat = $('#in-s');
 $('#in-t').innerHTML = [...'ronall prod'].map((c, i) => `<span class="l" style="--i:${i}">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
 let prog = 0, target = .1, introDone = false; const bump = v => { target = Math.max(target, v); };
@@ -56,7 +65,7 @@ function refreshBuy(key) {
 function select(b, first, track = true) {
   sel = b; if (track) R.track('beat', { beat: b.id });
   $('#ty').textContent = b.type || 'Beat';
-  $('#ttl').textContent = b.name; $('#top-t').textContent = b.name;
+  animateTitle($('#ttl'), b.name); $('#top-t').textContent = b.name;
   $('#meta').innerHTML = [b.genre, b.bpm && b.bpm + ' BPM', b.key, b.duration && R.fmt(b.duration), R.ago && R.ago(b)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
   $('#tgs').innerHTML = heroTags(b).map(x => `<button type="button" data-t="${esc(x)}">#${esc(x)}</button>`).join('');
   const im = $('#cimg'); $('#aglow').style.backgroundImage = `url("${b.thumb || b.cover}")`; im.src = b.cover || b.thumb; im.alt = 'Portada de ' + b.name;
@@ -131,7 +140,9 @@ const go = v => {
   if (v === 'lib' && !isM()) { v = 'beats'; setTimeout(() => $('#f-q').focus(), 0); }
   curView = v; app.dataset.v = v;
   $$('.view').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
-  $$('[data-v]').forEach(x => x.classList.toggle('on', x.dataset.v === v));
+  $('[data-v]').forEach(x => x.classList.toggle('on', x.dataset.v === v));
+  const heading = $('#v-' + v + ' h2');
+  if (heading) animateTitle(heading, heading.dataset.titleText || heading.textContent);
   main.scrollTo({ top: 0 });
 };
 $$('[data-v]').forEach(x => x.onclick = () => go(x.dataset.v));
@@ -185,7 +196,7 @@ motionObserver.observe(D.body, { childList: true, subtree: true });
 { let lt = 0; new MutationObserver(() => { const b = $('.drawer .tr b'); if (!b || b._m) return; b._m = 1; const to = +b.textContent.replace(/\D/g, ''); M.count(b, lt, to, { dur: 900 }); lt = to; }).observe($('.drawer'), { childList: true }); }
 M.reveal($('#v-cats'), '.tile');
 
-if (!beats.length) { $('#ttl').textContent = 'Sin beats'; $('#meta').innerHTML = '<span>No se pudieron cargar los beats. Si estás en local, abre el sitio con un servidor (python3 -m http.server), no con doble clic.</span>'; draw(); await hideIntro(); return; }
+if (!beats.length) { animateTitle($('#ttl'), 'Sin beats'); $('#meta').innerHTML = '<span>No se pudieron cargar los beats. Si estás en local, abre el sitio con un servidor (python3 -m http.server), no con doble clic.</span>'; draw(); await hideIntro(); return; }
 const h0 = location.hash.slice(1); if (h0 === 'categorias') go('cats');
 draw(); select(beats.find(b => b.slug === h0) || cur[0] || beats[0], true);
 
