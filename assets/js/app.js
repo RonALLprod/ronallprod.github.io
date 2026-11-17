@@ -163,7 +163,7 @@ $('#cats').onclick = e => { const t = e.target.closest('.tile'); if (t) { setG(t
 /* ───────── Sincronía con el reproductor ───────── */
 function sync() {
   const on = P.cur && !P.audio.paused ? P.cur.id : null;
-  $$('.row').forEach(r => r.classList.toggle('pl', r.dataset.id === on)); app.classList.toggle('live', !!on);
+  $$('.row').forEach(r => r.classList.toggle('pl', r.dataset.id === on)); app.classList.toggle('live', !!on); document.documentElement.classList.toggle('live', !!on);
   $('#cplay').innerHTML = R.svg(sel && on === sel.id ? 'pause' : 'play', 24);
   $('#cplay').setAttribute('aria-label', sel && on === sel.id ? 'Pausar' : 'Reproducir');
 }
