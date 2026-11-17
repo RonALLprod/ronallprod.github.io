@@ -15,7 +15,7 @@ const animateTitle = (el, value) => {
   el.dataset.titleText = text;
   el.setAttribute('aria-label', text);
   let i = 0;
-  el.innerHTML = text.split(/\\s+/u).map(word => `<span class="w">${[...word].map(char => `<span class="l" style="--i:${i++}">${esc(char)}</span>`).join('')}</span>`).join(' ');
+  el.innerHTML = text.split(/\s+/u).map(word => `<span class="w">${[...word].map(char => `<span class="l" style="--i:${i++}">${esc(char)}</span>`).join('')}</span>`).join(' ');
 };
 
 const intro = $('#intro'), t0 = performance.now(), ifill = $('#in-f'), ipct = $('#in-p'), istat = $('#in-s');
