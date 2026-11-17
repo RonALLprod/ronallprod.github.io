@@ -5,7 +5,7 @@ import fs from 'fs';import path from 'path';import {fileURLToPath} from 'url';
 const R=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const S=new Function('window',fs.readFileSync(R+'/config/site-config.js','utf8')+';return window.SITE')({});
 const cat=JSON.parse(fs.readFileSync(R+'/data/catalog.json','utf8'));
-const BUILD='RONALL-VISUAL-2026-11-11-V22';
+const BUILD='RONALL-VISUAL-2026-11-17-V23';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const live=cat.beats.filter(b=>b.visibility==='public'&&b.active!==false);
 // 1) JSON público (solo beats publicados y activos)
@@ -18,7 +18,7 @@ for(const b of live){
  const url=`${S.url}/beats/${b.slug}/`,img=`${S.url}/${b.cover}`,from=mn(b);
  const title=`${b.name}${b.type?' · '+b.type:''} | ${S.brand.name}`;
  const desc=`${b.name}${b.type?' — '+b.type:''}${b.genre?' ('+b.genre+')':''}.${b.bpm?' '+b.bpm+' BPM.':''}${b.key?' '+b.key+'.':''} Escucha el preview y compra tu licencia${from!=null?' desde '+S.currency+' '+from:''}.`;
- const ld={'@context':'https://schema.org','@type':'MusicRecording',name:b.name,url,image:img,genre:b.genre||undefined,duration:b.duration?`PT${Math.floor(b.duration/60)}M${Math.round(b.duration%60)}S`:undefined,byArtist:{'@type':'MusicGroup',name:S.brand.name}};
+ const ld={'@context':'https://schema.org','@type':'MusicRecording',name:b.name,url,image:img,genre:b.genre||undefined,keywords:(b.tags&&b.tags.length)?b.tags.join(', '):undefined,duration:b.duration?`PT${Math.floor(b.duration/60)}M${Math.round(b.duration%60)}S`:undefined,byArtist:{'@type':'MusicGroup',name:S.brand.name}};
  const meta=[b.genre,b.bpm&&b.bpm+' BPM',b.key,b.duration&&Math.floor(b.duration/60)+':'+String(Math.round(b.duration%60)).padStart(2,'0')].filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join('');
  const html=`<!DOCTYPE html>
 <html lang="es" data-root="../../" data-build="${BUILD}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">

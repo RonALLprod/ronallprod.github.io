@@ -54,7 +54,8 @@ try {
 const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArray(x) ? x : []).catch(() => []);
 const st = { q: '', g: '', sort: 'new' };
 let cur = [], sel = null, ui = null, shown = 0, coverP = Promise.resolve();
-const sub = b => [b.type, b.bpm && b.bpm + ' BPM', b.key].filter(Boolean).map(esc).join(' · ');
+const sub = b => [b.type, b.bpm && b.bpm + ' BPM', b.key].filter(Boolean).map(esc).concat(R.ago ? [`<span class="ag">${esc(R.ago(b))}</span>`] : []).join(' · ');
+const tagsOf = b => (b.tags || []).slice(0, 3);
 
 /* ───────── Vista de beat ───────── */
 const tot = $('#tot');
@@ -70,8 +71,9 @@ function select(b, first, track = true) {
   sel = b; if (track) R.track('beat', { beat: b.id });
   $('#ty').textContent = b.type || 'Beat';
   sway.hero = wrap($('#ttl'), b.name); $('#top-t').textContent = b.name;
-  $('#meta').innerHTML = [b.genre, b.bpm && b.bpm + ' BPM', b.key, b.duration && R.fmt(b.duration)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
+  $('#meta').innerHTML = [b.genre, b.bpm && b.bpm + ' BPM', b.key, b.duration && R.fmt(b.duration), R.ago && R.ago(b)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
   seedMeta();
+  $('#tgs').innerHTML = tagsOf(b).map(x => `<button type="button" data-t="${esc(x)}">#${esc(x)}</button>`).join('');
   const im = $('#cimg'); $('#aglow').style.backgroundImage = `url("${b.thumb || b.cover}")`; im.src = b.cover || b.thumb; im.alt = 'Portada de ' + b.name;
   const h = $('.hero'); h.classList.remove('swap'); void h.offsetWidth; h.classList.add('swap');
   $('#sold').hidden = !b.exclusiveSold; $('#b-pg').href = 'beats/' + b.slug + '/';
@@ -109,18 +111,35 @@ $('#more-l').onclick = e => { const c = e.target.closest('.card'); if (!c) retur
 /* ───────── Catálogo (lista lateral) ───────── */
 const genres = [...new Set(beats.map(b => b.genre).filter(Boolean))].sort();
 $('#chips').innerHTML = ['Todos', ...genres].map((g, i) => `<button class="chip ${i ? '' : 'on'}" data-g="${i ? esc(g) : ''}">${esc(g)}</button>`).join('');
-const view = () => beats.filter(b => (!st.g || b.genre === st.g) && (!st.q || (b.name + ' ' + b.type + ' ' + b.genre + ' ' + (b.tags || []).join(' ')).toLowerCase().includes(st.q)))
-  .sort({ new: (a, b) => b.created.localeCompare(a.created), pa: (a, b) => (R.fromPrice(a) ?? 1e9) - (R.fromPrice(b) ?? 1e9), pd: (a, b) => (R.fromPrice(b) ?? -1) - (R.fromPrice(a) ?? -1), bpm: (a, b) => (a.bpm || 0) - (b.bpm || 0), az: (a, b) => a.name.localeCompare(b.name) }[st.sort]);
+/* Buscador: sin tildes, por palabras sueltas, prefijos, tags/sobrenombres y tolerancia a 1 error de tecleo */
+const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9# ]+/g, ' ').replace(/\s+/g, ' ').trim();
+const near = (a, b) => { if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, e = 0; while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++e > 1) return false; if (a.length > b.length) i++; else if (a.length < b.length) j++; else { i++; j++; } } return e + (a.length - i) + (b.length - j) <= 1; };
+const idx = b => { const f = (a, w) => ({ w, t: norm(a) }); const tg = (b.tags || []).map(x => norm(x)).filter(Boolean);
+  return { tg, f: [f(b.name, 4), f(b.type, 2), f(b.genre, 2), f([b.bpm && b.bpm + ' bpm', b.key].filter(Boolean).join(' '), 1)], all: '' }; };
+const score = (b, qt) => { const ix = b._ix || (b._ix = idx(b)); let s = 0;
+  for (const q of qt) { const raw = q.replace(/^#/, ''); if (!raw) continue; let best = 0;
+    for (const f of ix.f) { const ws = f.t.split(' '); if (f.t === raw) best = Math.max(best, f.w * 3); else if (ws.some(w => w === raw)) best = Math.max(best, f.w * 2); else if (ws.some(w => w.startsWith(raw))) best = Math.max(best, f.w * 1.5); else if (raw.length > 3 && ws.some(w => near(w, raw))) best = Math.max(best, f.w * .7); }
+    for (const tg of ix.tg) { if (tg === raw) best = Math.max(best, 7); else if (tg.split(' ').includes(raw)) best = Math.max(best, 5); else if (tg.startsWith(raw)) best = Math.max(best, 4.5); else if (raw.length > 3 && (tg.includes(raw) || tg.split(' ').some(w => near(w, raw)))) best = Math.max(best, 2); }
+    if (!best) return 0; s += best; }
+  const full = norm(qt.join(' ')); if (full && ix.tg.includes(full)) s += 4; return s; };
+const view = () => { const qt = norm(st.q).split(' ').filter(Boolean), srt = { new: (a, b) => R.at(b) - R.at(a) || b.created.localeCompare(a.created), pa: (a, b) => (R.fromPrice(a) ?? 1e9) - (R.fromPrice(b) ?? 1e9), pd: (a, b) => (R.fromPrice(b) ?? -1) - (R.fromPrice(a) ?? -1), bpm: (a, b) => (a.bpm || 0) - (b.bpm || 0), az: (a, b) => a.name.localeCompare(b.name) }[st.sort];
+  let l = beats.filter(b => !st.g || b.genre === st.g);
+  if (!qt.length) return l.sort(srt);
+  l = l.map(b => [b, score(b, qt)]).filter(x => x[1] > 0);
+  return l.sort((a, b) => b[1] - a[1] || srt(a[0], b[0])).map(x => x[0]); };
 const draw = () => {
   cur = view(); $('#count').textContent = cur.length + ' beat' + (cur.length === 1 ? '' : 's'); P.setList(cur);
-  $('#list').innerHTML = cur.length ? cur.map((b, i) => { const fp = R.fromPrice(b); return `<button class="row ${sel && sel.id === b.id ? 'on' : ''}" data-id="${esc(b.id)}" style="--i:${Math.min(i, 10)}"><span class="n"><em>${i + 1}</em><i class="eq"><b></b><b></b><b></b></i></span><img src="${esc(b.thumb)}" alt="" loading="lazy" width="44" height="44"><span class="t"><b>${esc(b.name)}</b><small>${sub(b) || 'Beat'}</small></span><span class="p">${fp == null ? '—' : money(fp)}</span></button>`; }).join('') : '<div class="none">Sin resultados. Prueba otra búsqueda.</div>';
+  $('#list').innerHTML = cur.length ? cur.map((b, i) => { const fp = R.fromPrice(b); return `<button class="row ${sel && sel.id === b.id ? 'on' : ''}" data-id="${esc(b.id)}" style="--i:${Math.min(i, 10)}"><span class="n"><em>${i + 1}</em><i class="eq"><b></b><b></b><b></b></i></span><img src="${esc(b.thumb)}" alt="" loading="lazy" width="44" height="44"><span class="t"><b>${esc(b.name)}</b><small>${sub(b) || 'Beat'}</small>${tagsOf(b).length ? `<em class="tg">${tagsOf(b).map(x => '#' + esc(x)).join(' ')}</em>` : ''}</span><span class="p">${fp == null ? '—' : money(fp)}</span></button>`; }).join('') : '<div class="none">Sin resultados. Prueba otra búsqueda.</div>';
   sync();
 };
 $('#list').onclick = e => { const r = e.target.closest('.row'); if (!r) return; const b = beats.find(x => x.id === r.dataset.id); if (!sel || sel.id !== b.id) select(b); P.play(b, cur); if (isM()) go('beats'); };
 const setG = g => { st.g = g; $$('#chips .chip').forEach(x => x.classList.toggle('on', x.dataset.g === g)); draw(); };
 $('#chips').onclick = e => { const c = e.target.closest('.chip'); c && setG(c.dataset.g); };
-$('#f-q').oninput = e => { st.q = e.target.value.trim().toLowerCase(); draw(); };
+$('#f-q').oninput = e => { st.q = e.target.value.trim(); draw(); };
+$('#tgs').onclick = e => { const x = e.target.closest('[data-t]'); if (!x) return; const q = $('#f-q'); q.value = x.dataset.t; st.q = x.dataset.t; draw(); if (isM()) go('lib'); else q.focus(); };
 $('#f-sort').onchange = e => { st.sort = e.target.value; draw(); };
+
+addEventListener('ron:newbeats', e => { const ids = new Set(beats.map(b => b.id)), nb = (e.detail || []).filter(b => !ids.has(b.id)); if (!nb.length) return; beats.unshift(...nb); draw(); shelf(); });
 
 /* ───────── Navegación ───────── */
 let curView = 'beats';
