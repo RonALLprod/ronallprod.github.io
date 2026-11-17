@@ -9,3 +9,14 @@
 .main.sc .top{background:rgba(26,26,30,.78)}
 .drawer{background:rgba(29,29,33,.96)}
 @media(max-width:899px){.tabs{background:rgba(29,29,33,.94)}}
+
+/* RONALL · PERFORMANCE: fondo vectorial, sin canvas ampliado ni capas animadas */
+.fx-scene{background:var(--public-backdrop);contain:strict;isolation:isolate}
+#fx-camera,#fx-bloom,#fx-cover,#gl,.fx-grain,.fx-ambient,.fx-scene:before,.fx-scene:after{display:none!important}
+.shade{background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.16));contain:strict}
+.side,.main,.mini{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:0 12px 34px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.04)}
+.main.sc .top,.drawer,.nfp{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.main{background-image:none!important;scroll-behavior:auto}
+.row,.card,.tile,.lic{content-visibility:auto;contain-intrinsic-size:auto 100px}
+@media(max-width:899px){.side,.main,.mini,.tabs{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
