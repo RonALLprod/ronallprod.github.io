@@ -83,13 +83,12 @@
     if (!fine || reduce) return;
     if (h._lt) { h._ltRefresh?.(); return; }
     h._lt = 1;
-    let items = [], cached = 0;
+    let items = [];
     const build = () => {
       items = $$('.l', h).map(el => {
         const r = el.getBoundingClientRect();
         return { el, cx: r.left + r.width / 2, cy: r.top + r.height / 2, x: new Spring(120, 8), y: new Spring(120, 8), r: new Spring(90, 6), s: new Spring(170, 10) };
       });
-      cached = performance.now();
     };
     const obj = {
       tick(dt) {
@@ -110,7 +109,7 @@
     h._ltRefresh = build;
     h.addEventListener('pointerenter', build);
     h.addEventListener('pointermove', e => {
-      if (!items.length || performance.now() - cached > 2500) build();
+      if (!items.length) build();
       const selection = D.getSelection();
       if (selection && !selection.isCollapsed) { settle(); return; }
       for (const it of items) {
