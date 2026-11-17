@@ -1,0 +1,41 @@
+/* RONALL PROD · polish.css v2
+   Capa final, solo CSS. Va DESPUÉS de site.css. No cambia la identidad (blanco/negro, vidrio, ambiente).
+   Se apoya en lo que ya existe: .app.live (suena un beat), .fx-ambient, .mini, .row, .lic, etc.
+   Si regeneras site.css con tools/bundle-css.mjs, este archivo sigue intacto. */
+
+/* 1) El ambiente responde a la música: cuando suena algo, el fondo "despierta" */
+.fx-ambient{transition:opacity 1.6s ease}
+.fx-scene:before,.fx-scene:after{transition:opacity 1.6s ease}
+body:has(.app.live) .fx-ambient{opacity:1!important}
+body:has(.app.live) .fx-scene:before{opacity:.44!important}
+body:has(.app.live) .fx-scene:after{opacity:.36!important}
+
+/* 2) Reproductor: presencia cuando suena (portada con halo, seek con brillo, borde más claro) */
+.mini{transition:border-color .8s ease,box-shadow .8s ease}
+.mini .tk img{transition:box-shadow .8s ease,scale .8s cubic-bezier(.16,1,.3,1)}
+.app.live .mini{border-color:rgba(255,255,255,.17)!important}
+.app.live .mini .tk img{box-shadow:0 0 22px rgba(255,255,255,.26),0 6px 18px rgba(0,0,0,.6);scale:1.04}
+.app.live .sk .rng::-webkit-slider-runnable-track{box-shadow:0 0 14px rgba(255,255,255,.24)}
+.app.live .mini .bar i{box-shadow:0 0 10px #fff,0 0 22px rgba(255,255,255,.5)}
+
+/* 3) Lista y cards: menos glow repetido (rendimiento y nitidez en listas largas) */
+.row .t b,.row .p,.row .n,.card b,.ci-t b{text-shadow:var(--tb)}
+
+/* 4) Scroll y toque más finos */
+.main,.list,.db,.nfp{overscroll-behavior:contain}
+.main{scroll-padding-top:84px}
+.btn,.chip,.row,.lic,.card,.tile,.tabs button,.snav button,.cartb,.ib,.play,.ctl button{touch-action:manipulation;-webkit-touch-callout:none}
+.page p,.sold,.lead,.ld{text-wrap:pretty}
+.hero h1,.page h2,.page-h h2{hyphens:manual}
+
+/* 5) Foco visible con más contraste sobre vidrio */
+:focus-visible{outline:2px solid #fff!important;outline-offset:3px;box-shadow:0 0 0 5px rgba(0,0,0,.55)}
+
+/* 6) Móvil: menos GPU, misma estética (se quita el blur grande del canvas y 2 orbes) */
+@media (max-width:899px){
+  #fx-camera{filter:brightness(1.3) contrast(1.08) saturate(.6)!important}
+  .fx-ambient i:nth-child(n+3){display:none!important}
+}
+
+/* 7) Ahorro de batería y pestaña en segundo plano */
+@media (prefers-reduced-data:reduce){#fx-camera{display:none!important}}
