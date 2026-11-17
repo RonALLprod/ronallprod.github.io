@@ -1,6 +1,7 @@
 :root{color-scheme:dark}
-#main{scroll-behavior:auto!important;overscroll-behavior:auto!important}
-.list{overscroll-behavior:contain}
+html,body,#main,.main,.list{scroll-behavior:auto!important;overscroll-behavior:auto!important}
+#main,.main,.list{contain:none!important}
+.row,.card,.tile{content-visibility:visible!important;contain:none!important;contain-intrinsic-size:none!important}
 button,a,summary{touch-action:manipulation}
 h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 :where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:2px solid rgba(255,255,255,.9);outline-offset:3px}
@@ -40,11 +41,14 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
 .fx-ambient i:nth-child(2){animation:ronOrbB 37s ease-in-out infinite alternate!important}
 .fx-ambient i:nth-child(3){animation:ronOrbC 43s ease-in-out infinite alternate!important}
 
-.hero .info,.page-h h2,.page h2{will-change:auto!important;animation:none!important}
-.w{display:inline-block;white-space:nowrap;will-change:auto!important}
+.hero .info{will-change:transform;animation:ronallTextFloat 8s ease-in-out infinite}
+.page-h h2,.page h2{will-change:transform;animation:ronallTextFloat 9s ease-in-out infinite}
+@keyframes ronallTextFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-2px,0)}}
+.w{display:inline-block;white-space:nowrap}
 .w+.w{margin-left:.18em}
-.w .l{display:inline-block;transform-origin:50% 100%;animation:ronallGlyphIn .52s cubic-bezier(.2,.8,.2,1) both!important;animation-delay:calc(var(--i)*24ms)!important;filter:none!important}
-@keyframes ronallGlyphIn{from{opacity:0;transform:translate3d(0,.48em,0) rotateX(-55deg) scale(.96)}to{opacity:1;transform:translate3d(0,0,0) rotateX(0) scale(1)}}
+.w .l{display:inline-block;transform-origin:50% 100%;animation:ronallGlyphEntry 1.3s cubic-bezier(.2,.8,.2,1) both!important;animation-delay:calc(var(--i)*45ms + .05s)!important;filter:none!important}
+@keyframes ronallGlyphEntry{from{opacity:0;transform:translate3d(0,.6em,0) rotateX(-75deg) scale(.94)}60%{opacity:1}to{opacity:1;transform:none}}
+body.text-selecting .hero .info,body.text-selecting .page-h h2,body.text-selecting .page h2,body.text-selecting .w .l{animation-play-state:paused!important}
 .hero.swap .info>*{animation:ronallTextEnter .34s cubic-bezier(.2,.8,.2,1) both!important;filter:none!important}
 .hero.swap .kicker{animation-delay:0s!important}
 .hero.swap h1{animation-delay:.035s!important}
