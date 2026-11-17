@@ -87,3 +87,36 @@
     -webkit-backdrop-filter:blur(16px) saturate(1.12)!important;
   }
 }
+
+
+/* RONALL · DARKER BACKDROP + LOW-COST GLASS */
+:root{
+ --public-backdrop:radial-gradient(ellipse 82% 54% at 50% 0%,rgba(255,255,255,.018) 0%,transparent 68%),linear-gradient(180deg,#09090b 0%,#070709 56%,#050506 100%);
+}
+.fx-scene{background:var(--public-backdrop)!important}
+.shade{
+ background:linear-gradient(90deg,rgba(0,0,0,.38),rgba(0,0,0,.22) 52%,rgba(0,0,0,.42)),
+ linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,.16) 48%,rgba(0,0,0,.28)),
+ radial-gradient(120% 90% at 50% 42%,transparent 30%,rgba(0,0,0,.38));
+}
+.side,.main,.mini{
+ background:rgba(17,17,20,.68)!important;
+ backdrop-filter:blur(8px) saturate(1.08)!important;
+ -webkit-backdrop-filter:blur(8px) saturate(1.08)!important;
+ box-shadow:0 12px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+.top,.main.sc .top{
+ background:rgba(10,10,12,.72)!important;
+ backdrop-filter:blur(9px) saturate(1.08)!important;
+ -webkit-backdrop-filter:blur(9px) saturate(1.08)!important;
+}
+.drawer,.tabs{
+ background:rgba(15,15,18,.84)!important;
+ backdrop-filter:blur(10px) saturate(1.08)!important;
+ -webkit-backdrop-filter:blur(10px) saturate(1.08)!important;
+}
+.scrim{backdrop-filter:blur(4px)!important;-webkit-backdrop-filter:blur(4px)!important}
+#fx-camera{filter:saturate(.52) contrast(1.08) brightness(.78)!important;mix-blend-mode:screen!important}
+#fx-camera.on{opacity:.38!important}
+.fx-ambient{opacity:.62!important}
+.fx-ambient i{filter:blur(5px)!important}
