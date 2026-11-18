@@ -69,7 +69,7 @@
     const money = window.RON ? RON.money : (n => '$' + n), from = el._v ?? 0;
     el._v = to; cancelAnimationFrame(el._r);
     if (reduce || from === to) { el.textContent = money(to); return; }
-    const t0 = performance.now(), dur = o.dur || 560;
+    const t0 = performance.now(), dur = o.dur || 900;
     const f = now => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 4); el.textContent = money(Math.round(from + (to - from) * e)); if (k < 1) el._r = requestAnimationFrame(f); };
     el._r = requestAnimationFrame(f);
   }
@@ -105,50 +105,36 @@
   }
 
   /* Inclinación 3D suave de la portada con el puntero */
-  /* Inclinación local y moderada: no escucha el puntero global ni fuerza repintados. */
   function tilt(art) {
-    if (!art || !fine || reduce || art._t) return;
-    art._t = 1;
-    let raf = 0, px = 0, py = 0;
-    const reset = () => {
-      cancelAnimationFrame(raf); raf = 0;
-      art.classList.remove('tilting');
-      art.style.setProperty('--rx', '0deg'); art.style.setProperty('--ry', '0deg');
-    };
-    art.addEventListener('pointermove', e => {
+    if (!art || !fine || reduce || art._t) return; art._t = 1;
+    let raf = 0, px = 0, py = 0, idle = 0;
+    const apply = () => {
+      raf = 0; if (innerWidth < 900) return;
       const r = art.getBoundingClientRect();
-      px = (e.clientX - (r.left + r.width / 2)) / Math.max(1, r.width);
-      py = (e.clientY - (r.top + r.height / 2)) / Math.max(1, r.height);
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0; art.classList.add('tilting');
-        art.style.setProperty('--ry', (px * 5).toFixed(2) + 'deg');
-        art.style.setProperty('--rx', (-py * 4).toFixed(2) + 'deg');
-      });
-    }, { passive: true });
-    art.addEventListener('pointerleave', reset, { passive: true });
+      const dx = (px - (r.left + r.width / 2)) / innerWidth, dy = (py - (r.top + r.height / 2)) / innerHeight;
+      art.style.setProperty('--ry', (dx * 20).toFixed(2) + 'deg'); art.style.setProperty('--rx', (-dy * 14).toFixed(2) + 'deg');
+    };
+    addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; art.classList.add('tilting'); clearTimeout(idle); idle = setTimeout(() => art.classList.remove('tilting'), 160); if (!raf) raf = requestAnimationFrame(apply); }, { passive: true });
+    D.addEventListener('pointerleave', () => { art.classList.remove('tilting'); art.style.setProperty('--rx', '0deg'); art.style.setProperty('--ry', '0deg'); });
   }
 
-  /* Reflejo discreto: actualiza solo la superficie bajo el puntero. */
+  /* Reflejo de cristal que sigue al cursor, tilt 3D de tarjetas e imán suave en play/botones rellenos */
   function sheen() {
-    if (!fine) return;
-    let raf = 0, ev = null, last = null;
-    D.addEventListener('pointermove', e => {
-      ev = e;
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        if (!ev || !ev.target || !ev.target.closest) return;
-        const el = ev.target.closest('.glass,.pane,.bc');
-        if (el) {
-          const r = el.getBoundingClientRect();
-          el.style.setProperty('--mx', (ev.clientX - r.left) + 'px');
-          el.style.setProperty('--my', (ev.clientY - r.top) + 'px');
-          last = el;
-        }
-      });
-    }, { passive: true });
-    D.addEventListener('pointerleave', () => { last = null; }, { passive: true });
+    if (!fine) return; let raf = 0, ev = null, mag = null, tcard = null;
+    const clearCard = () => { if (tcard) { tcard.classList.remove('tilting'); tcard.style.setProperty('--rx', '0deg'); tcard.style.setProperty('--ry', '0deg'); tcard = null; } };
+    D.addEventListener('pointermove', e => { ev = e; if (!raf) raf = requestAnimationFrame(() => {
+      raf = 0; if (!ev) return;
+      const tg = ev.target.closest ? ev.target : null;
+      const t = tg && tg.closest('.glass,.pane,.bc');
+      if (t) { const r = t.getBoundingClientRect(); t.style.setProperty('--mx', (ev.clientX - r.left) + 'px'); t.style.setProperty('--my', (ev.clientY - r.top) + 'px'); }
+      const c = !reduce && !lite() && tg && tg.closest('.bc');
+      if (tcard && tcard !== c) clearCard();
+      if (c && !c.closest('.list')) { const r = c.getBoundingClientRect(), px = (ev.clientX - r.left) / r.width - .5, py = (ev.clientY - r.top) / r.height - .5; c.classList.add('tilting'); c.style.setProperty('--ry', (px * 9).toFixed(2) + 'deg'); c.style.setProperty('--rx', (-py * 9).toFixed(2) + 'deg'); tcard = c; }
+      const m = tg && tg.closest('.play,.btn.fill');
+      if (mag && mag !== m) { mag.style.translate = ''; mag = null; }
+      if (m && !reduce) { const r = m.getBoundingClientRect(); m.style.translate = ((ev.clientX - r.left - r.width / 2) * .16).toFixed(1) + 'px ' + ((ev.clientY - r.top - r.height / 2) * .22).toFixed(1) + 'px'; mag = m; }
+    }); }, { passive: true });
+    D.addEventListener('pointerleave', clearCard);
   }
 
   /* Aparición al hacer scroll DENTRO de una vista (root = el contenedor con scroll) */

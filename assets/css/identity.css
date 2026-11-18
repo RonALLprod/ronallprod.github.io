@@ -1,0 +1,38 @@
+/* RONALL PROD · V60
+   Directional refinements over the original Kosmos / bloom / glass art direction.
+   No component reset: keep the signature rail, wordmark, marquee, type and motion.
+*/
+@media (min-width:900px){
+  :root{--rail:232px}
+  .rail{width:208px}
+  .fl{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:14px;
+  }
+  .chips{
+    display:flex;
+    flex-wrap:nowrap;
+    min-width:0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scrollbar-width:none;
+    padding:2px 2px 8px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;white-space:nowrap}
+}
+@media (min-width:900px) and (max-width:1120px){
+  :root{--gut:26px;--rail:224px}
+  .rail{width:200px}
+  .hero{gap:32px}
+  .art-w{width:min(100%,420px)}
+}
+@media (max-width:899px){
+  /* Preserve the original mobile signature: cover first, title second. */
+  .hero .art-w{order:-1}
+  .hero .info{order:0}
+  .rail{width:auto}
+}
