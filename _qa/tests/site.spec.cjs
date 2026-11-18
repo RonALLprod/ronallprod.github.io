@@ -17,10 +17,10 @@ async function openStore(page) {
 }
 async function settleView(page, selector) {
   await page.locator(selector).evaluate(async el => {
-    const animations = el.getAnimations({ subtree: true });
+    const animations = el.getAnimations({ subtree: true }).filter(animation => animation.effect?.getTiming().iterations !== Infinity);
     await Promise.all(animations.map(animation => animation.finished.catch(() => {})));
   });
-  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(() => document.fonts.ready.then(() => true));
 }
 async function openCatalog(page) {
   const nav = page.locator('[data-go="catalogo"]:visible').first();
