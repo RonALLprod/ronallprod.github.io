@@ -1,0 +1,63 @@
+name: Export public remaster bundle
+
+on:
+  push:
+    branches:
+      - claude-remaster-export
+    paths:
+      - .github/workflows/export-public-remaster.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public site source
+        uses: actions/checkout@v4
+
+      - name: Assemble handoff ZIP
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+
+          root = Path(".")
+          out = Path("/tmp/RONALL-PUBLIC-REMASTER-FOR-CLAUDE.zip")
+          files = []
+          exact = [
+              "index.html", "404.html", "manifest.webmanifest", "sw.js",
+              "favicon.png", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "og.jpg",
+              "data/beats.public.json", "tools/build.mjs",
+              "package.json", "package-lock.json",
+              "_qa/playwright.config.cjs", "_qa/tests/site.spec.cjs",
+              ".github/workflows/browser-qa.yml",
+              "README_FOR_CLAUDE.md", "PROMPT_PARA_CLAUDE.txt"
+          ]
+          for name in exact:
+              p = root / name
+              if p.is_file():
+                  files.append(p)
+          for folder in ["assets/css", "assets/js", "beats", "public-img"]:
+              base = root / folder
+              if base.exists():
+                  for p in base.rglob("*"):
+                      if p.is_file() and (folder != "beats" or p.name == "index.html"):
+                          files.append(p)
+          files = sorted(set(files))
+          with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=7) as z:
+              for p in files:
+                  z.write(p, p.relative_to(root).as_posix())
+              z.write(root / "config/site-config.reference.js", "config/site-config.js")
+          print("ZIP ready:", out, "bytes:", out.stat().st_size, "files:", len(files) + 1)
+          PY
+
+      - name: Upload handoff ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: ronall-public-remaster-bundle
+          path: /tmp/RONALL-PUBLIC-REMASTER-FOR-CLAUDE.zip
+          if-no-files-found: error
+          retention-days: 7

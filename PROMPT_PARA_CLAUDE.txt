@@ -1,0 +1,65 @@
+Actúa como director de arte digital senior especializado en marcas musicales independientes y como frontend engineer senior. Tu encargo es hacer una REMASTERIZACIÓN COMPLETA de la web pública de RONALL PROD a partir de este ZIP.
+
+NO quiero un retoque superficial ni una plantilla bonita. La estética actual todavía no está al nivel. Necesito una dirección de arte con carácter propio, arriesgada, reconocible y ejecutada con calidad profesional. Tienes libertad creativa para replantear composición, jerarquía, navegación, ventanas, catálogo, detalles, microinteracciones y sistema de movimiento, siempre respetando las invariantes funcionales de abajo.
+
+1. DIRECCIÓN CREATIVA: NO PARECER UNA PLANTILLA
+- Diseña una experiencia para un productor musical / beat store con identidad de marca, no un e-commerce genérico, dashboard SaaS, portfolio de agencia ni landing prefabricada.
+- Rechaza patrones genéricos: navbar de plantilla, hero partido en dos columnas por defecto, tarjetas idénticas repetidas sin intención, glassmorphism por todas partes, gradientes decorativos aleatorios, pills innecesarias, CTAs de plantilla y exceso de cajas redondeadas.
+- Usa las portadas reales y la tipografía como elementos de dirección de arte. La composición puede ser editorial, experimental, asimétrica, visualizer-like, brutalista refinada o una mezcla coherente; decide una sola dirección potente y llévala hasta el final.
+- La base de marca es oscura, de alto contraste y monocromática con acentos que nazcan del artwork. En el sitio actual existen Kosmos y Acidic, bloom, tratamiento de portada, grano, luz y movimiento; estudia cómo reutilizarlos o elevarlos. No tienes que copiar el layout actual: tienes que evolucionarlo con criterio.
+- No conviertas todos los elementos en paneles. El espacio negativo, la escala tipográfica, las líneas, los recortes, las máscaras, la profundidad y la composición deben hacer el trabajo.
+- No inventes textos de marketing, claims, reseñas, cifras o contenido para rellenar.
+
+2. OBJETIVO DE ESTRUCTURA Y NAVEGACIÓN
+- La experiencia debe sentirse como un entorno musical interactivo, no una página larga que obliga a hacer scroll.
+- Reduce radicalmente el scroll innecesario. Prioriza vistas independientes y ventanas/drawers cuando ayuden: selección de licencia/compra, carrito, detalle ampliado y filtros.
+- La portada/beat activo debe tener un foco visual claro y controles inmediatos. El catálogo debe ser una vista propia, cómoda y rápida. La compra debe aparecer bajo demanda, no como una sección kilométrica debajo de la portada.
+- Mantén navegación clara en desktop y móvil. En móvil, la portada, controles y acciones deben caber sin recortes; los drawers deben tener altura y scroll internos correctos.
+- No escondas acciones esenciales en hover: todo debe ser accesible mediante toque y teclado.
+- Las páginas individuales de beats deben compartir el mismo lenguaje visual y patrón de compra que el sitio principal.
+
+3. MOTION DESIGN: FUERTE, SUAVE Y CLEAN
+- Transiciones entre vistas con continuidad espacial, entradas escalonadas y easing personalizado.
+- Portadas y títulos con movimiento cinético controlado, profundidad/parallax moderado y bloom sutilmente reactivo cuando aporte.
+- Ventanas con entrada/salida de calidad: escala, desplazamiento, blur, luz o máscara, con sensación de masa y resorte.
+- Hover y estados activos precisos en botones, filtros, tarjetas y controles; feedback inmediato de selección, play/pause, carga y carrito.
+- Evita movimiento perpetuo sin propósito, efectos pesados en cada frame, blur aplicado a bloques enormes y listeners globales de puntero que causen lag.
+- Respeta prefers-reduced-motion, funciona con touch y no sacrifica legibilidad ni FPS. Anima principalmente transform y opacity; mide antes de añadir efectos costosos.
+
+4. INVARIANTES: NO ROMPER LÓGICA COMERCIAL NI TÉCNICA
+Es obligatorio preservar:
+- Reproducción de previews y el flujo existente del reproductor: play/pause, progreso, duración, anterior/siguiente, volumen, reproductor mini y estado de reproducción.
+- Los objetos y APIs existentes de RON, RON.P, RON.Cart, RON.openCart, RON.waRequest, RON.track, RonUI, RON.licUI y demás módulos. Refactoriza solo si puedes demostrar equivalencia funcional.
+- Selector de licencias y sus datos reales. No cambies nombres BASIC/PREMIUM/UNLIMITED/EXCLUSIVE, precios, precios tachados, formatos, permisos, restricciones, combos, descuentos ni condiciones.
+- Añadir al carrito, contador, edición/eliminación de ítems, resumen, compra y apertura de WhatsApp/PayPal según configuración existente.
+- Búsqueda, filtros por género/tag, orden, cuadrícula/lista, contador de resultados, navegación, enlaces compartidos y páginas de beat individuales.
+- Estado de beats exclusivos vendidos, analítica pública y detección de beats nuevos si están implementadas.
+- Datos y rutas de data/beats.public.json, public-img/, public-audio/, slugs, URLs canónicas, meta tags, SEO, manifest, iconos y service worker.
+- En el catálogo actual solo hay dos beats públicos. No simules un catálogo más grande ni inventes material.
+
+No edites ni reemplaces la configuración sensible. El config/site-config.js del ZIP es un archivo de referencia con marcadores. Conserva su estructura y usos, pero no inventes valores. Los valores reales se restaurarán desde el repo original.
+
+5. RESTRICCIONES DE IMPLEMENTACIÓN
+- Trabaja sobre los archivos existentes y entiende primero cómo se conectan HTML, CSS y JS. No reemplaces la app por un mockup estático.
+- No cambies esquema de Supabase, tablas, consultas, claves, endpoints, datos, precios, licencias o rutas de audio.
+- No agregues frameworks, librerías, fuentes CDN o dependencias nuevas salvo razón técnica imprescindible. Preferencia por HTML/CSS/JS nativo.
+- No sustituyas las fuentes de marca. Los archivos assets/fonts/kosmos.woff2 y assets/fonts/acidic.woff2 no vienen en este paquete, pero existen en el repo original. Mantén los @font-face, nombres de familia y rutas exactas; no los borres ni uses una fuente genérica como reemplazo.
+- Mantén la estructura de carpetas y rutas relativas. El build script está incluido como referencia pero no se puede ejecutar aquí porque el catálogo maestro privado no forma parte del ZIP.
+- No edites private.html, panel, archivos SQL ni componentes del catálogo privado.
+- Mantén accesibilidad: focus visible, roles/labels correctos, Escape y backdrop para ventanas, focus return/trap, navegación por teclado y reduced motion.
+- Evita scroll horizontal, saltos de layout, fuentes que parpadeen, animaciones secas y controles solapados.
+- No elimines funciones existentes solo para simplificar la interfaz. Si cambias un patrón de UI, conecta la acción original a la nueva UI y verifica el flujo completo.
+
+6. MÉTODO DE TRABAJO
+1) Inspecciona el ZIP completo, mapa de dependencias, CSS acumulado y puntos de entrada.
+2) Define una dirección de arte original en REMASTER_NOTES.md con 5-8 principios concretos antes de implementarla.
+3) Remasteriza de extremo a extremo: portada, navegación, catálogo, tarjetas, ventanas, carrito/reproductor, páginas individuales, estados vacíos y responsive.
+4) Consolida CSS en vez de sumar overrides contradictorios. Elimina estilos muertos solo después de confirmar que no están usados.
+5) Mantén la lógica JavaScript estable; si debes mover componentes al DOM, conserva selectores/API o adapta todos los consumidores coordinadamente.
+6) Ejecuta npm ci, npm run check:syntax y npm run test:browser si el entorno lo permite; repara fallos antes de entregar. Si una prueba depende de credenciales/recursos no incluidos, indica cuál y por qué.
+7) Revisa screenshots reales desktop y móvil, incluyendo catálogo, modal de licencias, carrito y reproductor abierto. No te limites a decir que se ve bien.
+8) Comprueba los límites de cada elemento dentro del viewport, no solo document.scrollWidth.
+9) Devuelve un único ZIP completo, con estructura preservada y archivos necesarios para sustituir la versión pública. Incluye REMASTER_NOTES.md con dirección de arte, decisiones, archivos cambiados, pruebas y limitaciones.
+
+7. ENTREGA
+No me devuelvas solo un prompt, un diseño en imagen, una demo separada o fragmentos de código. Necesito el código real remasterizado, funcional y listo para que otro desarrollador lo reintegre. No hagas commits, no publiques cambios y no intentes acceder a cuentas externas. Devuelve el ZIP del sitio público remasterizado y las notas técnicas.
