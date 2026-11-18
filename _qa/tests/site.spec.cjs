@@ -99,6 +99,10 @@ test('el reproductor abierto queda visible y no invade el dock', async ({ page }
   await openStore(page);
   await page.locator('#cplay').click();
   await expect(page.locator('.mini')).toHaveClass(/on/);
+  await page.locator('.mini').evaluate(async el => {
+    const animations = el.getAnimations({ subtree: true }).filter(a => a.effect?.getTiming().iterations !== Infinity);
+    await Promise.all(animations.map(a => a.finished.catch(() => {})));
+  });
   const box = await page.locator('.mini').boundingBox();
   const dock = await page.locator('.dock').boundingBox();
   const viewport = page.viewportSize();
