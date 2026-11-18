@@ -15,12 +15,21 @@ async function openStore(page) {
   await expect(page.locator('#ttl')).not.toBeEmpty();
   await expect(page.locator('#intro')).toHaveCount(0, { timeout: 9000 });
 }
+async function settleView(page, selector) {
+  await page.locator(selector).evaluate(async el => {
+    const animations = el.getAnimations({ subtree: true });
+    await Promise.all(animations.map(animation => animation.finished.catch(() => {})));
+  });
+  await page.evaluate(() => document.fonts.ready);
+}
 async function openCatalog(page) {
   const nav = page.locator('[data-go="catalogo"]:visible').first();
   await expect(nav).toBeVisible();
   await nav.click();
   await expect(page.locator('#v-catalogo')).toHaveClass(/active/);
   await expect(page.locator('#f-q')).toBeVisible();
+  await settleView(page, '#v-catalogo');
+  await page.locator('#grid .bc img').evaluateAll(images => Promise.all(images.map(img => img.decode().catch(() => {}))));
 }
 async function openHome(page) {
   const nav = page.locator('[data-go="home"]:visible').first();
@@ -54,6 +63,7 @@ test('carga Beats y Catálogo, registra errores y genera capturas', async ({ pag
   }));
   console.log('RONALL_CATALOG_DIAG ' + JSON.stringify(catalogDiag));
   await page.screenshot({ path: testInfo.outputPath('catalog.png') });
+  await page.screenshot({ path: testInfo.outputPath('catalog-full.png'), fullPage: true });
   expect(errors).toEqual([]);
 });
 
