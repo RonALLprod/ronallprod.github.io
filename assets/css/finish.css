@@ -1,4 +1,4 @@
-/* RONALL PROD · V57 — editorial storefront
+/* RONALL PROD · V58 — editorial storefront
    Replaces the accumulated app-shell look with a clear music-store hierarchy.
    Typography: Kosmos only for track names; UI and figures use complete system fonts.
 */
@@ -331,4 +331,12 @@ h1 .l:hover,.h2 .l:hover{text-shadow:0 0 22px rgba(255,255,255,.35);transform:no
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   html.js .rvb{opacity:1;transform:none;filter:none}
   html.booting .view .st{opacity:1}
+}
+
+/* V58 · Keep the floating player inside the viewport on mobile. */
+.hero-copy{max-width:56ch}
+@media(max-width:899px){
+  .mini{transform:translate3d(0,150%,0) scale(.985)}
+  .mini.on{transform:translate3d(0,0,0) scale(1)}
+  .hero-copy{max-width:48ch}
 }

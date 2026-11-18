@@ -95,6 +95,22 @@ test('cabecera escritorio es horizontal y el CTA navega al catálogo', async ({ 
   await page.screenshot({ path: testInfo.outputPath('catalog-from-hero.png') });
 });
 
+test('el reproductor abierto queda visible y no invade el dock', async ({ page }, testInfo) => {
+  await openStore(page);
+  await page.locator('#cplay').click();
+  await expect(page.locator('.mini')).toHaveClass(/on/);
+  const box = await page.locator('.mini').boundingBox();
+  const dock = await page.locator('.dock').boundingBox();
+  const viewport = page.viewportSize();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
+  if (testInfo.project.name === 'mobile-chromium') {
+    expect(dock).not.toBeNull();
+    expect(box.y + box.height).toBeLessThanOrEqual(dock.y + 1);
+  }
+  await page.screenshot({ path: testInfo.outputPath('player-open.png') });
+});
+
 test('el botón play del hero es clicable (nada lo tapa)', async ({ page }) => {
   await openStore(page);
   const box = await page.locator('#cplay').boundingBox();
