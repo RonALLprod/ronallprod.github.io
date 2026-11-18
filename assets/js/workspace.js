@@ -1,4 +1,4 @@
-/* RONALL PROD · V61 — compact app workspace and focused license window */
+/* RONALL PROD · V62 — compact app workspace and focused license window */
 (() => {
 'use strict';
 const D=document,root=D.documentElement,body=D.body,$=(s,r=D)=>r.querySelector(s);
