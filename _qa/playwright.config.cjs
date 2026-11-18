@@ -12,7 +12,8 @@ module.exports = defineConfig({
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure'
+    video: process.env.PW_CHROME ? 'off' : 'retain-on-failure',
+    launchOptions: { executablePath: process.env.PW_CHROME || undefined }
   },
   projects: [
     {

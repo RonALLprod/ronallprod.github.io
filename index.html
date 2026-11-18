@@ -1,95 +1,120 @@
 <!DOCTYPE html>
-<html lang="es" data-root="" data-build="RONALL-RESTORED-ENGINE-2026-11-17-V37"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="es" data-root="" data-build="RONALL-V50"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RONALL PROD · Beats &amp; Instrumentales</title>
 <meta name="description" content="Tienda oficial de instrumentales de RONALL PROD. Escucha, elige tu licencia desde USD 17 y compra desde el carrito.">
-<link rel="canonical" href="https://ronallprod.github.io/"><meta name="theme-color" content="#000000"><meta name="color-scheme" content="dark">
+<link rel="canonical" href="https://ronallprod.github.io/"><meta name="theme-color" content="#040404"><meta name="color-scheme" content="dark">
 <meta property="og:type" content="website"><meta property="og:site_name" content="RONALL PROD"><meta property="og:locale" content="es_CO"><meta property="og:url" content="https://ronallprod.github.io/"><meta property="og:title" content="RONALL PROD · Beats &amp; Instrumentales"><meta property="og:description" content="Tienda oficial de instrumentales de RONALL PROD. Escucha, elige tu licencia desde USD 17 y compra desde el carrito."><meta property="og:image" content="https://ronallprod.github.io/og.jpg"><meta property="og:image:alt" content="RONALL PROD · Beats"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="RONALL PROD · Beats &amp; Instrumentales"><meta name="twitter:description" content="Tienda oficial de instrumentales de RONALL PROD. Escucha, elige tu licencia desde USD 17 y compra desde el carrito."><meta name="twitter:image" content="https://ronallprod.github.io/og.jpg">
 <link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://kwmofbiiwvpojtkvlmxz.supabase.co" crossorigin><link rel="preload" href="assets/fonts/kosmos.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://kwmofbiiwvpojtkvlmxz.supabase.co" crossorigin>
+<link rel="preload" href="assets/fonts/kosmos.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/acidic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/site.css?v=RONALL-STABLE-RESTORE-2026-11-17-V41"><link rel="stylesheet" href="assets/css/polish.css?v=POLISH-INTERACTION-PERF-2026-11-18-V7"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "RONALL PROD", "url": "https://ronallprod.github.io/", "inLanguage": "es", "description": "Tienda oficial de instrumentales de RONALL PROD. Escucha, elige tu licencia desde USD 17 y compra desde el carrito."}</script>
-<script>window.__cat=fetch("data/beats.public.json",{cache:"default"}).catch(function(){return null})</script>
-<script>document.write('<script src="config/site-config.js?t='+Date.now()+'"></'+'script>')</script></head><body>
+<link rel="stylesheet" href="assets/css/ronall.css?v=V50">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "RONALL PROD", "url": "https://ronallprod.github.io/", "inLanguage": "es", "description": "Tienda oficial de instrumentales de RONALL PROD. Escucha, elige tu licencia desde USD 17 y compra desde el carrito."}</script>
+<script>
+(function(){var d=document.documentElement;d.classList.add('js');
+try{var c=navigator.connection||{};if(c.saveData||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2))d.classList.add('lite')}catch(e){}})();
+window.__cat=fetch("data/beats.public.json",{cache:"default"}).catch(function(){return null});
+document.write('<script src="config/site-config.js?t='+Date.now()+'"></'+'script>');
+</script></head><body>
 <noscript><p style="padding:24px;font:16px system-ui;color:#fff;background:#000">RONALL PROD necesita JavaScript para reproducir y comprar beats.</p></noscript>
 
-<div id="intro" role="presentation"><div class="in-glow"></div><div class="in-c"><div class="in-lg"><img src="favicon.png" alt="" width="84" height="84"></div><b class="in-t" id="in-t" aria-label="RONALL PROD"></b><div class="in-bar"><i id="in-f"></i></div><div class="in-row"><span id="in-s">Cargando</span><span id="in-p">0%</span></div></div></div>
+<div id="intro" role="presentation"><div class="in-glow"></div><div class="in-c"><img src="favicon.png" alt="" width="84" height="84"><b class="in-t" id="in-t" aria-label="RONALL PROD"></b><div class="in-bar"><i id="in-f"></i></div></div></div>
 
-<div class="fx-scene" id="fx-scene" aria-hidden="true"><canvas id="fx-camera" width="640" height="360"></canvas></div><div class="shade" aria-hidden="true"></div>
+<!-- Escena: portada en gris desenfocada + luz + grano + viñeta. Solo transform/opacity. -->
+<div class="scene" aria-hidden="true"><div class="bgc a"></div><div class="bgc b"></div><i class="orb o1"></i><i class="orb o2"></i><div class="scan"></div><div class="grain"></div><div class="vig"></div></div>
 
-<div class="app" id="app" data-v="beats">
+<header class="top glass" id="top">
+ <a class="brand" href="./" aria-label="RONALL PROD"><img src="favicon.png" alt="" width="28" height="28"><b>RONALL PROD</b></a>
+ <nav class="nav" aria-label="Principal">
+  <button class="on" data-go="hero">Beats</button><button data-go="catalogo" data-v="beats">Catálogo</button><button data-go="privado">Private</button><button data-go="contacto">Contacto</button>
+ </nav>
+ <span class="sp"></span>
+ <button class="ib srch" id="tsearch" data-i="search" data-s="18" aria-label="Buscar (atajo: /)"></button>
+ <button class="cartb" id="cartb" aria-label="Carrito"><span data-i="cart" data-s="18"></span><span class="cl">Carrito</span><span class="cnt">0</span></button>
+</header>
 
- <!-- Lateral: navegación + catálogo -->
- <aside class="side" aria-label="Catálogo">
-  <a class="brand" href="./"><img src="favicon.png" alt="" width="28" height="28"><b>RONALL PROD</b></a>
-  <nav class="snav" aria-label="Principal">
-   <button class="on" data-v="beats" data-i="home">Beats</button>
-   <button data-v="cats" data-i="grid">Géneros</button>
-   <button data-v="priv" data-i="lock">Private Catalog</button>
-   <button data-v="ct" data-i="wa">Contacto</button>
-  </nav>
-  <section class="lib">
-   <div class="lib-h"><span>Catálogo</span><small id="count"></small></div>
-   <label class="sbx"><span data-i="search" data-s="16"></span><input id="f-q" type="search" placeholder="Buscar beat, artista o sonido" autocomplete="off" aria-label="Buscar"></label>
-   <div class="qf"><div class="chips2" id="chips"></div>
-    <select id="f-sort" aria-label="Ordenar"><option value="new">Por fecha</option><option value="pa">Precio ↑</option><option value="pd">Precio ↓</option><option value="bpm">BPM</option><option value="az">A–Z</option></select></div>
-   <div class="list" id="list"></div>
-  </section>
- </aside>
-
- <!-- Principal -->
- <main class="main" id="main">
-  <div class="glow" id="glow" aria-hidden="true"></div>
-  <header class="top">
-   <a class="mbrand" href="./" aria-label="RONALL PROD"><img src="favicon.png" alt="" width="26" height="26"><b>RONALL PROD</b></a>
-   <span class="tt" id="top-t"></span><span class="sp"></span>
-   <button class="cartb" id="cartb" aria-label="Carrito"><span data-i="cart" data-s="18"></span><span class="cl">Carrito</span><span class="cnt">0</span></button>
-  </header>
-
-  <section class="view on" id="v-beats">
-   <div class="marq" aria-hidden="true"><div><span>RONALL PROD · BEATS · TRAP · </span><span>RONALL PROD · BEATS · TRAP · </span><span>RONALL PROD · BEATS · TRAP · </span><span>RONALL PROD · BEATS · TRAP · </span></div></div>
-   <div class="hero">
-    <div class="artw" id="artw"><div class="art-glow" id="aglow"></div><div class="art"><img id="cimg" alt="Portada del beat" width="1200" height="1200" fetchpriority="high"></div></div>
-    <div class="info"><div class="hglow" id="hglow"></div><small class="kicker" id="ty">Beat</small><h1 id="ttl" aria-live="polite"></h1><div class="meta" id="meta"></div><div class="tgs" id="tgs"></div></div>
-   </div>
+<main id="main">
+ <!-- Beat seleccionado -->
+ <section class="hero" id="hero">
+  <div class="info">
+   <small class="kicker" id="ty">Beat</small>
+   <h1 id="ttl" aria-live="polite"></h1>
+   <div class="meta" id="meta"></div>
+   <div class="tgs" id="tgs"></div>
    <div class="acts">
-    <button class="play" id="cplay" aria-label="Reproducir"></button><span class="meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-    <button class="ib" id="b-sh" data-i="share" aria-label="Compartir"></button>
+    <button class="play" id="cplay" aria-label="Reproducir"></button>
+    <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+    <button class="ib" id="b-sh" data-i="share" data-s="18" aria-label="Compartir"></button>
+    <button class="ib" id="b-cp" data-i="link" data-s="18" aria-label="Copiar enlace"></button>
     <a class="lnk" id="b-pg">Página del beat</a>
    </div>
    <div class="sold" id="sold" hidden>La licencia EXCLUSIVE de este beat ya fue vendida. Las demás licencias siguen disponibles.</div>
-   <div class="split">
-    <section><h2 class="sec-h">Elige tu licencia</h2><div class="lics" id="lics"></div><div class="ldet" id="ldet"></div></section>
-    <aside class="buy" aria-label="Compra">
-     <div class="lbl">Total</div><div class="tot" id="tot">—</div><div class="sub" id="b-lic"></div>
-     <button class="btn fill block" id="b-buy" disabled>Comprar</button><button class="btn block" id="b-add" disabled>Añadir al carrito</button>
-     <ul class="trust"><li>Solicitud directa por WhatsApp</li><li>Confirmación de licencia y pago antes de cerrar</li></ul>
-    </aside>
+  </div>
+  <div class="art" id="art"><img id="cimg" alt="Portada del beat" width="1200" height="1200" fetchpriority="high" decoding="async"></div>
+ </section>
+
+ <div class="marq" id="marq" aria-hidden="true"><div class="mq" id="mq"></div></div>
+
+ <!-- Licencias y compra -->
+ <div class="split" id="comprar">
+  <section class="rvb"><h2 class="sec-h">Elige tu licencia</h2><div class="lics" id="lics"></div><div class="ldet" id="ldet"></div></section>
+  <aside class="buy glass rvb" style="--i:2" aria-label="Compra">
+   <div class="lbl">Total</div><div class="tot" id="tot">—</div><div class="sub" id="b-lic"></div>
+   <button class="btn fill block" id="b-buy" disabled>Comprar</button>
+   <button class="btn block" id="b-add" disabled>Añadir al carrito</button>
+   <ul class="trust"><li>Solicitud directa por WhatsApp</li><li>Confirmación de licencia y pago antes de cerrar</li><li>Combos automáticos desde 2 beats</li></ul>
+  </aside>
+ </div>
+
+ <!-- Catálogo -->
+ <section class="cat" id="catalogo">
+  <div class="sec-top rvb"><div><small class="kicker">Explora por sonido</small><h2 class="h2">Catálogo</h2></div><span class="cnt2" id="count"></span></div>
+  <div class="tools pane rvb">
+   <label class="sbx"><span data-i="search" data-s="18"></span><input id="f-q" type="search" placeholder="Buscar beat, artista, #tag o bpm:130-150" autocomplete="off" spellcheck="false" aria-label="Buscar"><kbd>/</kbd><button class="clr" id="f-clr" type="button" hidden aria-label="Limpiar búsqueda">×</button></label>
+   <div class="fl">
+    <div class="chips" id="chips"></div>
+    <div class="fr">
+     <div class="sel2"><select id="f-sort" aria-label="Ordenar"><option value="new">Más nuevos</option><option value="pa">Precio ↑</option><option value="pd">Precio ↓</option><option value="bpm">BPM</option><option value="az">A–Z</option></select></div>
+     <div class="seg" id="seg"><button data-view="grid" data-i="grid" data-s="17" aria-label="Cuadrícula"></button><button data-view="list" data-i="lib" data-s="17" aria-label="Lista"></button></div>
+    </div>
    </div>
-   <section class="more" id="more" hidden><h2 class="sec-h">Más beats</h2><div class="cards" id="more-l"></div></section>
-   <footer class="foot"><span>© Ronall Prod</span><a href="private.html">Private Catalog</a><a id="ft-wa" target="_blank" rel="noopener">Contacto</a></footer>
-  </section>
+  </div>
+  <div class="grid" id="grid"></div>
+ </section>
 
-  <section class="view" id="v-cats"><div class="page-h"><small class="kicker">Explora por sonido</small><h2>Géneros</h2></div><div class="tiles" id="cats"></div></section>
-  <section class="view" id="v-priv"><div class="page"><small class="kicker">Solo por invitación</small><h2>Private Catalog</h2><p>Un catálogo aparte con material no publicado. Solicita acceso y se revisa manualmente.</p><a class="btn fill" href="private.html">Solicitar acceso</a></div></section>
-  <section class="view" id="v-ct"><div class="page"><small class="kicker">Contacto</small><h2>Hablemos</h2><p>Dudas sobre licencias, exclusivos o beats a medida. Escríbele a Ronall Prod por WhatsApp.</p><a class="btn fill" id="ct-wa" target="_blank" rel="noopener">Abrir WhatsApp</a></div></section>
- </main>
+ <!-- Catálogo privado -->
+ <section class="priv pane rvb" id="privado">
+  <svg class="lockbg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+  <div><small class="kicker">Solo por invitación</small><h2 class="h2">Private Catalog</h2><p>Un catálogo aparte con material no publicado. Solicita acceso y se revisa manualmente.</p></div>
+  <a class="btn fill" href="private.html">Solicitar acceso</a>
+ </section>
 
- <!-- Reproductor -->
- <footer class="mini" aria-label="Reproductor"><div class="bar"><i></i></div><div class="in">
-  <div class="tk"><img alt="" id="mi"><div><b id="mn">Elige un beat</b><small id="ms">Pulsa play para escuchar</small></div></div>
-  <div class="mid"><div class="ctl"><button class="pv" id="mpv" data-i="prev" data-s="18" aria-label="Anterior"></button><button class="pp" id="mpp" data-i="play" data-s="18" aria-label="Play/Pause"></button><button class="nx" id="mnx" data-i="next" data-s="18" aria-label="Siguiente"></button></div>
-   <div class="sk"><span id="mt">0:00</span><input class="rng" id="msk" type="range" min="0" max="1000" value="0" aria-label="Progreso"><span id="md">0:00</span></div></div>
-  <div class="vl"><span data-i="vol" data-s="18"></span><input class="rng" id="mvl" type="range" min="0" max="100" value="85" aria-label="Volumen"></div>
- </div></footer>
+ <!-- Contacto -->
+ <section class="ctc" id="contacto">
+  <small class="kicker rvb">Contacto</small>
+  <h2 class="h2 rvb">Hablemos</h2>
+  <p class="rvb">Dudas sobre licencias, exclusivos o beats a medida. Escríbele a Ronall Prod por WhatsApp.</p>
+  <a class="btn fill rvb" id="ct-wa" target="_blank" rel="noopener">Abrir WhatsApp</a>
+ </section>
+</main>
 
- <!-- Navegación móvil -->
- <nav class="tabs" aria-label="Principal móvil">
-  <button class="on" data-v="beats" data-i="home" data-s="22"><span>Beats</span></button>
-  <button data-v="lib" data-i="lib" data-s="22"><span>Catálogo</span></button>
-  <button data-v="cats" data-i="grid" data-s="22"><span>Géneros</span></button>
-  <button data-v="priv" data-i="lock" data-s="22"><span>Private</span></button>
-  <button data-v="ct" data-i="wa" data-s="22"><span>Contacto</span></button>
- </nav>
-</div>
-<script src="assets/js/core.js?v=RONALL-VISUAL-2026-11-17-V24"></script><script src="assets/js/lic.js?v=RONALL-VISUAL-2026-11-17-V24"></script><script src="assets/js/fx.js?v=RONALL-FX-RESTORE-2026-11-17-V43"></script><script src="assets/js/motion.js?v=RONALL-LETTER-SELECTION-SCROLL-2026-11-17-V30"></script><script src="assets/js/news.js?v=RONALL-VISUAL-2026-11-17-V24"></script><script src="assets/js/app.js?v=RONALL-TAGS-PUBLIC-2026-11-18-V49"></script>
+<footer class="foot"><span>© Ronall Prod</span><a href="private.html">Private Catalog</a><a id="ft-wa" target="_blank" rel="noopener">Contacto</a></footer>
+
+<!-- Reproductor -->
+<div class="mini" aria-label="Reproductor"><div class="bar"><i></i></div><div class="in">
+ <div class="tk"><img alt="" id="mi" width="52" height="52"><div><b id="mn">Elige un beat</b><small id="ms">Pulsa play para escuchar</small></div></div>
+ <div class="mid"><div class="ctl"><button id="mpv" data-i="prev" data-s="18" aria-label="Anterior"></button><button class="pp" id="mpp" data-i="play" data-s="18" aria-label="Play/Pausa"></button><button id="mnx" data-i="next" data-s="18" aria-label="Siguiente"></button></div>
+  <div class="sk"><span id="mt">0:00</span><input class="rng" id="msk" type="range" min="0" max="1000" value="0" aria-label="Progreso"><span id="md">0:00</span></div></div>
+ <div class="vl"><span data-i="vol" data-s="18"></span><input class="rng" id="mvl" type="range" min="0" max="100" value="85" aria-label="Volumen"></div>
+</div></div>
+
+<!-- Dock móvil -->
+<nav class="dock glass" aria-label="Principal móvil">
+ <button class="on" data-go="hero" data-i="home" data-s="20"><span>Beats</span></button>
+ <button data-go="catalogo" data-i="grid" data-s="20"><span>Catálogo</span></button>
+ <button data-go="privado" data-i="lock" data-s="20"><span>Private</span></button>
+ <button data-go="contacto" data-i="wa" data-s="20"><span>Contacto</span></button>
+</nav>
+
+<script src="assets/js/core.js?v=V50"></script><script src="assets/js/lic.js?v=V50"></script><script src="assets/js/ui.js?v=V50"></script><script src="assets/js/news.js?v=V50"></script><script src="assets/js/store.js?v=V50"></script>
 </body></html>

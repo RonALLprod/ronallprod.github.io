@@ -1,89 +1,67 @@
 const { test, expect } = require('@playwright/test');
 
-async function openStore(page) {
-  await page.route('https://kwmofbiiwvpojtkvlmxz.supabase.co/**', async route => {
+/* Supabase se simula: los tests nunca tocan datos reales. */
+async function stub(page) {
+  await page.route('https://kwmofbiiwvpojtkvlmxz.supabase.co/**', route => {
     const url = new URL(route.request().url());
-    if (url.pathname.endsWith('/ron_track')) {
-      return route.fulfill({ status: 204, body: '' });
-    }
-    return route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: '[]'
-    });
+    if (url.pathname.endsWith('/ron_track')) return route.fulfill({ status: 204, body: '' });
+    return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
   });
+}
+async function openStore(page) {
+  await stub(page);
   await page.goto('/');
-  await expect(page.locator('#list .row').first()).toBeAttached();
+  await expect(page.locator('#grid .bc').first()).toBeAttached();
   await expect(page.locator('#ttl')).not.toBeEmpty();
+  await expect(page.locator('#intro')).toHaveCount(0, { timeout: 9000 });
 }
 
-test('carga catálogo y genera captura de escritorio', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop-chromium');
-  const pageErrors = [];
-  page.on('pageerror', error => pageErrors.push(error.message));
-
+test('carga la tienda sin errores y genera capturas', async ({ page }, testInfo) => {
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  page.on('response', r => { if (r.status() === 404) errors.push('404 ' + r.url()); });
   await openStore(page);
-  await expect(page.locator('#list .row').first()).toBeVisible();
-  await page.screenshot({ path: testInfo.outputPath('home-desktop.png'), fullPage: true });
-  expect(pageErrors).toEqual([]);
+  await page.screenshot({ path: testInfo.outputPath('home.png') });
+  await page.screenshot({ path: testInfo.outputPath('home-full.png'), fullPage: true });
+  expect(errors).toEqual([]);
 });
 
-test('buscar y seleccionar una licencia sin romper el carrito', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop-chromium');
+test('el botón play del hero es clicable (nada lo tapa)', async ({ page }) => {
   await openStore(page);
+  const box = await page.locator('#cplay').boundingBox();
+  const hit = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('#cplay') !== null, { x: box.x + box.width / 2, y: box.y + box.height / 2 });
+  expect(hit).toBe(true);
+});
 
-  const search = page.locator('#f-q');
-  await search.fill('click clack');
-  await expect(page.locator('#list .row')).toHaveCount(1);
-  await search.fill('esto-no-existe');
-  await expect(page.locator('#list .row')).toHaveCount(0);
-  await search.fill('');
-
+test('buscar, filtrar por tag y comprar sin romper el carrito', async ({ page }) => {
+  await openStore(page);
+  const q = page.locator('#f-q');
+  await q.fill('click clack'); await expect(page.locator('#grid .bc')).toHaveCount(1);
+  await q.fill('clik clak'); await expect(page.locator('#grid .bc')).toHaveCount(1);   /* tolera 1 error de tecleo */
+  await q.fill('esto-no-existe'); await expect(page.locator('#grid .bc')).toHaveCount(0);
+  await q.fill(''); await expect(page.locator('#grid .bc').first()).toBeAttached();
+  await page.locator('#chips .chip.tg').first().click();
+  await expect(page.locator('#grid .bc').first()).toBeAttached();
   await page.locator('#lics .lic[data-k="basic"]').click();
   await expect(page.locator('#b-add')).toBeEnabled();
   await page.locator('#b-add').click();
   await expect(page.locator('#cartb .cnt')).toHaveText('1');
 });
 
-test('scroll y selección suspenden efectos pesados y luego los reanudan', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop-chromium');
-  await openStore(page);
-
-  const main = page.locator('#main');
-  await expect.poll(() => main.evaluate(el => el.scrollHeight - el.clientHeight)).toBeGreaterThan(0);
-  await main.evaluate(el => el.scrollTo({ top: Math.min(420, el.scrollHeight), behavior: 'auto' }));
-  await expect.poll(() => main.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
-  await expect(page.locator('body')).toHaveClass(/is-scrolling/);
-  await expect.poll(() => page.locator('.fx-scene').evaluate(el =>
-    getComputedStyle(el, '::before').animationPlayState
-  )).toBe('paused');
-  await expect.poll(() => page.locator('body').evaluate(el => el.classList.contains('is-scrolling'))).toBe(false);
-  await expect.poll(() => page.locator('.fx-scene').evaluate(el =>
-    getComputedStyle(el, '::before').animationPlayState
-  )).toBe('running');
-
-  await page.evaluate(() => {
-    const heading = document.querySelector('#ttl');
-    heading.dispatchEvent(new Event('selectstart', { bubbles: true }));
-    const range = document.createRange();
-    range.selectNodeContents(heading);
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-  });
-  await expect.poll(() => page.locator('#ttl').evaluate(el => el._ltSelecting)).toBe(true);
-  await expect.poll(() => page.locator('#ttl').evaluate(el =>
-    getComputedStyle(el.closest('.info')).animationPlayState
-  )).toBe('paused');
-
-  await page.evaluate(() => window.getSelection().removeAllRanges());
-  await expect.poll(() => page.locator('#ttl').evaluate(el => el._ltSelecting)).toBe(false);
+test('la página de un beat carga y permite añadir al carrito', async ({ page }) => {
+  await stub(page);
+  const errors = []; page.on('pageerror', e => errors.push(e.message));
+  await page.goto('/beats/click-clack/');
+  await expect(page.locator('#bp-ttl')).toContainText(/click/i);
+  await page.locator('#lics .lic[data-k="basic"]').click();
+  await page.locator('#bp-add').click();
+  await expect(page.locator('#cartb .cnt')).toHaveText('1');
+  expect(errors).toEqual([]);
 });
 
-test('la interfaz móvil muestra navegación y catálogo', async ({ page }, testInfo) => {
+test('móvil: dock visible y sin desbordamiento horizontal', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-chromium');
   await openStore(page);
-  await expect(page.locator('.tabs')).toBeVisible();
-  await expect(page.locator('.side')).toBeHidden();
-  await page.screenshot({ path: testInfo.outputPath('home-mobile.png'), fullPage: true });
+  await expect(page.locator('.dock')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 });

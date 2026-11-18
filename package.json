@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "check:syntax": "node --check assets/js/core.js && node --check assets/js/lic.js && node --check assets/js/fx.js && node --check assets/js/motion.js && node --check assets/js/news.js && node --check assets/js/app.js",
+    "check:syntax": "node --check assets/js/core.js && node --check assets/js/lic.js && node --check assets/js/ui.js && node --check assets/js/news.js && node --check assets/js/store.js && node --check assets/js/beat.js && node --check tools/build.mjs",
     "test:browser": "playwright test --config=_qa/playwright.config.cjs"
   },
   "devDependencies": {
