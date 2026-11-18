@@ -200,8 +200,19 @@ test('la portada es una sola pantalla sin scroll vertical', async ({ page }) => 
   const metrics = await page.evaluate(() => {
     const view = document.querySelector('#v-home');
     const title = document.querySelector('#ttl').getBoundingClientRect();
+    const art = document.querySelector('#v-home .art-w').getBoundingClientRect();
     const dock = document.querySelector('.dock')?.getBoundingClientRect();
-    return {viewScroll:view.scrollHeight,viewClient:view.clientHeight,horizontal:document.documentElement.scrollWidth,titleBottom:title.bottom,dockTop:dock&&dock.width?dock.top:innerHeight};
+    return {
+      viewScroll:view.scrollHeight,
+      viewClient:view.clientHeight,
+      horizontal:document.documentElement.scrollWidth,
+      titleBottom:title.bottom,
+      titleLeft:title.left,
+      titleRight:title.right,
+      artLeft:art.left,
+      artRight:art.right,
+      dockTop:dock&&dock.width?dock.top:innerHeight
+    };
   });
   expect(metrics.viewScroll).toBeLessThanOrEqual(metrics.viewClient + 2);
   expect(metrics.horizontal).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
