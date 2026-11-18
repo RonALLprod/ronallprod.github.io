@@ -163,7 +163,9 @@ test('la estética del catálogo conserva el display art y filtros en un solo ca
     cardFont: getComputedStyle(document.querySelector('#grid .bc-b h3')).fontFamily,
     chipWrap: getComputedStyle(document.querySelector('#chips')).flexWrap,
     chipOverflow: getComputedStyle(document.querySelector('#chips')).overflowX,
-    count: document.querySelectorAll('#grid .bc').length
+    count: document.querySelectorAll('#grid .bc').length,
+    cardBounds: [...document.querySelectorAll('#grid .bc')].map(el => { const r=el.getBoundingClientRect(); return [r.left,r.right]; }),
+    searchBounds: (() => { const r=document.querySelector('#f-q').getBoundingClientRect(); return [r.left,r.right]; })()
   }));
   console.log('RONALL_CATALOG_STYLE ' + JSON.stringify(diag));
   expect(diag.headingFont).toContain('Kosmos');
@@ -171,6 +173,9 @@ test('la estética del catálogo conserva el display art y filtros en un solo ca
   expect(diag.chipWrap).toBe('nowrap');
   expect(['auto','scroll']).toContain(diag.chipOverflow);
   expect(diag.count).toBeGreaterThan(0);
+  for (const [left,right] of diag.cardBounds) { expect(left).toBeGreaterThanOrEqual(-1); expect(right).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1)); }
+  expect(diag.searchBounds[0]).toBeGreaterThanOrEqual(-1);
+  expect(diag.searchBounds[1]).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
 });
 
 
@@ -201,6 +206,10 @@ test('la portada es una sola pantalla sin scroll vertical', async ({ page }) => 
   expect(metrics.viewScroll).toBeLessThanOrEqual(metrics.viewClient + 2);
   expect(metrics.horizontal).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
   expect(metrics.titleBottom).toBeLessThan(metrics.dockTop);
+  expect(metrics.artLeft).toBeGreaterThanOrEqual(-1);
+  expect(metrics.artRight).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
+  expect(metrics.titleLeft).toBeGreaterThanOrEqual(-1);
+  expect(metrics.titleRight).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
 });
 
 test('el modal mantiene la compra visible en móvil', async ({ page }, testInfo) => {

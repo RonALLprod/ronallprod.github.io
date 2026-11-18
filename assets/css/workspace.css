@@ -1,5 +1,5 @@
-/* RONALL PROD · V62 — compact app workspace, focused windows and smooth motion */
-:root{--rail:232px;--workspace-ease:cubic-bezier(.18,.9,.22,1);--workspace-spring:cubic-bezier(.2,1.25,.32,1)}
+/* RONALL PROD · V63 — compact app workspace, focused windows and smooth motion */
+:root{--workspace-ease:cubic-bezier(.18,.9,.22,1);--workspace-spring:cubic-bezier(.2,1.25,.32,1)}
 html,body{height:100%;overflow:hidden}.stage{overflow:hidden}
 #v-home{overflow:hidden!important;padding:0!important}
 #v-home>.wrap:first-child{height:calc(100% - 48px);display:flex;align-items:center}
