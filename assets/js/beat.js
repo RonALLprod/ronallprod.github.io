@@ -1,4 +1,4 @@
-/* RONALL PROD · beat.js (V51) — página individual de beat. Misma lógica de compra y mismo sistema visual que la tienda. */
+/* RONALL PROD · beat.js (V52) — página individual de beat. Misma lógica de compra y mismo sistema visual que la tienda. */
 (async () => {
 'use strict';
 const R = RON, U = RonUI, { $, $$, money, S } = R, D = document, root = D.documentElement, ROOT = root.dataset.root || '';

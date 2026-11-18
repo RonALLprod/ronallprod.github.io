@@ -1,4 +1,4 @@
-/* RONALL PROD · ui.js (V51) — efectos compartidos (tienda + páginas de beat).
+/* RONALL PROD · ui.js (V52) — efectos compartidos (tienda + páginas de beat).
    Reglas: ningún bucle rAF corre en reposo; el fondo se hornea UNA vez en canvas (oscuro + bloom);
    el motion blur direccional es un filtro SVG que solo existe durante la animación;
    si el equipo va justo de fps se activa solo el modo "lite". */
@@ -39,12 +39,28 @@
   /* Letras del título: entran escalonadas + motion blur horizontal en todo el bloque */
   function letters(el, text) {
     if (!el) return;
-    el.setAttribute('aria-label', text);
-    el.innerHTML = '<span aria-hidden="true">' + text.split(' ').map((w, wi) =>
-      `<span class="w">${[...w].map((c, i) => `<span class="l" style="--i:${i + wi * 3}">${esc(c)}</span>`).join('')}</span>`).join(' ') + '</span>';
-    el.classList.toggle('long', text.length > 12);
-    el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
-    motionBlur(el, { x: 26, dur: 950 });
+    const value = String(text ?? '');
+    const seq = (el._ronLettersSeq || 0) + 1;
+    el._ronLettersSeq = seq;
+    el.setAttribute('aria-label', value);
+    el.textContent = value;
+    el.classList.toggle('long', value.length > 12);
+    const render = () => {
+      if (el._ronLettersSeq !== seq) return;
+      let index = 0;
+      const words = value.split(' ').map(word => {
+        const chars = [...word].map(char => {
+          const n = index++;
+          return `<span class="l" style="--i:${n}">${esc(char)}</span>`;
+        }).join('');
+        return `<span class="w">${chars}</span>`;
+      }).join(' ');
+      el.classList.remove('swap');
+      el.innerHTML = '<span aria-hidden="true">' + words + '</span>';
+      requestAnimationFrame(() => { if (el._ronLettersSeq === seq) el.classList.add('swap'); });
+    };
+    const fontReady = D.fonts && D.fonts.load ? D.fonts.load('400 64px Kosmos').catch(() => []) : Promise.resolve();
+    Promise.resolve(fontReady).then(render);
   }
 
   /* Contador de precio con ease-out fuerte */
@@ -69,8 +85,8 @@
     for (let i = 0; i < p.length; i += 4) {
       const y0 = p[i] * .3 + p[i + 1] * .59 + p[i + 2] * .11;
       const y = Math.max(0, Math.min(255, (y0 - 100) * 1.5 + 100));
-      p[i] = p[i + 1] = p[i + 2] = y * .22;                /* fondo: casi negro */
-      q[i] = q[i + 1] = q[i + 2] = Math.min(255, y * 1.1); q[i + 3] = 255;   /* bloom: más luminoso */
+      p[i] = p[i + 1] = p[i + 2] = y * .29;                /* fondo: casi negro */
+      q[i] = q[i + 1] = q[i + 2] = Math.min(255, y * 1.32); q[i + 3] = 255;   /* bloom: más luminoso */
     }
     x.putImageData(d, 0, 0); gx.putImageData(gd, 0, 0);
     return { bg: c.toDataURL('image/jpeg', .82), glow: glow.toDataURL('image/jpeg', .8) };
@@ -169,14 +185,14 @@
     return { on, off };
   }
 
-  /* Modo lite automático si el equipo va justo (mide ~1.4 s tras cargar) */
+  /* Activa lite solo si el equipo sigue por debajo de 18 fps tras estabilizar la interfaz. */
   function adaptive() {
     if (lite() || reduce) return;
     setTimeout(() => {
       if (D.hidden) return; let n = 0, t0 = 0;
-      const f = t => { if (!t0) t0 = t; n++; if (t - t0 < 1400) return requestAnimationFrame(f); if (n / ((t - t0) / 1000) < 24) root.classList.add('lite'); };
+      const f = t => { if (!t0) t0 = t; n++; if (t - t0 < 1400) return requestAnimationFrame(f); if (n / ((t - t0) / 1000) < 18) root.classList.add('lite'); };
       requestAnimationFrame(f);
-    }, 2200);
+    }, 3600);
   }
 
   window.RonUI = { reduce, fine, absUrl, vib, motionBlur, letters, count, scene, tilt, sheen, reveal, scrollFx, indicator, pulse, adaptive };
