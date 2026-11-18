@@ -1,4 +1,4 @@
-/* RONALL PROD · V63 — compact app workspace, focused windows and smooth motion */
+/* RONALL PROD · V64 — compact app workspace, focused windows and smooth motion */
 :root{--workspace-ease:cubic-bezier(.18,.9,.22,1);--workspace-spring:cubic-bezier(.2,1.25,.32,1)}
 html,body{height:100%;overflow:hidden}.stage{overflow:hidden}
 #v-home{overflow:hidden!important;padding:0!important}
@@ -62,8 +62,8 @@ body.license-window-open .dock,body.license-window-open .rail{filter:brightness(
 }
 @media(max-width:899px){
 #v-home>.wrap:first-child{height:calc(100% - var(--tab) - var(--miniH));padding-inline:clamp(15px,4vw,24px)}
-#v-home .hero{height:100%;min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;align-content:center;gap:clamp(8px,1.6vh,15px);padding:8px 0 10px}
-#v-home .art-w{order:-1;grid-row:1;justify-self:center;align-self:end;width:min(76vw,min(34vh,305px));max-height:100%;margin:0 auto}
+#v-home .hero{height:100%;min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:auto auto;align-content:center;justify-content:center;gap:clamp(8px,1.6vh,15px);padding:8px 0 10px}
+#v-home .art-w{order:-1;grid-row:1;justify-self:center;align-self:center;width:min(76vw,min(34vh,305px));max-height:100%;margin:0 auto}
 #v-home .info{grid-row:2;gap:clamp(8px,1.45vh,13px);justify-items:start;max-width:100%}
 #v-home h1{font-size:clamp(37px,10.5vw,58px);line-height:.94;max-width:100%;padding-top:.06em}
 #v-home h1.long{font-size:clamp(31px,8.6vw,48px)}
