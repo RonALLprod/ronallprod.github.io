@@ -118,3 +118,11 @@ body.text-selecting .marq div {
 
 @media(max-width:899px){.buy:before{display:none}}
 @media(prefers-reduced-motion:reduce){.top:after{display:none}}
+
+
+/* Táctil: zonas de toque de 44px sin cambiar el aspecto (el área extra es invisible). */
+@media (pointer:coarse){
+  .mbrand,.nfb,#b-pg,#ft-wa{position:relative}
+  .mbrand:before,.nfb:before,#b-pg:before,#ft-wa:before{content:"";position:absolute;inset:-7px -6px}
+  #ft-wa:before{inset:-13px -8px}
+}
