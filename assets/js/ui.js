@@ -1,4 +1,4 @@
-/* RONALL PROD · ui.js (V52) — efectos compartidos (tienda + páginas de beat).
+/* RONALL PROD · ui.js (V53) — efectos compartidos (tienda + páginas de beat).
    Reglas: ningún bucle rAF corre en reposo; el fondo se hornea UNA vez en canvas (oscuro + bloom);
    el motion blur direccional es un filtro SVG que solo existe durante la animación;
    si el equipo va justo de fps se activa solo el modo "lite". */
@@ -190,7 +190,7 @@
     if (lite() || reduce) return;
     setTimeout(() => {
       if (D.hidden) return; let n = 0, t0 = 0;
-      const f = t => { if (!t0) t0 = t; n++; if (t - t0 < 1400) return requestAnimationFrame(f); if (n / ((t - t0) / 1000) < 18) root.classList.add('lite'); };
+      const f = t => { if (!t0) t0 = t; n++; if (t - t0 < 1400) return requestAnimationFrame(f); if (n / ((t - t0) / 1000) < 12) root.classList.add('lite'); };
       requestAnimationFrame(f);
     }, 3600);
   }
