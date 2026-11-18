@@ -5,7 +5,7 @@ import fs from 'fs';import path from 'path';import {fileURLToPath} from 'url';
 const R=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const S=new Function('window',fs.readFileSync(R+'/config/site-config.js','utf8')+';return window.SITE')({});
 const cat=JSON.parse(fs.readFileSync(R+'/data/catalog.json','utf8'));
-const BUILD='V50';
+const BUILD='V51';
 const tc=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const live=cat.beats.filter(b=>b.visibility==='public'&&b.active!==false);
@@ -35,17 +35,19 @@ for(const b of live){
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g,'\\u003c')}</script>
 <script>(function(){var d=document.documentElement;d.classList.add('js');try{var c=navigator.connection||{};if(c.saveData||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2))d.classList.add('lite')}catch(e){}})();document.write('<script src="../../config/site-config.js?t='+Date.now()+'"></'+'script>')</script></head><body class="pg beat-product">
 <div class="scene" aria-hidden="true"><div class="bgc a"></div><div class="bgc b"></div><i class="orb o1"></i><i class="orb o2"></i><div class="scan"></div><div class="grain"></div><div class="vig"></div></div>
-<header class="top glass"><a class="brand" href="../../index.html"><img src="../../favicon.png" alt="" width="28" height="28"><b>${esc(S.brand.name)}</b></a><span class="sp"></span><a class="back" href="../../index.html#catalogo">Todos los beats</a><button class="cartb" id="cartb" aria-label="Carrito"><span data-i="cart" data-s="18"></span><span class="cl">Carrito</span><span class="cnt">0</span></button></header>
-<main>
-<section class="hero"><div class="info"><small class="kicker">${esc(b.type||'Beat')}</small><h1 id="bp-ttl">${esc(b.name)}</h1><div class="meta">${meta}</div>${tags?`<div class="tgs">${tags}</div>`:''}
-<div class="acts"><button class="play" id="bp-play" aria-label="Reproducir preview"></button><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><button class="ib" id="bp-copy" data-i="link" data-s="18" aria-label="Copiar enlace"></button><button class="ib" id="bp-share" data-i="share" data-s="18" aria-label="Compartir"></button></div>
-<div class="sold" id="bp-sold" hidden>La licencia EXCLUSIVE de este beat ya fue vendida. Las demás licencias siguen disponibles.</div></div>
-<div class="art" id="art"><img id="cimg" src="../../${esc(b.cover)}" alt="Portada de ${esc(b.name)}" width="1200" height="1200" fetchpriority="high" decoding="async"></div></section>
-<div class="split"><section class="rvb"><h2 class="sec-h">Elige tu licencia</h2><div class="lics" id="lics"></div><div class="ldet" id="bp-det"></div></section>
+<header class="rail glass" id="top"><a class="brand" href="../../index.html" aria-label="${esc(S.brand.name)}"><img src="../../favicon.png" alt="" width="30" height="30"><b>${esc(S.brand.name)}</b></a>
+<nav class="nav" id="nav" aria-label="Principal"><i class="ind"></i><a class="on" href="../../index.html" data-i="home" data-s="20"><span>Beats</span></a><a href="../../index.html#catalogo" data-i="grid" data-s="20"><span>Catálogo</span></a><a href="../../index.html#privado" data-i="lock" data-s="20"><span>Private</span></a><a href="../../index.html#contacto" data-i="wa" data-s="20"><span>Contacto</span></a></nav>
+<span class="sp"></span><div class="rail-act"><button class="cartb" id="cartb" aria-label="Carrito"><span data-i="cart" data-s="18"></span><span class="cl">Carrito</span><span class="cnt">0</span></button></div></header>
+<main class="stage" id="main"><section class="view active enter" id="v-home" aria-label="${esc(b.name)}">
+<div class="wrap"><div class="hero"><div class="info"><small class="kicker st" style="--i:0">${esc(b.type||'Beat')}</small><h1 class="st" id="bp-ttl" style="--i:1">${esc(b.name)}</h1><div class="meta st" style="--i:2">${meta}</div>${tags?`<div class="tgs st" style="--i:3">${tags}</div>`:''}
+<div class="acts st" style="--i:4"><button class="play" id="bp-play" aria-label="Reproducir preview"><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="rt" cx="50" cy="50" r="48"/><circle class="rp" id="ring" cx="50" cy="50" r="48"/></svg><span class="pi" id="bp-pi"></span></button><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><button class="ib" id="bp-copy" data-i="link" data-s="18" aria-label="Copiar enlace"></button><button class="ib" id="bp-share" data-i="share" data-s="18" aria-label="Compartir"></button></div>
+<div class="sold st" id="bp-sold" hidden>La licencia EXCLUSIVE de este beat ya fue vendida. Las demás licencias siguen disponibles.</div></div>
+<div class="art-w st" style="--i:2"><div class="art" id="art"><img id="cimg" src="../../${esc(b.cover)}" alt="Portada de ${esc(b.name)}" width="1200" height="1200" fetchpriority="high" decoding="async"></div></div></div></div>
+<div class="wrap"><div class="split"><section class="rvb"><h2 class="sec-h">Elige tu licencia</h2><div class="lics" id="lics"></div><div class="ldet" id="bp-det"></div></section>
 <aside class="buy glass rvb" style="--i:2" aria-label="Compra"><div class="lbl">Total</div><div class="tot" id="bp-tot">—</div><div class="sub" id="bp-sub"></div><button class="btn fill block" id="bp-buy" disabled>Comprar</button><button class="btn block" id="bp-add" disabled>Añadir al carrito</button><ul class="trust"><li>Solicitud directa por WhatsApp</li><li>Confirmación de licencia y pago antes de cerrar</li><li>Combos automáticos desde 2 beats</li></ul></aside></div>
-</main>
-<footer class="foot"><span>© ${esc(S.brand.name)}</span><a href="../../index.html#catalogo">Beats</a><a href="../../private.html">Private Catalog</a></footer>
-<div class="mini mini-product" aria-label="Reproductor"><div class="bar"><i></i></div><div class="in"><div class="tk"><img alt="" id="mi" width="52" height="52"><div><b id="mn"></b><small id="ms"></small></div></div><div class="mid"><div class="ctl"><button class="pp" id="mpp" data-i="play" data-s="18" aria-label="Play/Pausa"></button></div></div></div></div>
+<footer class="foot"><span>© ${esc(S.brand.name)}</span><a href="../../index.html#catalogo">Beats</a><a href="../../private.html">Private Catalog</a></footer></div></section></main>
+<div class="mini mini-product glass" aria-label="Reproductor"><div class="bar"><i></i></div><div class="in"><div class="tk"><img alt="" id="mi" width="52" height="52"><div><b id="mn"></b><small id="ms"></small></div></div><div class="mid"><div class="ctl"><button class="pp" id="mpp" data-i="play" data-s="18" aria-label="Play/Pausa"></button></div></div></div></div>
+<nav class="dock glass" id="dock" aria-label="Principal móvil"><div class="nav"><i class="ind"></i><a class="on" href="../../index.html" data-i="home" data-s="20"><span>Beats</span></a><a href="../../index.html#catalogo" data-i="grid" data-s="20"><span>Catálogo</span></a><a href="../../index.html#privado" data-i="lock" data-s="20"><span>Private</span></a><a href="../../index.html#contacto" data-i="wa" data-s="20"><span>Contacto</span></a></div></nav>
 <script type="application/json" id="beat-data">${JSON.stringify(b).replace(/</g,'\\u003c')}</script>
 <script src="../../assets/js/core.js?v=${BUILD}"></script><script src="../../assets/js/lic.js?v=${BUILD}"></script><script src="../../assets/js/ui.js?v=${BUILD}"></script><script src="../../assets/js/beat.js?v=${BUILD}"></script></body></html>`;
  fs.mkdirSync(`${bd}/${b.slug}`,{recursive:true});fs.writeFileSync(`${bd}/${b.slug}/index.html`,html);
