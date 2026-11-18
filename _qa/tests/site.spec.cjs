@@ -39,32 +39,60 @@ async function openHome(page) {
   await expect(page.locator('#lics .lic').first()).toBeVisible();
 }
 
-test('carga Beats y Catálogo, registra errores y genera capturas', async ({ page }, testInfo) => {
+test('portada y catálogo cargan, tipografía y capturas sin errores', async ({ page }, testInfo) => {
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
   page.on('response', r => { if (r.status() >= 400) errors.push(r.status() + ' ' + r.url()); });
   await openStore(page);
+  await settleView(page, '#v-home');
   const homeDiag = await page.evaluate(() => ({
     viewport: [innerWidth, innerHeight],
-    rootClasses: document.documentElement.className,
     activeView: document.querySelector('.view.active')?.id,
-    bgOpacity: getComputedStyle(document.querySelector('.bgc.on') || document.querySelector('.bgc')).opacity,
+    title: document.querySelector('#ttl')?.textContent,
     titleFont: getComputedStyle(document.querySelector('#ttl')).fontFamily,
-    kosmosReady: document.fonts.check('400 64px Kosmos')
+    kosmosReady: document.fonts.check('400 64px Kosmos'),
+    heroCopy: !!document.querySelector('.hero-copy'),
+    heroCTA: !!document.querySelector('.hero-extra [data-go="catalogo"]'),
+    headerDirection: getComputedStyle(document.querySelector('#nav')).display,
+    scrollWidth: document.documentElement.scrollWidth
   }));
   console.log('RONALL_HOME_DIAG ' + JSON.stringify(homeDiag));
+  expect(homeDiag.title).toBeTruthy();
+  expect(homeDiag.heroCopy).toBe(true);
+  expect(homeDiag.heroCTA).toBe(true);
+  expect(homeDiag.scrollWidth).toBeLessThanOrEqual(homeDiag.viewport[0] + 1);
   await page.screenshot({ path: testInfo.outputPath('home.png') });
   await openCatalog(page);
   const catalogDiag = await page.evaluate(() => ({
     activeView: document.querySelector('.view.active')?.id,
     searchVisible: !!document.querySelector('#f-q')?.getClientRects().length,
-    cards: document.querySelectorAll('#grid .bc').length
+    cards: document.querySelectorAll('#grid .bc').length,
+    sectionFont: getComputedStyle(document.querySelector('#v-catalogo .h2')).fontFamily,
+    priceFont: getComputedStyle(document.querySelector('#grid .bc-pr')).fontFamily,
+    scrollWidth: document.documentElement.scrollWidth
   }));
   console.log('RONALL_CATALOG_DIAG ' + JSON.stringify(catalogDiag));
+  expect(catalogDiag.cards).toBeGreaterThan(0);
+  expect(catalogDiag.scrollWidth).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
   await page.screenshot({ path: testInfo.outputPath('catalog.png') });
   await page.screenshot({ path: testInfo.outputPath('catalog-full.png'), fullPage: true });
   expect(errors).toEqual([]);
+});
+
+test('cabecera escritorio es horizontal y el CTA navega al catálogo', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium');
+  await openStore(page);
+  const header = await page.locator('#top').evaluate(el => {
+    const r = el.getBoundingClientRect();
+    return { direction: getComputedStyle(el).flexDirection, width: r.width, height: r.height, top: r.top, bottom: r.bottom };
+  });
+  expect(header.direction).toBe('row');
+  expect(header.width).toBeGreaterThan(1000);
+  expect(header.height).toBeGreaterThanOrEqual(60);
+  await page.locator('.hero-extra [data-go="catalogo"]').click();
+  await expect(page.locator('#v-catalogo')).toHaveClass(/active/);
+  await page.screenshot({ path: testInfo.outputPath('catalog-from-hero.png') });
 });
 
 test('el botón play del hero es clicable (nada lo tapa)', async ({ page }) => {
@@ -102,11 +130,39 @@ test('la página de un beat carga y permite añadir al carrito', async ({ page }
   expect(errors).toEqual([]);
 });
 
-test('móvil: dock visible, navegación funcional y sin desbordamiento horizontal', async ({ page }, testInfo) => {
+test('móvil: jerarquía, dock, búsqueda y cero desbordamiento horizontal', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-chromium');
   await openStore(page);
   await expect(page.locator('.dock')).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  const mobileHero = await page.evaluate(() => {
+    const image = document.querySelector('.art-w').getBoundingClientRect();
+    const title = document.querySelector('#ttl').getBoundingClientRect();
+    const header = document.querySelector('#top').getBoundingClientRect();
+    return {
+      viewport: innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      titleTop: title.top,
+      artTop: image.top,
+      headerBottom: header.bottom,
+      dockVisible: !!document.querySelector('.dock')?.getClientRects().length
+    };
+  });
+  console.log('RONALL_MOBILE_DIAG ' + JSON.stringify(mobileHero));
+  expect(mobileHero.scrollWidth).toBeLessThanOrEqual(mobileHero.viewport + 1);
+  expect(mobileHero.titleTop).toBeGreaterThan(mobileHero.headerBottom);
+  expect(mobileHero.titleTop).toBeLessThan(mobileHero.artTop);
+  await page.screenshot({ path: testInfo.outputPath('mobile-home.png') });
   await openCatalog(page);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('mobile-catalog.png') });
+});
+
+test('private y contacto tienen navegación estable', async ({ page }) => {
+  await openStore(page);
+  await page.locator('[data-go="privado"]:visible').first().click();
+  await expect(page.locator('#v-privado')).toHaveClass(/active/);
+  await expect(page.locator('#v-privado .btn')).toBeVisible();
+  await page.locator('[data-go="contacto"]:visible').first().click();
+  await expect(page.locator('#v-contacto')).toHaveClass(/active/);
+  await expect(page.locator('#ct-wa')).toBeVisible();
 });
