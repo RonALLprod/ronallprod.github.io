@@ -5,7 +5,7 @@ import fs from 'fs';import path from 'path';import {fileURLToPath} from 'url';
 const R=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const S=new Function('window',fs.readFileSync(R+'/config/site-config.js','utf8')+';return window.SITE')({});
 const cat=JSON.parse(fs.readFileSync(R+'/data/catalog.json','utf8'));
-const BUILD='V60';
+const BUILD='V61'
 const tc=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const live=cat.beats.filter(b=>b.visibility==='public'&&b.active!==false);
@@ -31,7 +31,7 @@ for(const b of live){
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${img}">
 <link rel="icon" type="image/png" href="../../favicon.png"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><link rel="manifest" href="../../manifest.webmanifest">
 <link rel="preload" href="../../assets/fonts/kosmos.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="../../assets/fonts/acidic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../assets/css/ronall.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/identity.css?v=${BUILD}">
+<link rel="stylesheet" href="../../assets/css/ronall.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/identity.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/workspace.css?v=${BUILD}">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g,'\\u003c')}</script>
 <script>(function(){var d=document.documentElement;d.classList.add('js');try{var c=navigator.connection||{};if(c.saveData||(navigator.deviceMemory&&navigator.deviceMemory<=1))d.classList.add('lite')}catch(e){}})();document.write('<script src="../../config/site-config.js?t='+Date.now()+'"></'+'script>')</script></head><body class="pg beat-product">
 <div class="scene" aria-hidden="true"><div class="bgc a"></div><div class="bgc b"></div><i class="orb o1"></i><i class="orb o2"></i><div class="scan"></div><div class="grain"></div><div class="vig"></div></div>
@@ -49,7 +49,7 @@ for(const b of live){
 <div class="mini mini-product glass" aria-label="Reproductor"><div class="bar"><i></i></div><div class="in"><div class="tk"><img alt="" id="mi" width="52" height="52"><div><b id="mn"></b><small id="ms"></small></div></div><div class="mid"><div class="ctl"><button class="pp" id="mpp" data-i="play" data-s="18" aria-label="Play/Pausa"></button></div></div></div></div>
 <nav class="dock glass" id="dock" aria-label="Principal móvil"><div class="nav"><i class="ind"></i><a class="on" href="../../index.html" data-i="home" data-s="20"><span>Beats</span></a><a href="../../index.html#catalogo" data-i="grid" data-s="20"><span>Catálogo</span></a><a href="../../index.html#privado" data-i="lock" data-s="20"><span>Private</span></a><a href="../../index.html#contacto" data-i="wa" data-s="20"><span>Contacto</span></a></div></nav>
 <script type="application/json" id="beat-data">${JSON.stringify(b).replace(/</g,'\\u003c')}</script>
-<script src="../../assets/js/core.js?v=${BUILD}"></script><script src="../../assets/js/lic.js?v=${BUILD}"></script><script src="../../assets/js/ui.js?v=${BUILD}"></script><script src="../../assets/js/beat.js?v=${BUILD}"></script></body></html>`;
+<script src="../../assets/js/core.js?v=${BUILD}"></script><script src="../../assets/js/lic.js?v=${BUILD}"></script><script src="../../assets/js/ui.js?v=${BUILD}"></script><script src="../../assets/js/beat.js?v=${BUILD}"></script><script src="../../assets/js/workspace.js?v=${BUILD}"></script></body></html>`;
  fs.mkdirSync(`${bd}/${b.slug}`,{recursive:true});fs.writeFileSync(`${bd}/${b.slug}/index.html`,html);
 }
 // 3) sitemap + robots

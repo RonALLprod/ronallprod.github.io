@@ -1,0 +1,96 @@
+/* RONALL PROD · V61 — compact app workspace, focused windows and smooth motion */
+:root{--rail:232px;--workspace-ease:cubic-bezier(.18,.9,.22,1);--workspace-spring:cubic-bezier(.2,1.25,.32,1)}
+html,body{height:100%;overflow:hidden}.stage{overflow:hidden}
+#v-home{overflow:hidden!important;padding:0!important}
+#v-home>.wrap:first-child{height:calc(100% - 48px);display:flex;align-items:center}
+#v-home .hero{width:100%;height:min(760px,calc(100dvh - 76px));min-height:0;padding:clamp(18px,3vh,34px) 0 clamp(44px,6vh,70px);align-items:center;gap:clamp(28px,4.5vw,68px)}
+#v-home .info{gap:clamp(14px,2vh,22px)}#v-home .art-w{width:min(100%,min(48vw,540px));justify-self:center}
+#v-home .marq{position:absolute;left:var(--gut);right:var(--gut);bottom:9px;height:37px;margin:0;padding:6px 0;border-color:rgba(255,255,255,.13);background:linear-gradient(90deg,transparent,rgba(255,255,255,.025),transparent)}
+#v-home .mq{animation-duration:64s}#v-home .mq span{font-size:clamp(24px,3vw,40px);padding-inline:22px}
+#v-home .wrap:last-child,#v-home .more,#v-home .foot{display:none!important}
+
+.license-layer{position:fixed;z-index:150;inset:0;display:grid;place-items:center;padding:22px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .38s var(--workspace-ease),visibility 0s .55s}
+.license-layer[hidden]{display:none!important}.license-layer.is-open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .38s var(--workspace-ease),visibility 0s}
+.license-backdrop{position:absolute;inset:0;width:100%;height:100%;background:rgba(0,0,0,.74);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);cursor:default;transition:backdrop-filter .55s var(--workspace-ease),background .4s}
+.license-layer.is-open .license-backdrop{-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);background:rgba(0,0,0,.78)}
+.license-window{position:relative;z-index:1;width:min(1040px,calc(100vw - 44px));max-height:min(810px,calc(100dvh - 44px));display:grid;grid-template-rows:auto minmax(0,1fr) auto;border-radius:28px;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.035) 36%,rgba(255,255,255,.07)),rgba(4,4,4,.94);border:1px solid rgba(255,255,255,.27);box-shadow:inset 0 1px 0 rgba(255,255,255,.42),0 50px 140px -28px #000,0 0 90px -48px rgba(255,255,255,.48);opacity:0;transform:translate3d(0,38px,0) scale(.94) rotateX(3deg);transform-origin:50% 70%;transition:transform .72s var(--workspace-spring),opacity .38s var(--workspace-ease);will-change:transform,opacity}
+.license-layer.is-open .license-window{opacity:1;transform:translate3d(0,0,0) scale(1) rotateX(0)}
+.license-window::before{content:"";position:absolute;z-index:3;top:0;left:-45%;width:35%;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,#fff,transparent);opacity:0}
+.license-layer.is-open .license-window::before{animation:window-scan 1.1s .18s var(--workspace-ease) both}
+@keyframes window-scan{0%{left:-45%;opacity:0}18%{opacity:.9}100%{left:115%;opacity:0}}
+.license-window-head{padding:21px 27px 17px;border-bottom:1px solid rgba(255,255,255,.14);background:linear-gradient(120deg,rgba(255,255,255,.085),rgba(255,255,255,.012) 62%,rgba(255,255,255,.05))}
+.window-mark{display:flex;align-items:center;gap:9px;font:700 9px/1 var(--ui);letter-spacing:.23em;color:rgba(255,255,255,.48)}
+.window-led{width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 12px rgba(255,255,255,.8)}
+.window-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:14px}
+.window-heading h2{font:400 clamp(25px,3vw,37px)/1 var(--disp);letter-spacing:.01em;text-transform:uppercase;color:#fff}
+.window-heading p{margin-top:7px;font:500 12px/1.4 var(--ui);color:rgba(255,255,255,.57)}
+.window-close{flex:none;width:42px;height:42px;display:grid;place-items:center;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.045);font:300 27px/1 var(--ui);color:rgba(255,255,255,.8);transition:transform .42s var(--workspace-spring),background .25s,border-color .25s,color .25s}
+.window-close:hover{transform:rotate(90deg) scale(1.06);background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.5);color:#fff}
+.license-window-body{min-height:0;overflow:auto;overscroll-behavior:contain;padding:23px 27px 25px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.24) transparent}
+.license-window-body .split{padding:0;grid-template-columns:minmax(0,1.2fr) minmax(280px,.78fr);gap:clamp(18px,3vw,34px);align-items:start}
+.license-window-body .sec-h{margin:0 0 18px;font-size:clamp(24px,3vw,34px)}
+.license-window-body .lics{gap:10px}.license-window-body .lic{padding:15px 17px;border-radius:17px}
+.license-window-body .buy{position:static;top:auto;max-width:none;padding:23px;border-radius:21px}
+.license-window-body .tot{font-size:clamp(48px,5vw,68px)}.license-window-body .ldet{margin-top:12px}
+.window-foot{display:flex;justify-content:space-between;gap:12px;padding:10px 27px;border-top:1px solid rgba(255,255,255,.11);font:700 8px/1.4 var(--ui);letter-spacing:.2em;color:rgba(255,255,255,.34)}
+.license-launch{min-height:49px;display:inline-flex;align-items:center;gap:11px;padding:0 17px;border:1px solid rgba(255,255,255,.3);border-radius:15px;background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.035));box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 28px -18px #fff;transition:transform .46s var(--workspace-spring),background .3s,border-color .3s,box-shadow .38s}
+.license-launch .launch-k{font:700 8px/1 var(--ui);letter-spacing:.17em;color:rgba(255,255,255,.54)}
+.license-launch b{font:750 11px/1 var(--ui);letter-spacing:.015em}
+.license-launch i{font:normal 16px/1 var(--ui);color:rgba(255,255,255,.8);transition:transform .42s var(--workspace-spring)}
+.license-launch:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.62);background:rgba(255,255,255,.11);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 12px 36px -15px rgba(255,255,255,.3)}
+.license-launch:hover i{transform:translate(3px,-3px)}
+#v-home .acts{gap:12px}#v-home .acts .license-launch{margin-left:3px}
+#v-home .play{transition:transform .5s var(--workspace-spring),box-shadow .4s}
+#v-home .play:hover{transform:scale(1.075);box-shadow:0 0 0 1px #fff,0 0 72px rgba(255,255,255,.62),0 25px 65px -18px #fff}
+#v-home .art-w{transition:transform .8s var(--workspace-ease)}#v-home .art-w:hover{transform:translate3d(0,-7px,0) scale(1.012)}
+#v-home .info .st{animation-duration:.82s}
+.rail .nav button,.dock .nav button{transition:color .35s,transform .6s var(--workspace-spring),text-shadow .35s}
+.rail .nav button:hover{transform:translateX(7px)}
+.bc{transition:transform .58s var(--workspace-spring),border-color .35s,box-shadow .58s}.bc:hover{--ty:-7px}
+.bc-i img{transition:transform .82s var(--workspace-ease),filter .6s}
+.chip{transition:transform .4s var(--workspace-spring),color .25s,background .3s,border-color .3s,box-shadow .35s}
+.chip:hover{transform:translateY(-2px)}.chip.on{box-shadow:0 0 30px rgba(255,255,255,.32)}
+.btn,.ib,.play{touch-action:manipulation}
+body.license-window-open .mini{z-index:80!important}
+body.license-window-open .dock,body.license-window-open .rail{filter:brightness(.65);pointer-events:none}
+
+@media(min-width:900px){
+#v-home>.wrap:first-child{height:calc(100% - 44px)}
+#v-home .hero{height:min(780px,calc(100dvh - 80px))}
+#v-home .art-w{width:min(100%,min(45vw,520px))}
+.license-window-body{max-height:calc(100dvh - 210px)}
+}
+@media(max-width:899px){
+#v-home>.wrap:first-child{height:calc(100% - var(--tab) - var(--miniH));padding-inline:clamp(15px,4vw,24px)}
+#v-home .hero{height:100%;min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;align-content:center;gap:clamp(8px,1.6vh,15px);padding:8px 0 10px}
+#v-home .art-w{order:-1;grid-row:1;justify-self:center;align-self:end;width:min(76vw,min(34vh,305px));max-height:100%;margin:0 auto}
+#v-home .info{grid-row:2;gap:clamp(8px,1.45vh,13px);justify-items:start;max-width:100%}
+#v-home h1{font-size:clamp(37px,10.5vw,58px);line-height:.94;max-width:100%;padding-top:.06em}
+#v-home h1.long{font-size:clamp(31px,8.6vw,48px)}
+#v-home .meta{gap:6px}#v-home .meta span{padding:5px 9px;font-size:10px}
+#v-home .tgs{gap:2px 10px}#v-home .tgs button{padding:2px 0;font-size:10px}
+#v-home .acts{gap:8px;flex-wrap:nowrap}#v-home .play{width:58px;height:58px;flex:none}#v-home .play .ring{display:none}
+#v-home .acts .ib{width:38px;height:38px;min-width:38px}
+#v-home .license-launch{min-height:42px;padding:0 10px;gap:6px;border-radius:12px}
+#v-home .license-launch .launch-k{display:none}#v-home .license-launch b{font-size:10px}#v-home .license-launch i{font-size:13px}
+#v-home .marq,#v-home .wrap:last-child{display:none}
+.license-layer{padding:0;align-items:end}
+.license-window{width:100%;max-height:min(92dvh,850px);height:auto;border-radius:25px 25px 0 0;transform:translate3d(0,70px,0) scale(.97);transform-origin:50% 100%;border-bottom:0;padding-bottom:env(safe-area-inset-bottom)}
+.license-layer.is-open .license-window{transform:translate3d(0,0,0) scale(1)}
+.license-window-head{padding:17px 19px 14px}.window-heading{margin-top:11px}.window-heading h2{font-size:25px}.window-heading p{font-size:11px}
+.window-close{width:38px;height:38px;border-radius:12px}
+.license-window-body{padding:16px 17px 16px;max-height:calc(92dvh - 132px);overflow-y:auto}
+.license-window-body .split{grid-template-columns:1fr;gap:15px}
+.license-window-body .sec-h{font-size:23px;margin-bottom:12px}
+.license-window-body .lics{gap:8px}.license-window-body .lic{padding:13px 14px;grid-template-columns:1fr auto;gap:4px 12px}
+.license-window-body .ln{font-size:16px}.license-window-body .lp{font-size:18px}.license-window-body .lf{font-size:9px}.license-window-body .ld{font-size:11px}
+.license-window-body .buy{position:sticky;bottom:-16px;z-index:4;padding:17px;border-radius:17px;background:linear-gradient(150deg,rgba(28,28,28,.98),rgba(6,6,6,.97));border:1px solid rgba(255,255,255,.24);box-shadow:0 -16px 40px -26px #fff,0 20px 45px -25px #000}
+.license-window-body .buy .tot{font-size:46px}.license-window-body .trust{display:none}
+.window-foot{padding:8px 18px;font-size:7px}
+}
+@media(max-height:700px) and (max-width:899px){
+#v-home .art-w{width:min(61vw,25vh,245px)}#v-home .hero{gap:6px}#v-home .info{gap:7px}#v-home h1{font-size:clamp(32px,8.5vw,48px)}
+}
+@media(prefers-reduced-motion:reduce){
+.license-window,.license-backdrop,.license-window::before,.license-launch,.bc,.art-w,.play{animation:none!important;transition:none!important;transform:none!important}
+}

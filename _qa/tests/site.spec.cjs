@@ -36,6 +36,9 @@ async function openHome(page) {
   await expect(nav).toBeVisible();
   await nav.click();
   await expect(page.locator('#v-home')).toHaveClass(/active/);
+  await expect(page.locator('#openLicenses')).toBeVisible();
+  await page.locator('#openLicenses').click();
+  await expect(page.locator('#licenseModal')).toHaveClass(/is-open/);
   await expect(page.locator('#lics .lic').first()).toBeVisible();
 }
 
@@ -96,6 +99,9 @@ test('la página de un beat carga y permite añadir al carrito', async ({ page }
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto('/beats/click-clack/');
   await expect(page.locator('#bp-ttl')).toContainText(/click/i);
+  await expect(page.locator('#bp-openLicenses')).toBeVisible();
+  await page.locator('#bp-openLicenses').click();
+  await expect(page.locator('#licenseModal')).toHaveClass(/is-open/);
   await page.locator('#lics .lic[data-k="basic"]').click();
   await page.locator('#bp-add').click();
   await expect(page.locator('#cartb .cnt')).toHaveText('1');
@@ -126,7 +132,10 @@ test('conserva el lenguaje visual RonALL y ordena la compra antes de Más beats'
       railDirection: getComputedStyle(document.querySelector('#top')).flexDirection,
       railPosition: getComputedStyle(document.querySelector('#top')).position,
       artAboveTitle: innerWidth < 900 ? art.top < titleBox.top : art.left > titleBox.left,
-      buyBeforeMore: !!(buy.compareDocumentPosition(more) & Node.DOCUMENT_POSITION_FOLLOWING),
+      homeScrollHeight: document.querySelector('#v-home').scrollHeight,
+      homeClientHeight: document.querySelector('#v-home').clientHeight,
+      modalTrigger: !!document.querySelector('#openLicenses'),
+      moreHidden: getComputedStyle(document.querySelector('#moreS')).display === 'none',
       hasLetterAnimation: !!title.querySelector('.l'),
       viewport: [innerWidth, innerHeight],
       scrollWidth: document.documentElement.scrollWidth
@@ -138,7 +147,9 @@ test('conserva el lenguaje visual RonALL y ordena la compra antes de Más beats'
   expect(state.railPosition).toBe('fixed');
   expect(state.railDirection).toBe(testInfo.project.name === 'mobile-chromium' ? 'row' : 'column');
   expect(state.artAboveTitle).toBe(true);
-  expect(state.buyBeforeMore).toBe(true);
+  expect(state.modalTrigger).toBe(true);
+  expect(state.moreHidden).toBe(true);
+  expect(state.homeScrollHeight).toBeLessThanOrEqual(state.homeClientHeight + 2);
   expect(state.hasLetterAnimation).toBe(true);
   expect(state.scrollWidth).toBeLessThanOrEqual(state.viewport[0] + 1);
   await page.screenshot({ path: testInfo.outputPath('identity-home.png') });
@@ -160,4 +171,48 @@ test('la estética del catálogo conserva el display art y filtros en un solo ca
   expect(diag.chipWrap).toBe('nowrap');
   expect(['auto','scroll']).toContain(diag.chipOverflow);
   expect(diag.count).toBeGreaterThan(0);
+});
+
+
+test('ventana de licencias abre y cierra con Escape y backdrop', async ({ page }) => {
+  await openStore(page);
+  const trigger = page.locator('#openLicenses');
+  await trigger.click();
+  await expect(page.locator('#licenseModal')).toHaveClass(/is-open/);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.locator('#lics .lic')).toHaveCount(4);
+  const focusInside = await page.evaluate(() => document.activeElement?.closest('.license-window') !== null);
+  expect(focusInside).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#licenseModal')).not.toHaveClass(/is-open/);
+  await trigger.click();
+  await page.locator('.license-backdrop').click({ position: { x: 6, y: 6 } });
+  await expect(page.locator('#licenseModal')).not.toHaveClass(/is-open/);
+});
+
+test('la portada es una sola pantalla sin scroll vertical', async ({ page }) => {
+  await openStore(page);
+  const metrics = await page.evaluate(() => {
+    const view = document.querySelector('#v-home');
+    const title = document.querySelector('#ttl').getBoundingClientRect();
+    const dock = document.querySelector('.dock')?.getBoundingClientRect();
+    return {viewScroll:view.scrollHeight,viewClient:view.clientHeight,horizontal:document.documentElement.scrollWidth,titleBottom:title.bottom,dockTop:dock?.top??innerHeight};
+  });
+  expect(metrics.viewScroll).toBeLessThanOrEqual(metrics.viewClient + 2);
+  expect(metrics.horizontal).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
+  expect(metrics.titleBottom).toBeLessThan(metrics.dockTop);
+});
+
+test('el modal mantiene la compra visible en móvil', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium');
+  await openStore(page);
+  await page.locator('#openLicenses').click();
+  await expect(page.locator('#licenseModal')).toHaveClass(/is-open/);
+  await page.locator('#lics .lic[data-k="premium"]').click();
+  await expect(page.locator('#b-add')).toBeEnabled();
+  const modal=await page.locator('.license-window').boundingBox(),buy=await page.locator('#b-add').boundingBox();
+  expect(modal.y).toBeGreaterThanOrEqual(0);
+  expect(modal.y+modal.height).toBeLessThanOrEqual(844);
+  expect(buy.y+buy.height).toBeLessThanOrEqual(modal.y+modal.height+1);
+  await page.screenshot({path:testInfo.outputPath('license-window-mobile.png')});
 });
