@@ -695,3 +695,35 @@ html.js .rvb.in{filter:none;transform:none}
   .art-w::before{animation:none;opacity:.7}
   .view.enter .st,.swap .l{animation:none!important}
 }
+
+
+/* V56 · Catálogo adaptable: chips en carril horizontal, controles en su propia fila. */
+.grid{grid-template-columns:repeat(auto-fit,minmax(240px,300px));justify-content:center}
+@media(max-width:899px){
+  .tools{gap:14px;padding:14px}
+  .fl{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:stretch}
+  .chips{
+    display:flex;flex-wrap:nowrap;flex:0 0 auto;
+    width:100%;min-width:0;max-width:100%;
+    gap:8px;overflow-x:auto;overflow-y:hidden;
+    padding:2px 2px 9px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;
+  }
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;min-width:max-content;max-width:none;white-space:nowrap;padding:8px 14px;scroll-snap-align:start}
+  .fr{width:100%;display:flex;align-items:center;justify-content:flex-end;gap:10px}
+  .sel2 select{height:40px;padding:0 36px 0 15px}
+  .seg{flex:none}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;gap:12px}
+}
+@media(max-width:420px){
+  .tools{padding:12px;gap:12px}
+  .chips{gap:7px}
+  .chip{font-size:12px;padding:8px 12px}
+  .sel2 select{font-size:12px}
+  .grid{gap:10px}
+  .bc-b{padding:5px 11px 13px}
+  .bc-b h3{font-size:clamp(13px,3.8vw,17px)}
+  .bc-pr{font-size:18px}
+}
