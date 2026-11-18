@@ -60,8 +60,18 @@ const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArr
 const st = { q: '', g: '', sort: 'new' };
 let cur = [], sel = null, ui = null, shown = 0, coverP = Promise.resolve();
 const sub = b => [b.type, b.bpm && b.bpm + ' BPM', b.key].filter(Boolean).map(esc).concat(R.ago ? [`<span class="ag">${esc(R.ago(b))}</span>`] : []).join(' · ');
-/* Los tags siguen indexados para búsqueda, pero nunca se exponen como hashtags en la tienda pública. */
-const tagsOf = () => [], heroTags = () => [];
+/* Tags públicos: se muestran como #hashtags clicables en la ficha y como chips en el catálogo, y además alimentan el buscador.
+   Pon SHOW_TAGS en false para ocultarlos de la vista (el buscador los seguirá usando). */
+const SHOW_TAGS = true;
+const tcompact = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+/* Quita alias duplicados ("ynjay" si ya existe "yn jay") y tags que repiten el nombre, tipo o género del beat */
+const tagsOf = b => {
+  if (!SHOW_TAGS) return [];
+  const seen = new Set([tcompact(b.name), tcompact(b.type), tcompact(b.genre)]), out = [];
+  for (const t of (b.tags || [])) { const s = String(t).trim().replace(/^#/, ''), k = tcompact(s); if (!k || seen.has(k)) continue; seen.add(k); out.push(s); }
+  return out;
+};
+const heroTags = b => tagsOf(b).slice(0, 6);
 
 /* ───────── Vista de beat ───────── */
 const tot = $('#tot');
@@ -117,9 +127,14 @@ $('#more-l').onclick = e => { const c = e.target.closest('.card'); if (!c) retur
 /* ───────── Catálogo (lista lateral) ───────── */
 const genres = [...new Set(beats.map(b => b.genre).filter(Boolean))].sort();
 $('#chips').innerHTML = ['Todos', ...genres].map((g, i) => `<button class="chip ${i ? '' : 'on'}" data-g="${i ? esc(g) : ''}">${esc(g)}</button>`).join('');
-/* Tags internos: no renderizar chips públicos. El buscador sigue consultando b.tags. */
 /* Buscador: sin tildes, por palabras sueltas, prefijos, tags/sobrenombres y tolerancia a 1 error de tecleo */
 const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9# ]+/g, ' ').replace(/\s+/g, ' ').trim();
+/* Chips de tags más usados junto a los de género: un clic busca ese tag, otro clic lo quita */
+if (SHOW_TAGS) {
+  const cnt = new Map(); beats.forEach(b => tagsOf(b).forEach(t => { const k = tcompact(t), e = cnt.get(k) || { t, n: 0 }; e.n++; cnt.set(k, e); }));
+  const top = [...cnt.values()].filter(e => !genres.some(g => tcompact(g) === tcompact(e.t))).sort((a, b) => b.n - a.n || a.t.localeCompare(b.t)).slice(0, 8);
+  $('#chips').insertAdjacentHTML('beforeend', top.map(e => `<button class="chip tg" data-tg="${esc(e.t)}">#${esc(e.t)}</button>`).join(''));
+}
 const near = (a, b) => { if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, e = 0; while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++e > 1) return false; if (a.length > b.length) i++; else if (a.length < b.length) j++; else { i++; j++; } } return e + (a.length - i) + (b.length - j) <= 1; };
 const idx = b => { const f = (a, w) => ({ w, t: norm(a) }); const tg = (b.tags || []).map(x => norm(x)).filter(Boolean);
   return { tg, f: [f(b.name, 4), f(b.type, 2), f(b.genre, 2), f([b.bpm && b.bpm + ' bpm', b.key].filter(Boolean).join(' '), 1)], all: '' }; };
@@ -145,7 +160,7 @@ const syncTags = () => $$('#chips .chip.tg').forEach(x => x.classList.toggle('on
 $('#chips').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; if (c.dataset.tg) { const on = norm(st.q.replace(/^#/, '')) === norm(c.dataset.tg); st.q = on ? '' : c.dataset.tg; $('#f-q').value = st.q; draw(); syncTags(); return; } setG(c.dataset.g); };
 $('#f-q').addEventListener('input', () => setTimeout(syncTags));
 $('#f-q').oninput = e => { st.q = e.target.value.trim(); draw(); };
-$('#tgs').onclick = e => { const x = e.target.closest('[data-t]'); if (!x) return; const q = $('#f-q'); q.value = x.dataset.t; st.q = x.dataset.t; draw(); if (isM()) go('lib'); else q.focus(); };
+$('#tgs').onclick = e => { const x = e.target.closest('[data-t]'); if (!x) return; const q = $('#f-q'); q.value = x.dataset.t; st.q = x.dataset.t; draw(); syncTags(); if (isM()) go('lib'); else q.focus(); };
 $('#f-sort').onchange = e => { st.sort = e.target.value; draw(); };
 
 addEventListener('ron:newbeats', e => { const ids = new Set(beats.map(b => b.id)), nb = (e.detail || []).filter(b => !ids.has(b.id)); if (!nb.length) return; beats.unshift(...nb); draw(); shelf(); });
