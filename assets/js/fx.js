@@ -20,7 +20,7 @@
   const sp = () => ({ x: 0, v: 0 });
   const M = { X: sp(), Y: sp(), R: sp(), Z: sp(), heat: 0, flash: 0, flashS: 0, dir: 1, ik: 1, ikT: 1, lastHit: 0,
     nz: 0, tA: 0, rate: .6, fade: 0, fadeOn: false, tr: 1 };
-  const AMP = .6, DIM = .9;
+  const AMP = .6, SHAKE = .4, DIM = .9;
   const NT = new Float32Array(256); for (let i = 0; i < 256; i++) NT[i] = Math.random() * 2 - 1;
   const vn = x => { const i = Math.floor(x), f = x - i, u = f * f * f * (f * (f * 6 - 15) + 10); return NT[i & 255] + (NT[(i + 1) & 255] - NT[i & 255]) * u; };
   const nz2 = x => vn(x) * .72 + vn(x * 2.03 + 17.3) * .28;
@@ -36,9 +36,9 @@
     M.dir = -M.dir;
     M.heat += (1 - M.heat) * (.45 + strength * .55);
     M.Z.x = Math.min(.1, M.Z.x); M.Z.v = Math.min(2.4, M.Z.v + imp * .28 / ik);
-    M.X.x += M.dir * W * .022 * imp; M.X.v += M.dir * W * 1.55 * imp / ik;
-    M.Y.x += (Math.random() - .5) * W * .015 * imp; M.Y.v += (Math.random() * 2 - 1) * W * 1.1 * imp / ik;
-    M.R.v += M.dir * (55 + Math.random() * 28) * imp / ik;
+    M.X.x += M.dir * W * .022 * imp * SHAKE; M.X.v += M.dir * W * 1.55 * imp * SHAKE / ik;
+    M.Y.x += (Math.random() - .5) * W * .015 * imp * SHAKE; M.Y.v += (Math.random() * 2 - 1) * W * 1.1 * imp * SHAKE / ik;
+    M.R.v += M.dir * (55 + Math.random() * 28) * imp * SHAKE / ik;
     M.flash = Math.max(M.flash, .55 + strength * .45);
   }
   const P1 = { a: 0, w: 0 };
@@ -254,9 +254,9 @@ void main(){
     const ax = Math.sin(tt * .37) + Math.sin(tt * .91 + 1.7) * .5 + Math.sin(tt * 1.73 + .3) * .25;
     const ay = Math.sin(tt * .43 + 2.1) + Math.sin(tt * 1.07 + .4) * .5 + Math.sin(tt * 1.91 + 1.1) * .25;
     const ar = Math.sin(tt * .29 + .7) * .35 + Math.sin(tt * .83) * .15;
-    sceneNow.ox = ax * W * .007 + M.X.x + nz2(M.nz) * e * W * .05 * AMP;
-    sceneNow.oy = ay * W * .006 + M.Y.x + nz2(M.nz + 31.7) * e * W * .04 * AMP;
-    sceneNow.rot = (ar + M.R.x + nz2(M.nz * .8 + 67.3) * e * 2.2 * AMP) * Math.PI / 180;
+    sceneNow.ox = ax * W * .007 + M.X.x + nz2(M.nz) * e * W * .05 * AMP * SHAKE;
+    sceneNow.oy = ay * W * .006 + M.Y.x + nz2(M.nz + 31.7) * e * W * .04 * AMP * SHAKE;
+    sceneNow.rot = (ar + M.R.x + nz2(M.nz * .8 + 67.3) * e * 2.2 * AMP * SHAKE) * Math.PI / 180;
     if (M.fadeOn && M.fade < 1) M.fade = Math.min(1, M.fade + d / 2.4);
     if (M.tr < 1) M.tr = Math.min(1, M.tr + d / 1.8);
     sceneNow.scl = 1.04 + Math.sin(tt * .21) * .006 + M.Z.x + e * .012 + S.lv * .018 + (1 - sstep(M.fade)) * .06 + (1 - sstep(M.tr)) * .05;
