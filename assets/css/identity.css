@@ -30,11 +30,12 @@ html body .view .foot{display:none!important}
 html body #v-privado .wrap,html body #v-contacto .wrap{height:100%;display:flex;flex-direction:column;justify-content:center;padding-top:0}
 
 /* Transiciones de pantalla: zoom + motion blur + desplazamiento (nada seco) */
-@keyframes vin{from{opacity:0;transform:translate3d(calc(var(--dir)*110px),0,0) scale(1.08);filter:blur(18px)}}
-@keyframes vout{to{opacity:0;transform:translate3d(calc(var(--dir)*-90px),0,0) scale(.93);filter:blur(16px)}}
-@keyframes rise{from{opacity:0;transform:translate3d(0,34px,0) scale(.97);filter:blur(14px)}}
-html body .view.enter{animation-duration:1.05s;animation-timing-function:var(--soft)}
-html body .view.leave{animation-duration:.6s}
+@keyframes vin{from{opacity:0;transform:translate3d(calc(var(--dir)*60px),0,0) scale(1.035)}}
+@keyframes vout{to{opacity:0;transform:translate3d(calc(var(--dir)*-48px),0,0) scale(.975)}}
+@keyframes rise{from{opacity:0;transform:translate3d(0,22px,0)}}
+html body .view{will-change:opacity,transform}
+html body .view.enter{animation-duration:.8s;animation-timing-function:var(--soft)}
+html body .view.leave{animation-duration:.45s}
 
 /* ═══ VIDRIO LÍQUIDO ══════════════════════════════════════════════════ */
 html body .glass,html body .pane{
@@ -113,16 +114,18 @@ html body h1{
 html body #v-home h1{font-size:clamp(54px,8.6vw,132px);line-height:.88}
 html body #v-home h1.long{font-size:clamp(42px,6.2vw,96px)}
 html body h1 .l,html body .h2 .l{display:inline-block;will-change:transform}
+/* Mismo efecto que el hover, disparado en automático por fx.js */
+html body h1 .l.hot,html body .h2 .l.hot{text-shadow:0 0 30px #fff,0 0 70px rgba(255,255,255,.7);transform:translateY(-.07em) scale(1.05)}
 html body h1.swap .l{
   animation:
     ronLetter 1.25s var(--soft) calc(var(--i)*42ms) backwards,
-    ronSway 7s ease-in-out calc(var(--i)*-.55s) infinite alternate;
+    ronSway 9s ease-in-out calc(var(--i)*-.55s) infinite alternate;
 }
 @keyframes ronLetter{
   from{opacity:0;transform:translate3d(-.5em,.45em,0) rotate(-18deg) skewX(-16deg) scale(1.55);filter:blur(16px)}
   60%{filter:blur(2px)}
 }
-@keyframes ronSway{from{rotate:-1.3deg;translate:0 -.014em}to{rotate:1.3deg;translate:0 .016em}}
+@keyframes ronSway{from{rotate:-.5deg;translate:0 -.006em}to{rotate:.5deg;translate:0 .006em}}
 
 html body .kicker{letter-spacing:.34em;font-size:11px;color:rgba(255,255,255,.78)}
 html body .kicker::before{width:56px;transform-origin:left;animation:ronLine 1.4s var(--soft) both}

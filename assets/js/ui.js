@@ -197,15 +197,42 @@
     return place;
   }
 
-  /* Pulso: solo corre mientras suena el audio. Escribe --lv en la portada (bloom que respira). */
+  /* Pulso: solo corre mientras suena el audio. Analiza el audio real (graves/808) y escribe --lv en la portada.
+     Cada golpe de bajo dispara RonFX.kick() → zoom del fondo, como en el catálogo privado. */
   function pulse(audio, o = {}) {
-    let raf = 0, last = 0;
-    const art = o.art, tick = t => {
-      raf = requestAnimationFrame(tick); if (t - last < 33) return; last = t; const k = t / 1000;
-      const v = Math.min(1, Math.max(0, .5 + .32 * Math.sin(k * 5.4) + .2 * Math.sin(k * 2.3 + 1.2) * Math.sin(k * 9.1)));
+    let raf = 0, lastKick = 0, bassS = 0, avg = 0, last = 0;
+    const art = o.art;
+    const setup = () => {
+      if (!audio || audio._ron) return audio && audio._ron;
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+        const ctx = new AC(), src = ctx.createMediaElementSource(audio), an = ctx.createAnalyser();
+        an.fftSize = 1024; an.smoothingTimeConstant = .55; src.connect(an); an.connect(ctx.destination);
+        audio._ron = { ctx, an, bins: new Uint8Array(an.frequencyBinCount) };
+      } catch (e) { audio._ron = null; }
+      return audio._ron;
+    };
+    const tick = t => {
+      raf = requestAnimationFrame(tick);
+      const A = audio && audio._ron; let v;
+      if (A) {
+        A.an.getByteFrequencyData(A.bins);
+        let b = 0; for (let i = 1; i <= 7; i++) b += A.bins[i]; b /= 7 * 255;
+        bassS += (b - bassS) * .45; avg += (b - avg) * .025;
+        if (b > .40 && b > avg * 1.2 && t - lastKick > 170) {
+          lastKick = t; if (window.RonFX && RonFX.kick) RonFX.kick(Math.min(1, (b - avg) * 3 + .4));
+        }
+        v = Math.min(1, bassS * 1.2);
+      } else {
+        if (t - last < 33) return; last = t; const k = t / 1000;
+        v = Math.min(1, Math.max(0, .5 + .32 * Math.sin(k * 5.4) + .2 * Math.sin(k * 2.3 + 1.2) * Math.sin(k * 9.1)));
+      }
       if (art) art.style.setProperty('--lv', v.toFixed(3));
     };
-    const on = () => { root.classList.add('live'); if (!raf && !reduce && !D.hidden) raf = requestAnimationFrame(tick); };
+    const on = () => {
+      root.classList.add('live'); const A = setup(); if (A && A.ctx.state === 'suspended') A.ctx.resume().catch(() => {});
+      if (!raf && !reduce && !D.hidden) raf = requestAnimationFrame(tick);
+    };
     const off = () => { root.classList.remove('live'); cancelAnimationFrame(raf); raf = 0; if (art) art.style.setProperty('--lv', 0); };
     if (audio) { audio.addEventListener('play', on); audio.addEventListener('playing', on); audio.addEventListener('pause', off); audio.addEventListener('ended', off); }
     D.addEventListener('visibilitychange', () => { if (D.hidden) { cancelAnimationFrame(raf); raf = 0; } else if (audio && !audio.paused) on(); });
