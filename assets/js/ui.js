@@ -132,15 +132,47 @@
     }, { passive: true });
   }
 
-  const ios = new WeakMap();
-  function reveal(view) {
-    const els = $$('.rvb:not(.in)', view);
+  const revealStates = new WeakMap();
+  function reveal(view, replay = false) {
+    if (!view) return;
+    let state = revealStates.get(view);
+    if (!state) {
+      state = { io: null, timer: 0, seq: 0 };
+      revealStates.set(view, state);
+    }
+
+    // Re-arm entrance reveals when the user returns to a section.
+    if (replay) {
+      state.seq++;
+      clearTimeout(state.timer);
+      if (state.io) { state.io.disconnect(); state.io = null; }
+      $('.rvb', view).forEach(e => e.classList.remove('in'));
+    }
+
+    const els = $('.rvb:not(.in)', view);
     if (!els.length) return;
-    if (!('IntersectionObserver' in window) || reduce) { els.forEach(e => e.classList.add('in')); return; }
-    let io = ios.get(view);
-    if (!io) { io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { root: view, rootMargin: '0px 0px -6% 0px', threshold: .06 }); ios.set(view, io); }
-    els.forEach(e => io.observe(e));
-    setTimeout(() => $$('.rvb:not(.in)', view).forEach(e => e.classList.add('in')), 4500);
+    if (!('IntersectionObserver' in window) || reduce) {
+      els.forEach(e => e.classList.add('in'));
+      return;
+    }
+
+    if (!state.io) {
+      const io = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      }), { root: view, rootMargin: '0px 0px -6% 0px', threshold: .06 });
+      state.io = io;
+    }
+    els.forEach(e => state.io.observe(e));
+
+    const seq = state.seq;
+    clearTimeout(state.timer);
+    state.timer = setTimeout(() => {
+      if (state.seq !== seq) return;
+      $('.rvb:not(.in)', view).forEach(e => e.classList.add('in'));
+    }, 4500);
   }
 
   function indicator(nav) {
