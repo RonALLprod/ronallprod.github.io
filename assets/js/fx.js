@@ -59,7 +59,7 @@
       S.kick = Math.min(1.2, Math.max(S.kick, a)); hit(a);
       S.shock = 0; S.shockA = Math.min(1.2, a); P1.w += (Math.random() < .5 ? -1 : 1) * a * 5;
     },
-    punch(a = 1) { hit(a * .5); },
+    punch(a = 1) { S.kick = Math.min(1.2, Math.max(S.kick, a)); },
     push(v) { P1.w += v; P2.w += v * .6; },
     flare() { const a = $('.art'); if (!a) return; a.classList.remove('flare'); void a.offsetWidth; a.classList.add('flare'); setTimeout(() => a.classList.remove('flare'), 1500); },
   };
