@@ -157,7 +157,7 @@
   }
 
   function pulse(audio, o = {}) {
-    let raf = 0, lastKick = 0, bassS = 0, avg = 0, last = 0, prevE = 0, fluxAvg = 0, eqs = [], eqT = -1e9;
+    let raf = 0, lastKick = 0, bassS = 0, last = 0, prevE = 0, fluxAvg = 0, floor = 0, quietSince = 0, armed = true, warmupUntil = 0, eqs = [], eqT = -1e9;
     const art = o.art, lv5 = [0, 0, 0, 0, 0], EQB = [[35, 120], [120, 300], [300, 1000], [1000, 4000], [4000, 12000]];
     const eqList = t => {
       if (t - eqT > 400) {
@@ -172,9 +172,9 @@
       try {
         const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
         const ctx = new AC(), src = ctx.createMediaElementSource(audio), an = ctx.createAnalyser();
-        an.fftSize = 2048; an.smoothingTimeConstant = .2; src.connect(an); an.connect(ctx.destination);
+        an.fftSize = 2048; an.smoothingTimeConstant = .08; src.connect(an); an.connect(ctx.destination);
         const hz = ctx.sampleRate / an.fftSize, bin = f => Math.max(1, Math.round(f / hz));
-        audio._ron = { ctx, an, bins: new Uint8Array(an.frequencyBinCount), s0: bin(35), s1: bin(140), p1: bin(260), eq: EQB.map(([x, y]) => [bin(x), Math.max(bin(x), bin(y))]) };
+        audio._ron = { ctx, an, bins: new Uint8Array(an.frequencyBinCount), s0: bin(36), s1: bin(105), s2: bin(180), p1: bin(260), eq: EQB.map(([x, y]) => [bin(x), Math.max(bin(x), bin(y))]) };
       } catch (e) { audio._ron = null; }
       return audio._ron;
     };
@@ -184,12 +184,31 @@
       const A = audio && audio._ron; let v;
       if (A) {
         A.an.getByteFrequencyData(A.bins);
-        const e = Math.min(1, band(A.bins, A.s0, A.s1) * .85 + band(A.bins, A.s1 + 1, A.p1) * .3);
-        const flux = Math.max(0, e - prevE); prevE = e;
-        fluxAvg += (flux - fluxAvg) * .08; avg += (e - avg) * .035;
-        if (e > .22 && e > avg * 1.1 && flux > fluxAvg * 2.2 + .025 && t - lastKick > 110) {
-          lastKick = t;
-          if (window.RonFX && RonFX.kick) RonFX.kick(Math.min(1.1, .5 + (e - avg) * 2 + flux * 3));
+        // Detección de transitorios: prioriza subgrave, ataque rápido y caída real.
+        // El suelo se adapta lentamente al subir y rápido al bajar, evitando disparos por 808 sostenidos.
+        const sub = band(A.bins, A.s0, A.s1);
+        const body = band(A.bins, A.s1 + 1, A.s2);
+        const e = Math.min(1, sub * .84 + body * .16);
+        const rise = Math.max(0, e - prevE); prevE = e;
+        const falling = e < floor;
+        floor += (e - floor) * (falling ? .12 : .008);
+        fluxAvg += (rise - fluxAvg) * (rise > fluxAvg ? .08 : .025);
+        const prominence = e - floor;
+        const onsetGate = Math.max(.035, fluxAvg * 2.8 + .018);
+        const subFocus = sub / (body + .02);
+
+        // Un solo impulso por golpe: se rearma cuando el grave realmente cae.
+        if (e < floor + .045) {
+          if (!quietSince) quietSince = t;
+          if (t - quietSince >= 78) armed = true;
+        } else quietSince = 0;
+
+        if (t >= warmupUntil && armed && t - lastKick > 180 &&
+            rise > onsetGate && prominence > .09 && sub > .18 &&
+            subFocus > .72 && e > .20) {
+          lastKick = t; armed = false;
+          const strength = clamp((prominence - .075) * 4.8 + (rise - onsetGate) * 2.5, .28, 1.05);
+          if (window.RonFX && RonFX.kick) RonFX.kick(strength);
         }
         bassS += (e - bassS) * .5;
         v = Math.min(1, bassS * 1.25);
@@ -211,9 +230,17 @@
     };
     const on = () => {
       root.classList.add('live'); const A = setup(); if (A && A.ctx.state === 'suspended') A.ctx.resume().catch(() => {});
-      if (!raf && !reduce && !D.hidden) raf = requestAnimationFrame(tick);
+      if (!raf && !reduce && !D.hidden) {
+        lastKick = 0; bassS = 0; prevE = 0; fluxAvg = 0; floor = 0; quietSince = 0; armed = true;
+        warmupUntil = performance.now() + 260;
+        raf = requestAnimationFrame(tick);
+      }
     };
-    const off = () => { root.classList.remove('live'); cancelAnimationFrame(raf); raf = 0; prevE = 0; eqOff(); if (art) art.style.setProperty('--lv', 0); };
+    const off = () => {
+      root.classList.remove('live'); cancelAnimationFrame(raf); raf = 0;
+      prevE = 0; fluxAvg = 0; floor = 0; quietSince = 0; armed = true;
+      eqOff(); if (art) art.style.setProperty('--lv', 0);
+    };
     if (audio) { audio.addEventListener('play', on); audio.addEventListener('playing', on); audio.addEventListener('pause', off); audio.addEventListener('ended', off); }
     D.addEventListener('visibilitychange', () => { if (D.hidden) { cancelAnimationFrame(raf); raf = 0; } else if (audio && !audio.paused) on(); });
     if (audio && !audio.paused) on();
