@@ -45,13 +45,12 @@
   const P1 = { a: 0, w: 0 };
   const P2 = { a: 0, w: 0 };
 
-  let artEl = null, wraps = [];
+  let artEl = null, artFl = null, artSh = null, leak = null, hudTick = null, fcount = 0;
   const el = {
     art: null, info: null, marq: null, img: null, artImg: null,
   };
   const grab = () => {
     el.art = $('.art-w'); el.info = $('.hero .info'); el.marq = $('#marq');
-    wraps = $$('.view > .wrap');
     el.artImg = $('.art img'); el.img = $('#cimg') || el.artImg; artEl = $('.art');
   };
   grab();
@@ -140,8 +139,10 @@ void main(){
   }
   col/=tw;
   float ca=.002+uFlash*.03+length(uCam)*.5;
-  col.r=mix(col.r,art(uv+(uv-ctr)*ca,liquid).r,.55);
-  col.b=mix(col.b,art(uv-(uv-ctr)*ca,liquid).b,.55);
+  if(ca>.004){
+    col.r=mix(col.r,art(uv+(uv-ctr)*ca,liquid).r,.55);
+    col.b=mix(col.b,art(uv-(uv-ctr)*ca,liquid).b,.55);
+  }
   float l=lm(col);
   float base=clamp((l-.18)*1.25,0.,1.);
   vec3 g=vec3(base)*vec3(.94,.96,1.);
@@ -153,19 +154,19 @@ void main(){
   if(uQ>.5){
     float bl=0.;
     float rad=.016+uFlash*.02+uLv*.012;
-    for(int i=0;i<8;i++){
-      float a=float(i)*.7853982+uT*.12;
+    for(int i=0;i<6;i++){
+      float a=float(i)*1.0471976+uT*.12;
       float rr=rad*(1.+mod(float(i),2.)*1.1);
       bl+=max(lm(art(uv+vec2(cos(a),sin(a))*rr,liquid))-.5,0.);
     }
-    g+=bl*.125*(.3+uMid*.9+uFlash*.9+uLv*.4);
+    g+=bl*.1667*(.3+uMid*.9+uFlash*.9+uLv*.4);
   }
   if(uQ>1.5){
     vec2 dr=(ctr-uv)*.16;vec2 pp=uv;float ry=0.;
     for(int i=0;i<6;i++){pp+=dr;ry+=max(lm(art(pp,liquid))-.62,0.)*(1.-float(i)*.14);}
     g+=ry*.045*(.5+uLv*1.2+uFlash);
   }
-  if(uFlash>.1){
+  if(uFlash>.3){
     vec3 st=art(uv+vec2(.035,0.),liquid)+art(uv-vec2(.035,0.),liquid);
     float sl2=lm(st)*.5;
     g+=pow(clamp((sl2-.4)*1.6,0.,1.),2.)*uFlash*.07;
@@ -216,8 +217,8 @@ void main(){
     size(); let rz = 0; addEventListener('resize', () => { if (!rz) rz = requestAnimationFrame(() => { rz = 0; size(); }); }, { passive: true });
     return true;
   }
-  const DPR = Math.min(devicePixelRatio || 1, 1.5), TIERS = [.3, .4, .5, .6, .72];
-  let tier = 2, qk = DPR * TIERS[tier], qCool = 120, ema = 16.7, slow = 0, base = 16.7, good = 0, lastDown = -1e9, half = false;
+  const DPR = Math.min(devicePixelRatio || 1, 1.25), TIERS = [.3, .4, .5, .6, .72];
+  let tier = 1, qk = DPR * TIERS[tier], qCool = 120, ema = 16.7, slow = 0, base = 16.7, good = 0, lastDown = -1e9, half = false;
   function adapt(dt) {
     if (root.classList.contains('vt')) { qCool = Math.max(qCool, 40); return; }
     const ms = dt * 1000; ema += (ms - ema) * .05; if (ms < base) base += (ms - base) * .05; else base += (ms - base) * .002;
@@ -339,21 +340,14 @@ void main(){
     stepPendulum(P2, 15, .95, -P1.w * .9 - P1.a * 1.8, dt);
 
     S.shock = Math.min(1, S.shock + dt / .62);
-    put(root, '--beat', q(clamp(Math.max(S.kick, M.flashS * .9), 0, 1), .1));
-    {
-      const sx = clamp(M.X.x * 260, -9, 9).toFixed(1), sy = clamp(M.Y.x * 260, -7, 7).toFixed(1);
-      for (const w of wraps) {
-        const on = w.parentElement && w.parentElement.classList.contains('active'), v = on ? sx + 'px ' + sy + 'px' : '';
-        if (w._t !== v) { w._t = v; w.style.translate = v; }
-      }
-    }
     if (el.art) {
       put(el.art, '--pend', P1.a.toFixed(2) + 'deg');
       put(el.art, '--ptx', (S.px * 6).toFixed(1) + 'px');
       put(el.art, '--pty', (S.py * 4).toFixed(1) + 'px');
       put(el.art, '--mb', q(clamp(Math.abs(P1.w) * .02 + S.vel * .5, 0, 1.2), .2));
       put(el.art, '--kk', S.kick > .01 ? S.kick.toFixed(2) : '0');
-      put(el.art, '--sxp', (P1.a * -5 + S.px * -10).toFixed(1) + 'px');
+      if (artFl) put(artFl, 'opacity', (clamp(S.kick, 0, 1) * .4).toFixed(2));
+      if (artSh) { put(artSh, 'transform', 'translate3d(' + (P1.a * -9 + S.px * -14).toFixed(1) + 'px,0,0)'); put(artSh, 'opacity', (.3 + S.lv * .5 + S.kick * .3).toFixed(2)); }
     }
     if (el.info) {
       const m2 = q(clamp(Math.abs(P2.w) * .012, 0, .8), .2);
@@ -363,6 +357,8 @@ void main(){
       put(el.info, '--mb2', m2);
       el.info.classList.toggle('mb', +m2 > 0);
     }
+    if (leak) put(leak, 'opacity', (clamp(Math.max(S.kick, M.flashS * .9), 0, 1) * .9).toFixed(2));
+    if (hudTick && (fcount++ & 1) === 0) hudTick();
     if (el.marq) put(el.marq, '--skew', (P1.w * -.02 - S.px * .5).toFixed(2) + 'deg');
 
     if (glOK && hasTex) {
@@ -379,11 +375,13 @@ void main(){
       gl.uniform1f(uni.uShock, S.shock); gl.uniform1f(uni.uShockA, S.shockA);
       gl.uniform1f(uni.uRot, sceneNow.rot); gl.uniform1f(uni.uScl, sceneNow.scl);
       gl.uniform1f(uni.uFade, sstep(M.fade)); gl.uniform1f(uni.uSettled, S.mix >= 1 ? 1 : 0);
-      gl.uniform1f(uni.uDim, DIM); gl.uniform1f(uni.uTaps, amtHi ? 9 : (idle ? 2 : 5));
+      gl.uniform1f(uni.uDim, DIM);
+      const busy = root.classList.contains('vt');
+      gl.uniform1f(uni.uTaps, busy ? 3 : (amtHi ? 9 : (idle ? 2 : 5)));
       gl.uniform2f(uni.uCam, S.cx + S.wx, S.cy);
       gl.uniform1f(uni.uInv, S.inv > .5 ? 1 : 0);
       gl.uniform1f(uni.uMid, S.mid); gl.uniform1f(uni.uHi, S.hi);
-      gl.uniform1f(uni.uQ, (half || tier < 2) ? 0 : (tier >= 3 ? 2 : 1));
+      gl.uniform1f(uni.uQ, (half || busy || tier < 2) ? 0 : (tier >= 3 ? 2 : 1));
       gl.uniform1f(uni.uSlice, clamp((flash - .85) * 6, 0, 1));
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
@@ -479,6 +477,64 @@ void main(){
     setTimeout(run, 2600);
   }
 
+  const z2 = n => String(n).padStart(2, '0');
+  function artFx() {
+    const w = el.art; if (!w || w._fx) return; w._fx = 1;
+    const sh = D.createElement('i'); sh.className = 'art-sh'; w.insertBefore(sh, w.firstChild);
+    const a = $('.art', w), fl = D.createElement('i'); fl.className = 'art-fl'; if (a) a.appendChild(fl);
+    artSh = sh; artFl = fl;
+  }
+  function sceneLeak() {
+    const sc = $('.scene'); if (!sc || reduce || leak) return;
+    leak = D.createElement('i'); leak.className = 'leak'; sc.appendChild(leak);
+  }
+  function hud() {
+    if (D.getElementById('hud')) return;
+    const h = D.createElement('div'); h.id = 'hud'; h.setAttribute('aria-hidden', 'true');
+    h.innerHTML = '<i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><div class="tc"><b class="dot"></b><span id="tc">00:00:00:00</span><small id="tcs">STBY</small></div>';
+    D.body.appendChild(h);
+    const tc = $('#tc', h), st = $('#tcs', h); let lt = '', ls = '';
+    hudTick = () => {
+      const a = window.RON && RON.P && RON.P.audio; if (!a) return;
+      const t = a.currentTime || 0, txt = z2(Math.floor(t / 3600)) + ':' + z2(Math.floor(t / 60) % 60) + ':' + z2(Math.floor(t) % 60) + ':' + z2(Math.floor((t % 1) * 24));
+      if (txt !== lt) { lt = txt; tc.textContent = txt; }
+      const p = !a.paused, ss = p ? 'REC' : 'STBY';
+      if (ss !== ls) { ls = ss; st.textContent = ss; h.classList.toggle('rec', p); }
+    };
+  }
+  function cursor() {
+    if (reduce || !matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    const c = D.createElement('div'); c.className = 'cur'; c.setAttribute('aria-hidden', 'true'); c.innerHTML = '<i></i>'; D.body.appendChild(c);
+    let x = -100, y = -100, tx = -100, ty = -100, r = 0;
+    const loop = () => { x += (tx - x) * .24; y += (ty - y) * .24; c.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)'; r = (Math.abs(tx - x) + Math.abs(ty - y) > .3) ? requestAnimationFrame(loop) : 0; };
+    addEventListener('pointermove', e => { if (!c.classList.contains('vis')) { x = tx = e.clientX; y = ty = e.clientY; c.classList.add('vis'); } tx = e.clientX; ty = e.clientY; if (!r) r = requestAnimationFrame(loop); }, { passive: true });
+    D.addEventListener('pointerover', e => c.classList.toggle('on', !!(e.target.closest && e.target.closest('a,button,.bc,input,select,label,[data-go]'))), { passive: true });
+    D.addEventListener('pointerdown', () => c.classList.add('dn'), { passive: true });
+    D.addEventListener('pointerup', () => c.classList.remove('dn'), { passive: true });
+    D.documentElement.addEventListener('mouseleave', () => c.classList.remove('vis'));
+  }
+  function ruler() {
+    const g = $('#grid'), top = $('#v-catalogo .tools'); if (!g || !top || $('#ruler')) return;
+    const r = D.createElement('div'); r.id = 'ruler'; r.setAttribute('aria-hidden', 'true'); r.innerHTML = '<i class="ph"></i>';
+    top.insertAdjacentElement('afterend', r);
+    const ph = r.firstChild; let raf = 0;
+    const upd = () => {
+      raf = 0; const max = g.scrollWidth - g.clientWidth, k = max > 0 ? g.scrollLeft / max : 0;
+      ph.style.transform = 'translate3d(' + (k * Math.max(0, r.clientWidth - 2)).toFixed(1) + 'px,0,0)';
+      r.classList.toggle('off', g.classList.contains('list') || max <= 0);
+    };
+    g.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
+    addEventListener('resize', upd, { passive: true });
+    r.addEventListener('pointerdown', e => { const b = r.getBoundingClientRect(), max = g.scrollWidth - g.clientWidth; g.scrollTo({ left: ((e.clientX - b.left) / b.width) * max, behavior: 'smooth' }); });
+    if ('MutationObserver' in window) new MutationObserver(() => { if (!raf) raf = requestAnimationFrame(upd); }).observe(g, { attributes: true, attributeFilter: ['class'], childList: true });
+    setTimeout(upd, 700);
+  }
+  function bgword() {
+    const t = $('#ttl'), v = $('#v-home'); if (!t || !v) return;
+    const set = () => { const n = (t.textContent || '').trim(); v.style.setProperty('--bgword', n ? JSON.stringify(n) : '""'); };
+    set(); if ('MutationObserver' in window) new MutationObserver(set).observe(t, { childList: true, characterData: true, subtree: true });
+  }
+
   function motionToggle() {
     if (!osReduce) return;
     const b = D.createElement('button'); b.type = 'button'; b.className = 'motion-toggle';
@@ -488,7 +544,7 @@ void main(){
   }
   function boot() {
     motionToggle();
-    grab();
+    grab(); artFx(); sceneLeak(); hud(); ruler(); bgword(); cursor();
     glOK = initGL();
     if (glOK) watchCover();
     if (reduce) return;
