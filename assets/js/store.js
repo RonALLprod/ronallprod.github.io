@@ -82,7 +82,7 @@ const compute = () => {
 };
 
 const VIEWS = ['home', 'catalogo', 'privado', 'contacto'], ORD = Object.fromEntries(VIEWS.map((v, i) => [v, i]));
-let curView = null;
+let curView = null, vtTimer = 0;
 const vEl = id => $('#v-' + id);
 const kick = v => { if (!v) return; v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); clearTimeout(v._k); v._k = setTimeout(() => v.classList.remove('enter'), 2000); };
 const placeRail = U.indicator($('#nav')), placeDock = U.indicator($('#dock .nav'));
@@ -96,6 +96,11 @@ function show(id, o = {}) {
   if (!VIEWS.includes(id)) id = 'home';
   const to = vEl(id), from = curView && vEl(curView);
   if (id === curView) { to.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  if (!o.first) {
+    root.classList.add('vt');
+    clearTimeout(vtTimer);
+    vtTimer = setTimeout(() => root.classList.remove('vt'), 950);
+  }
   const dir = curView ? (ORD[id] >= ORD[curView] ? 1 : -1) : 1;
   if (from) { clearTimeout(from._leaveTimer); from.style.setProperty('--dir', dir); from.classList.remove('active', 'enter', 'leave'); from.classList.add('leave'); from._leaveTimer = setTimeout(() => from.classList.remove('leave'), 540); }
   clearTimeout(to._leaveTimer); to.classList.remove('leave');
