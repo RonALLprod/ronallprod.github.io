@@ -1,5 +1,3 @@
-/* RONALL-VISUAL-2026-11-11-V13 · core.js */
-/* RONALL PROD · core — helpers, cabecera, reproductor global (AES-GCM), carrito, checkout */
 (()=>{
 const S=window.SITE,D=document,ROOT=D.documentElement.dataset.root||'';
 const $=(s,r=D)=>r.querySelector(s),$$=(s,r=D)=>[...r.querySelectorAll(s)];
@@ -31,10 +29,8 @@ let tt;const toast=m=>{let t=$('.toast')||D.body.appendChild(Object.assign(D.cre
 const copy=async(t,m='Copiado')=>{try{await navigator.clipboard.writeText(t)}catch(e){const a=D.createElement('textarea');a.value=t;D.body.appendChild(a);a.select();D.execCommand('copy');a.remove()}toast(m)};
 const share=async b=>{track('share',{beat:b.id});const d={title:`${b.name} · ${S.brand.name}`,text:`${b.name} — ${b.type||'beat'}`,url:beatUrl(b)};if(navigator.share){try{await navigator.share(d);return}catch(e){if(e.name==='AbortError')return}}copy(d.url,'Enlace copiado')};
 
-/* ---------- Supabase (solo RPC públicas con clave publishable) ---------- */
 const rpc=async(f,b)=>{const r=await fetch(S.supabase.url+'/rest/v1/rpc/'+f,{method:'POST',headers:{apikey:S.supabase.key,'Content-Type':'application/json'},body:JSON.stringify(b||{})});if(!r.ok)throw new Error(await r.text().catch(()=>'rpc'));return r.status===204?null:r.json()};
 
-/* ---------- arranque común (home + página de beat) ---------- */
 function boot(){
  $$('[data-i]').forEach(e=>e.insertAdjacentHTML('afterbegin',svg(e.dataset.i,+e.dataset.s||20)));
  if(!$('.scrim'))D.body.append(Object.assign(D.createElement('div'),{className:'scrim'}));
@@ -44,7 +40,6 @@ function boot(){
  P.bind();Cart.paint();
  D.addEventListener('pointerdown',e=>{const t=e.target.closest('.btn,.chip,.tile,.card');if(!t)return;const r=t.getBoundingClientRect(),x=D.createElement('span');x.className='rip';x.style.left=e.clientX-r.left+'px';x.style.top=e.clientY-r.top+'px';t.append(x);setTimeout(()=>x.remove(),900)});
 }
-/* color de acento (apagado y profundo: se usa solo como luz suave de fondo) */
 function accent(i){
  const c=D.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d');x.drawImage(i,0,0,24,24);const d=x.getImageData(0,0,24,24).data;
  let r=0,g=0,bl=0,W=0;
@@ -55,7 +50,6 @@ function accent(i){
  return [f(0),f(8),f(4)];
 }
 
-/* ---------- reproductor global (previews cifrados AES-GCM, 1 activo) ---------- */
 const P=(()=>{
  const a=new Audio();a.preload='auto';let q=[],cur=null,tok=0,keyP=null;const cache=new Map(),ev=new EventTarget();
  const key=()=>keyP||(keyP=crypto.subtle.importKey('raw',Uint8Array.from(atob(S.previewKey),c=>c.charCodeAt(0)),'AES-GCM',false,['decrypt']));
@@ -82,10 +76,8 @@ const P=(()=>{
  }
  return{play,step,ev,audio:a,get cur(){return cur},preload:b=>blob(b).catch(()=>{}),bind,setList:l=>q=l}})();
 
-/* ---------- carrito ---------- */
 const Cart=(()=>{let items=[];try{items=JSON.parse(localStorage.ronCart||'[]')}catch(e){}const ev=new EventTarget();
  const save=()=>{try{localStorage.ronCart=JSON.stringify(items)}catch(e){}paint();ev.dispatchEvent(new Event('change'))};
- /* combo: % según nº de beats distintos; las EXCLUSIVE no se rebajan */
  const tiers=(S.bundle&&S.bundle.tiers)||[];
  const pctFor=n=>tiers.reduce((p,[c,d])=>n>=c?d:p,0);
  const nextTier=n=>tiers.find(([c])=>c>n)||null;
@@ -100,7 +92,6 @@ const Cart=(()=>{let items=[];try{items=JSON.parse(localStorage.ronCart||'[]')}c
  function add(beat,lic,from){if(!avail(beat,lic))return toast('Licencia no disponible');const it={id:beat.id,slug:beat.slug,name:beat.name,thumb:beat.thumb,lic,price:price(beat,lic)};items=items.filter(i=>i.id!==beat.id);items.push(it);save();ping(from);track('cart',{beat:beat.id,lic});toast(`${beat.name} · ${S.licenses[lic].name} añadido`)}
  return{ev,get items(){return items},total,subtotal,net,pct,nextTier,add,has:(id,lic)=>items.some(i=>i.id===id&&i.lic===lic),remove:id=>{items=items.filter(i=>i.id!==id);save()},clear:()=>{items=[];save()},paint}})();
 
-/* ---------- checkout dentro de la web: carrito → datos → pedido registrado → pago PayPal ---------- */
 let step='cart',pending=null;try{pending=JSON.parse(localStorage.ronPending||'null')}catch(e){}
 const setPending=p=>{pending=p;try{p?localStorage.ronPending=JSON.stringify(p):localStorage.removeItem('ronPending')}catch(e){}};
 const payUrl=p=>`${S.paypal.me}/${p.total}${S.currency}`;
@@ -160,9 +151,7 @@ function drawerView(){
  const dn=$('#done');dn&&(dn.onclick=()=>{setPending(null);step='cart';closeCart()});
 }
 
-/* ---------- init ---------- */
 const sold=async()=>{try{return await rpc('exclusivos_vendidos')}catch(e){return[]}};
-/* ---------- analítica anónima: cola persistente + presencia real ---------- */
 const track=(()=>{
  let reason='ready',enabled=!!(S.supabase&&S.supabase.url&&S.supabase.key);
  const diag={enabled:false,reason:'',state:'idle',lastSuccess:null,lastError:null,pending:0};

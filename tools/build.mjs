@@ -1,17 +1,12 @@
-#!/usr/bin/env node
-/* Genera: beats/<slug>/index.html (con meta propios), data/beats.public.json, sitemap.xml, robots.txt
-   Uso:  node tools/build.mjs        (sin dependencias; Node 18+) */
 import fs from 'fs';import path from 'path';import {fileURLToPath} from 'url';
 const R=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const S=new Function('window',fs.readFileSync(R+'/config/site-config.js','utf8')+';return window.SITE')({});
 const cat=JSON.parse(fs.readFileSync(R+'/data/catalog.json','utf8'));
-const BUILD='V61'
+const BUILD='V66'
 const tc=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const live=cat.beats.filter(b=>b.visibility==='public'&&b.active!==false);
-// 1) JSON público (solo beats publicados y activos)
 fs.writeFileSync(R+'/data/beats.public.json',JSON.stringify({beats:live}));
-// 2) páginas individuales
 const bd=R+'/beats';fs.mkdirSync(bd,{recursive:true});
 for(const d of fs.readdirSync(bd)){if(!live.some(b=>b.slug===d))fs.rmSync(path.join(bd,d),{recursive:true,force:true})}
 const mn=(b)=>{const p=b.licenses.filter(k=>!(S.licenses[k].exclusive&&b.exclusiveSold)).map(k=>b.prices?.[k]??S.licenses[k].price);return p.length?Math.min(...p):null};
@@ -36,7 +31,7 @@ for(const b of live){
 <script>(function(){var d=document.documentElement;d.classList.add('js');try{var c=navigator.connection||{};if(c.saveData||(navigator.deviceMemory&&navigator.deviceMemory<=1))d.classList.add('lite')}catch(e){}})();document.write('<script src="../../config/site-config.js?t='+Date.now()+'"></'+'script>')</script></head><body class="pg beat-product">
 <div class="scene" aria-hidden="true"><div class="bgc a"></div><div class="bgc b"></div><i class="orb o1"></i><i class="orb o2"></i><div class="scan"></div><div class="grain"></div><div class="vig"></div></div>
 <header class="rail glass" id="top"><a class="brand" href="../../index.html" aria-label="${esc(S.brand.name)}"><img src="../../favicon.png" alt="" width="30" height="30"><b>${esc(S.brand.name)}</b></a>
-<nav class="nav" id="nav" aria-label="Principal"><i class="ind"></i><a class="on" href="../../index.html" data-i="home" data-s="20"><span>Beats</span></a><a href="../../index.html#catalogo" data-i="grid" data-s="20"><span>Catálogo</span></a><a href="../../index.html#privado" data-i="lock" data-s="20"><span>Private</span></a><a href="../../index.html#contacto" data-i="wa" data-s="20"><span>Contacto</span></a></nav>
+<nav class="nav" id="nav" aria-label="Principal"><i class="ind"></i><a class="on" href="../../index.html" data-i="home" data-s="20"><span>Beats</span></a><a href="../../index.html#catalogo" data-i="grid" data-s="20"><span>Catalogo</span></a><a href="../../index.html#privado" data-i="lock" data-s="20"><span>Private</span></a><a href="../../index.html#contacto" data-i="wa" data-s="20"><span>Contacto</span></a></nav>
 <span class="sp"></span><div class="rail-act"><button class="cartb" id="cartb" aria-label="Carrito"><span data-i="cart" data-s="18"></span><span class="cl">Carrito</span><span class="cnt">0</span></button></div></header>
 <main class="stage" id="main"><section class="view active enter" id="v-home" aria-label="${esc(b.name)}">
 <div class="wrap"><div class="hero"><div class="info"><small class="kicker st" style="--i:0">${esc(b.type||'Beat')}</small><h1 class="st" id="bp-ttl" style="--i:1">${esc(b.name)}</h1><div class="meta st" style="--i:2">${meta}</div>${tags?`<div class="tgs st" style="--i:3">${tags}</div>`:''}
@@ -47,12 +42,11 @@ for(const b of live){
 <aside class="buy glass rvb" style="--i:2" aria-label="Compra"><div class="lbl">Total</div><div class="tot" id="bp-tot">—</div><div class="sub" id="bp-sub"></div><button class="btn fill block" id="bp-buy" disabled>Comprar</button><button class="btn block" id="bp-add" disabled>Añadir al carrito</button><ul class="trust"><li>Solicitud directa por WhatsApp</li><li>Confirmación de licencia y pago antes de cerrar</li><li>Combos automáticos desde 2 beats</li></ul></aside></div>
 <footer class="foot"><span>© ${esc(S.brand.name)}</span><a href="../../index.html#catalogo">Beats</a><a href="../../private.html">Private Catalog</a></footer></div></section></main>
 <div class="mini mini-product glass" aria-label="Reproductor"><div class="bar"><i></i></div><div class="in"><div class="tk"><img alt="" id="mi" width="52" height="52"><div><b id="mn"></b><small id="ms"></small></div></div><div class="mid"><div class="ctl"><button class="pp" id="mpp" data-i="play" data-s="18" aria-label="Play/Pausa"></button></div></div></div></div>
-<nav class="dock glass" id="dock" aria-label="Principal móvil"><div class="nav"><i class="ind"></i><a class="on" href="../../index.html" data-i="home" data-s="20"><span>Beats</span></a><a href="../../index.html#catalogo" data-i="grid" data-s="20"><span>Catálogo</span></a><a href="../../index.html#privado" data-i="lock" data-s="20"><span>Private</span></a><a href="../../index.html#contacto" data-i="wa" data-s="20"><span>Contacto</span></a></div></nav>
+<nav class="dock glass" id="dock" aria-label="Principal móvil"><div class="nav"><i class="ind"></i><a class="on" href="../../index.html" data-i="home" data-s="20"><span>Beats</span></a><a href="../../index.html#catalogo" data-i="grid" data-s="20"><span>Catalogo</span></a><a href="../../index.html#privado" data-i="lock" data-s="20"><span>Private</span></a><a href="../../index.html#contacto" data-i="wa" data-s="20"><span>Contacto</span></a></div></nav>
 <script type="application/json" id="beat-data">${JSON.stringify(b).replace(/</g,'\\u003c')}</script>
 <script src="../../assets/js/core.js?v=${BUILD}"></script><script src="../../assets/js/lic.js?v=${BUILD}"></script><script src="../../assets/js/ui.js?v=${BUILD}"></script><script src="../../assets/js/beat.js?v=${BUILD}"></script><script src="../../assets/js/workspace.js?v=${BUILD}"></script></body></html>`;
  fs.mkdirSync(`${bd}/${b.slug}`,{recursive:true});fs.writeFileSync(`${bd}/${b.slug}/index.html`,html);
 }
-// 3) sitemap + robots
 const today=new Date().toISOString().slice(0,10);
 fs.writeFileSync(R+'/sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>${S.url}/</loc><lastmod>${today}</lastmod></url>\n${live.map(b=>`<url><loc>${S.url}/beats/${b.slug}/</loc><lastmod>${b.created||today}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 fs.writeFileSync(R+'/robots.txt',`User-agent: *\nAllow: /\nDisallow: /private.html\nDisallow: /panel.html\nSitemap: ${S.url}/sitemap.xml\n`);

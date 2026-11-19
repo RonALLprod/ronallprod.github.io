@@ -1,10 +1,3 @@
-/* RONALL PROD · V65 — REMASTER «APP / MOTION GRAPHICS»
-   Capa final de identidad (se carga DESPUÉS de ronall.css y workspace.css).
-   Qué es: una app sin scroll de página. Negro profundo, plata, Kosmos/Acidic.
-   Fondo WebGL (fx.js) con postprocesado; péndulos; motion blur; vidrio líquido; zooms suaves.
-   Solo CSS + fx.js: no cambia el JS de negocio, precios, licencias ni rutas.
-*/
-
 :root{
   --hair:rgba(255,255,255,.14);
   --hair2:rgba(255,255,255,.34);
@@ -15,29 +8,29 @@
 }
 @media(min-width:900px){:root{--rail:232px}}
 
-/* ═══ ESCENA: canvas WebGL + capas de postproceso ═════════════════════ */
 .fx-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:auto}
 html.fx-on .scene .bgc,html.fx-on .scene .orb{display:none}
-/* Sin WebGL: portada horneada en plata, muy oscura, con deriva lenta */
+
 html:not(.fx-on) .scene .bgc.on{opacity:.42;filter:grayscale(1) contrast(1.15) brightness(.7) blur(5px)}
 html body .scene .vig{background:radial-gradient(120% 92% at 58% 46%,transparent 30%,rgba(0,0,0,.72) 100%)}
 html body .scene .grain{opacity:.06;mix-blend-mode:screen}
 html body .scene .scan{opacity:.8}
 
-/* ═══ APP: ninguna pantalla hace scroll de página ═════════════════════ */
 html body .view{overflow:hidden;padding-bottom:calc(var(--tab) + var(--miniH) + 12px)}
 html body .view .foot{display:none!important}
 html body #v-privado .wrap,html body #v-contacto .wrap{height:100%;display:flex;flex-direction:column;justify-content:center;padding-top:0}
 
-/* Transiciones de pantalla: zoom + motion blur + desplazamiento (nada seco) */
-@keyframes vin{from{opacity:0;transform:translate3d(calc(var(--dir)*60px),0,0) scale(1.035)}}
-@keyframes vout{to{opacity:0;transform:translate3d(calc(var(--dir)*-48px),0,0) scale(.975)}}
-@keyframes rise{from{opacity:0;transform:translate3d(0,22px,0)}}
-html body .view{will-change:opacity,transform}
-html body .view.enter{animation-duration:.8s;animation-timing-function:var(--soft)}
-html body .view.leave{animation-duration:.45s}
+@keyframes vin{0%{opacity:0;filter:blur(20px);transform:translate3d(calc(var(--dir)*76px),0,0) scale(1.045)}55%{opacity:1;filter:blur(4px)}100%{opacity:1;filter:none;transform:none}}
+@keyframes vout{0%{opacity:1;filter:none}100%{opacity:0;filter:blur(16px);transform:translate3d(calc(var(--dir)*-60px),0,0) scale(.965)}}
+@keyframes rise{0%{opacity:0;filter:blur(12px);transform:translate3d(0,26px,0) scale(.98)}65%{opacity:1;filter:blur(1.5px)}100%{opacity:1;filter:none;transform:none}}
+@keyframes cardin{0%{opacity:0;filter:blur(10px);transform:translate3d(0,34px,0) scale(.94)}70%{opacity:1;filter:blur(1px)}100%{opacity:1;filter:none;transform:none}}
+html body .view{will-change:auto}
+html body .view.enter{animation:vin .9s var(--out) both;will-change:opacity,transform,filter}
+html body .view.leave{animation:vout .5s var(--out) both;will-change:opacity,transform,filter}
+html body .view.enter .st{animation:rise 1s var(--out) both;animation-delay:calc(var(--i,0)*70ms + 110ms)}
+html body .grid.mb{filter:blur(calc(var(--sb,0)*1px))}
+html body .hero .info.mb{filter:blur(calc(var(--mb2,0)*1px))}
 
-/* ═══ VIDRIO LÍQUIDO ══════════════════════════════════════════════════ */
 html body .glass,html body .pane{
   background:
     radial-gradient(300px circle at var(--mx,28%) var(--my,0%),rgba(255,255,255,.15),transparent 60%),
@@ -49,7 +42,7 @@ html body .rail,html body .mini,html body .license-window,html body .drawer,html
   -webkit-backdrop-filter:blur(20px) saturate(1.6);
   backdrop-filter:blur(20px) saturate(1.6);
 }
-/* ═══ RAIL ════════════════════════════════════════════════════════════ */
+
 @media(min-width:900px){
   html body .rail{width:208px;border-radius:30px 8px 30px 8px}
   html body .rail .nav button:hover{transform:translateX(6px)}
@@ -58,22 +51,20 @@ html body .brand b{letter-spacing:.01em;text-shadow:0 0 18px rgba(255,255,255,.4
 html body .brand img{transition:transform 1.2s var(--soft)}
 html body .brand:hover img{transform:rotate(360deg) scale(1.08)}
 
-/* ═══ HOME: péndulo, parallax y bloom ═════════════════════════════════ */
 html body #v-home .hero{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}
 
-/* Portada colgada de un pivote: oscila (fx.js escribe --pend/--ptx/--pty/--mb) */
 html body .art-w,html body #v-home .art-w,html body #v-home .art-w:hover{
-  position:relative;transform-origin:50% -26%;
+  position:relative;transform-origin:50% -26%;scale:calc(1 + var(--kk,0)*.045);
   transform:rotate(var(--pend,0deg));
   translate:var(--ptx,0) var(--pty,0);
   will-change:transform;
 }
-/* Título: segundo péndulo, arrastrado por el primero */
+
 html body .hero .info{transform-origin:0 0;rotate:var(--pend2,0deg);translate:var(--ptx,0) var(--pty,0);will-change:transform}
 
 html body .art img{
   border-radius:var(--cut) 10px var(--cut) 10px;
-  filter:grayscale(.92) contrast(1.18) brightness(.98) blur(calc(var(--mb,0)*1px));
+  filter:grayscale(.92) contrast(1.18) brightness(calc(.98 + var(--kk,0)*.22)) blur(calc(var(--mb,0)*1px));
   border-color:rgba(255,255,255,.28);
   box-shadow:0 0 0 1px rgba(255,255,255,.05),0 0 130px -26px rgba(255,255,255,.4),0 60px 110px -26px #000;
 }
@@ -84,7 +75,6 @@ html body .art.flare::after{animation:ronFlare 1.4s var(--soft)}
 html body .art img.swap{animation:ronArtIn 1.4s var(--soft)}
 @keyframes ronArtIn{from{opacity:0;transform:scale(1.18) rotate(-3deg);filter:grayscale(1) blur(26px)}}
 
-/* Marco fantasma + marcas de registro */
 html body .art-w::after{
   content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
   border:1px solid var(--hair);border-radius:var(--cut) 10px var(--cut) 10px;
@@ -106,7 +96,6 @@ html body .art-w::before{
   html body #v-home .info{z-index:3;margin-right:clamp(-70px,-4vw,-22px)}
 }
 
-/* Título: Kosmos con bloom; cada letra entra con motion blur y luego se mece */
 html body h1{
   color:#fff;letter-spacing:-.02em;
   text-shadow:0 0 26px rgba(255,255,255,.4),0 0 90px rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.6);
@@ -114,7 +103,7 @@ html body h1{
 html body #v-home h1{font-size:clamp(54px,8.6vw,132px);line-height:.88}
 html body #v-home h1.long{font-size:clamp(42px,6.2vw,96px)}
 html body h1 .l,html body .h2 .l{display:inline-block;will-change:transform}
-/* Mismo efecto que el hover, disparado en automático por fx.js */
+
 html body h1 .l.hot,html body .h2 .l.hot{text-shadow:0 0 30px #fff,0 0 70px rgba(255,255,255,.7);transform:translateY(-.07em) scale(1.05)}
 html body h1.swap .l{
   animation:
@@ -139,7 +128,6 @@ html body .meta span{
 html body .meta span:last-child{border-right:0;margin-right:0;padding-right:0;font-family:var(--num);letter-spacing:.08em;font-size:15px;font-weight:400;color:rgba(255,255,255,.8)}
 html body .tgs button,html body .tgs a{font-size:12px;letter-spacing:.04em}
 
-/* Play: pulso, anillo de progreso, zoom elástico */
 html body .play{box-shadow:0 0 0 1px rgba(255,255,255,.7),0 0 70px rgba(255,255,255,.45),0 26px 50px -10px #000}
 html body .play:hover{transform:scale(1.12)}
 html body .ring .rt{stroke:rgba(255,255,255,.18)}
@@ -148,12 +136,10 @@ html body .license-launch{border-radius:4px 16px 4px 16px;background:transparent
 html body .license-launch:hover{background:#fff;color:#000;border-color:#fff;box-shadow:0 0 44px -8px rgba(255,255,255,.7)}
 html body .license-launch:hover .launch-k,html body .license-launch:hover i{color:#000}
 
-/* Marquesina inclinada por la velocidad del péndulo */
 html body #v-home .marq{border-color:var(--hair);background:none;transform:skewX(var(--skew,0deg));will-change:transform}
 html body .mq span{-webkit-text-stroke:1px rgba(255,255,255,.3);color:transparent}
 html body .mq span:nth-child(3n){color:rgba(255,255,255,.92);-webkit-text-stroke:0;text-shadow:var(--bloom)}
 
-/* ═══ CATÁLOGO: carril horizontal (sin scroll de página) ══════════════ */
 html body #v-catalogo .wrap.cat-top{
   max-width:none;height:100%;display:flex;flex-direction:column;padding-top:clamp(18px,3.4vh,40px)
 }
@@ -206,11 +192,9 @@ html body .bc-ty{border-radius:3px;background:rgba(0,0,0,.6);font-size:10px;lett
 html body .bc-pl{box-shadow:0 0 44px rgba(255,255,255,.5)}
 html body .bc-go{pointer-events:auto}
 
-/* Vista lista: columna con scroll interno propio */
 html body .grid.list{flex:1;min-height:0;display:grid;align-content:start;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
 html body .grid.list .bc{border-radius:4px 18px 4px 18px;background:none;border-color:var(--hair);box-shadow:none}
 
-/* ═══ LICENCIAS ═══════════════════════════════════════════════════════ */
 html body .license-window{border-radius:6px 28px 6px 28px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.015) 40%),rgba(3,3,3,.9);border-color:var(--hair2)}
 html body .window-heading h2{font-size:clamp(30px,4vw,52px);text-shadow:var(--bloom)}
 html body .lic{border-radius:4px 16px 4px 16px;background:rgba(255,255,255,.015);border-color:var(--hair);box-shadow:none;transition:transform .7s var(--soft),border-color .3s,background .4s,box-shadow .6s var(--soft)}
@@ -221,7 +205,6 @@ html body .lic em{border-radius:2px;letter-spacing:.18em}
 html body .buy,html body .license-window-body .buy{border-radius:4px 20px 4px 20px;background:rgba(255,255,255,.025);border-color:var(--hair);box-shadow:none}
 html body .lic-info{border-radius:4px 14px 4px 14px;background:none}
 
-/* ═══ CARRITO / PLAYER / BOTONES ══════════════════════════════════════ */
 html body .drawer{border-radius:6px 28px 6px 28px;border-color:var(--hair2)}
 html body .mini{border-radius:6px 24px 6px 24px;border-color:var(--hair);background:rgba(4,4,4,.62)}
 html body .mini .bar i{box-shadow:0 0 12px #fff}
@@ -232,10 +215,8 @@ html body .cartb{border-radius:4px 16px 4px 16px}
 html body .btn{border-radius:4px 14px 4px 14px}
 html body .ib{border-radius:50%}
 
-/* ═══ FOCO ════════════════════════════════════════════════════════════ */
 html body :where(a,button,input,select,summary,[tabindex]):focus-visible{outline:2px solid #fff;outline-offset:3px}
 
-/* ═══ MÓVIL: portada primero, título después; carril táctil ═══════════ */
 @media(max-width:899px){
   html body .hero .art-w{order:-1}
   html body .hero .info{order:0}
@@ -263,7 +244,6 @@ html body :where(a,button,input,select,summary,[tabindex]):focus-visible{outline
   html body #v-home .info{margin-right:0}
 }
 
-/* ═══ SEGURIDAD: si no cabe, la pantalla se desplaza en vez de cortarse ═══ */
 @media(max-height:780px){html body .view{overflow-y:auto}html body #v-catalogo{overflow:hidden}}
 @media(max-width:899px){
   html body .view{overflow-y:auto}
@@ -271,13 +251,11 @@ html body :where(a,button,input,select,summary,[tabindex]):focus-visible{outline
   html body .art-w{width:min(74%,380px,36dvh)}
 }
 
-/* ═══ MOVIMIENTO REDUCIDO (solo si la persona lo pidió con el interruptor) ═══ */
 html.rm body h1.swap .l{animation:none}
 html.rm body .art-w,html.rm body .hero .info{transform:none;rotate:0deg;translate:0 0}
 html.rm body #v-home .marq{transform:none}
 html.rm.live body .mini .tk img{animation:none}
 html.rm body .art img.swap,html.rm body .art.flare::after{animation:none}
 
-/* Interruptor de movimiento (solo aparece si el sistema pide menos movimiento) */
 .motion-toggle{position:fixed;z-index:60;right:14px;bottom:calc(var(--tab,0px) + var(--miniH,0px) + 10px);padding:8px 12px;border:1px solid var(--hair2);border-radius:4px 12px 4px 12px;background:rgba(0,0,0,.6);color:#fff;font:600 11px/1 var(--ui);letter-spacing:.06em;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:.7;transition:opacity .3s}
 .motion-toggle:hover{opacity:1}

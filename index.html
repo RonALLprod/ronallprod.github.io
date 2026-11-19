@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-root="" data-build="RONALL-V65.4"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="es" data-root="" data-build="RONALL-V66"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RONALL PROD · Beats &amp; Instrumentales</title>
 <meta name="description" content="Tienda oficial de instrumentales de RONALL PROD. Escucha, elige tu licencia desde USD 17 y compra desde el carrito.">
 <link rel="canonical" href="https://ronallprod.github.io/"><meta name="theme-color" content="#000000"><meta name="color-scheme" content="dark"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://kwmofbiiwvpojtkvlmxz.supabase.co" crossorigin>
 <link rel="preload" href="assets/fonts/kosmos.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/acidic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/ronall.css?v=V65.4"><link rel="stylesheet" href="assets/css/workspace.css?v=V65.4"><link rel="stylesheet" href="assets/css/identity.css?v=V65.4">
+<link rel="stylesheet" href="assets/css/ronall.css?v=V66"><link rel="stylesheet" href="assets/css/workspace.css?v=V66"><link rel="stylesheet" href="assets/css/identity.css?v=V66">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "RONALL PROD", "url": "https://ronallprod.github.io/", "inLanguage": "es", "description": "Tienda oficial de instrumentales de RONALL PROD. Escucha, elige tu licencia desde USD 17 y compra desde el carrito."}</script>
 <script>
 (function(){var d=document.documentElement;d.classList.add('js','booting');try{var rm=matchMedia('(prefers-reduced-motion:reduce)').matches&&localStorage.getItem('ronMotion')==='off';window.__reduce=rm;if(rm)d.classList.add('rm')}catch(e){window.__reduce=false};setTimeout(function(){d.classList.remove('booting')},6000);
@@ -20,15 +20,13 @@ window.__cat=fetch("data/beats.public.json",{cache:"default"}).catch(function(){
 
 <div id="intro" role="presentation"><div class="in-glow"></div><div class="in-c"><img src="favicon.png" alt="" width="84" height="84"><b class="in-t" id="in-t" aria-label="RONALL PROD"></b><div class="in-bar"><i id="in-f"></i></div></div></div>
 
-<!-- Escena: portada horneada (muy oscura) + bloom + scan + grano + viñeta -->
 <div class="scene" aria-hidden="true"><div class="bgc a"></div><div class="bgc b"></div><i class="orb o1"></i><i class="orb o2"></i><div class="scan"></div><div class="grain"></div><div class="vig"></div></div>
 
-<!-- Rail (escritorio) / barra superior (móvil) -->
 <header class="rail glass" id="top">
  <a class="brand" href="./" aria-label="RONALL PROD"><img src="favicon.png" alt="" width="30" height="30"><b>RONALL PROD</b></a>
  <nav class="nav" id="nav" aria-label="Principal"><i class="ind"></i>
   <button class="on" data-go="home" data-i="home" data-s="20"><span>Beats</span></button>
-  <button data-go="catalogo" data-v="beats" data-i="grid" data-s="20"><span>Catálogo</span></button>
+  <button data-go="catalogo" data-v="beats" data-i="grid" data-s="20"><span>Catalogo</span></button>
   <button data-go="privado" data-i="lock" data-s="20"><span>Private</span></button>
   <button data-go="contacto" data-i="wa" data-s="20"><span>Contacto</span></button>
  </nav>
@@ -41,7 +39,7 @@ window.__cat=fetch("data/beats.public.json",{cache:"default"}).catch(function(){
 
 <main class="stage" id="main">
 
- <!-- BEATS: beat seleccionado + licencias + más beats -->
+
  <section class="view active" id="v-home" aria-label="Beats">
   <div class="wrap">
    <div class="hero">
@@ -76,20 +74,18 @@ window.__cat=fetch("data/beats.public.json",{cache:"default"}).catch(function(){
     </aside>
    </div>
    <section class="more rvb" id="moreS" hidden>
-    <div class="sec-top"><h2 class="sec-h">Más beats</h2><button class="lnk" data-go="catalogo" type="button">Ver catálogo</button></div>
+    <div class="sec-top"><h2 class="sec-h">Más beats</h2><button class="lnk" data-go="catalogo" type="button">Ver catalogo</button></div>
     <div class="hs" id="more"></div>
    </section>
-
-
 
    <footer class="foot"><span>© Ronall Prod</span><a href="private.html">Private Catalog</a><a id="ft-wa" target="_blank" rel="noopener">Contacto</a></footer>
   </div>
  </section>
 
- <!-- CATÁLOGO -->
- <section class="view" id="v-catalogo" aria-label="Catálogo">
+
+ <section class="view" id="v-catalogo" aria-label="Catalogo">
   <div class="wrap cat-top">
-   <div class="sec-top st" style="--i:0"><h2 class="h2">Catálogo</h2><span class="cnt2" id="count"></span></div>
+   <div class="sec-top st" style="--i:0"><h2 class="h2">Catalogo</h2><span class="cnt2" id="count"></span></div>
    <div class="tools pane st" style="--i:1">
     <label class="sbx"><span data-i="search" data-s="18"></span><input id="f-q" type="search" placeholder="Buscar beat, artista, #tag o bpm:130-150" autocomplete="off" spellcheck="false" aria-label="Buscar"><kbd>/</kbd><button class="clr" id="f-clr" type="button" hidden aria-label="Limpiar búsqueda">×</button></label>
     <div class="fl">
@@ -105,19 +101,19 @@ window.__cat=fetch("data/beats.public.json",{cache:"default"}).catch(function(){
   </div>
  </section>
 
- <!-- PRIVATE -->
+
  <section class="view" id="v-privado" aria-label="Private Catalog">
   <div class="wrap cat-top">
    <div class="priv pane st" style="--i:0">
     <svg class="lockbg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-    <div><h2 class="h2">Private Catalog</h2><p>Un catálogo aparte con material no publicado, solo por invitación. Solicita acceso y se revisa manualmente.</p></div>
+    <div><h2 class="h2">Private Catalog</h2><p>Un catalogo aparte con material no publicado, solo por invitación. Solicita acceso y se revisa manualmente.</p></div>
     <a class="btn fill" href="private.html">Solicitar acceso</a>
    </div>
    <footer class="foot"><span>© Ronall Prod</span></footer>
   </div>
  </section>
 
- <!-- CONTACTO -->
+
  <section class="view" id="v-contacto" aria-label="Contacto">
   <div class="wrap cat-top">
    <div class="ctc">
@@ -130,7 +126,6 @@ window.__cat=fetch("data/beats.public.json",{cache:"default"}).catch(function(){
  </section>
 </main>
 
-<!-- Reproductor -->
 <div class="mini glass" aria-label="Reproductor"><div class="bar"><i></i></div><div class="in">
  <div class="tk" id="mtk" title="Ver beat"><img alt="" id="mi" width="52" height="52"><div><b id="mn">Elige un beat</b><small id="ms">Pulsa play para escuchar</small></div></div>
  <div class="mid"><div class="ctl"><button id="mpv" data-i="prev" data-s="18" aria-label="Anterior"></button><button class="pp" id="mpp" data-i="play" data-s="18" aria-label="Play/Pausa"></button><button id="mnx" data-i="next" data-s="18" aria-label="Siguiente"></button></div>
@@ -138,17 +133,15 @@ window.__cat=fetch("data/beats.public.json",{cache:"default"}).catch(function(){
  <div class="vl"><span data-i="vol" data-s="18"></span><input class="rng" id="mvl" type="range" min="0" max="100" value="85" aria-label="Volumen"></div>
 </div></div>
 
-<!-- Dock móvil -->
 <nav class="dock glass" id="dock" aria-label="Principal móvil"><div class="nav"><i class="ind"></i>
  <button class="on" data-go="home" data-i="home" data-s="20"><span>Beats</span></button>
- <button data-go="catalogo" data-i="grid" data-s="20"><span>Catálogo</span></button>
+ <button data-go="catalogo" data-i="grid" data-s="20"><span>Catalogo</span></button>
  <button data-go="privado" data-i="lock" data-s="20"><span>Private</span></button>
  <button data-go="contacto" data-i="wa" data-s="20"><span>Contacto</span></button>
 </div></nav>
 
-<script src="config/site-config.js?v=V65.4"></script><script src="assets/js/core.js?v=V65.4"></script><script src="assets/js/lic.js?v=V65.4"></script><script src="assets/js/ui.js?v=V65.4"></script><script src="assets/js/news.js?v=V65.4"></script><script src="assets/js/store.js?v=V65.4"></script><script src="assets/js/fx.js?v=V65.4"></script><script src="assets/js/workspace.js?v=V65.4"></script>
-<script>/* red de seguridad: si algo no carga, la app no se queda en negro */
-(function(){var d=document.documentElement;function rescue(){var i=document.getElementById('intro');
+<script src="config/site-config.js?v=V66"></script><script src="assets/js/core.js?v=V66"></script><script src="assets/js/lic.js?v=V66"></script><script src="assets/js/ui.js?v=V66"></script><script src="assets/js/news.js?v=V66"></script><script src="assets/js/store.js?v=V66"></script><script src="assets/js/fx.js?v=V66"></script><script src="assets/js/workspace.js?v=V66"></script>
+<script>(function(){var d=document.documentElement;function rescue(){var i=document.getElementById('intro');
 if(i&&!i.classList.contains('out')){i.classList.add('out');setTimeout(function(){i.remove()},1100)}
 d.classList.remove('booting');
 if(!window.RON&&!window.SITE){var m=document.createElement('div');m.style.cssText='position:fixed;inset:auto 16px 16px 16px;z-index:999;padding:14px 16px;border:1px solid rgba(255,255,255,.3);border-radius:12px;background:#000;color:#fff;font:14px system-ui';

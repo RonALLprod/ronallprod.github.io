@@ -1,4 +1,3 @@
-/* sw.js — solo avisos de beats nuevos (no cachea nada) */
 const C='ron-state',K='/__known';
 const load=async()=>{try{return await(await(await caches.open(C)).match(K)).json()}catch(e){return[]}};
 const save=async ids=>(await caches.open(C)).put(K,new Response(JSON.stringify(ids)));

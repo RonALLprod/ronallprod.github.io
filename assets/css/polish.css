@@ -69,15 +69,11 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
  .btn,.chip,.cartb,.ib,.play,.ctl button,.tile,.card,.lic,.row,.snav button,.tabs button{transition-duration:.16s!important}
 }
 
-
-/* Compatibilidad: scroll nativo y selección de texto sin animaciones encima. */
 #main,.main{scroll-behavior:auto!important}
 body.text-selecting .hero .info,
 body.text-selecting .page-h h2,
 body.text-selecting .page h2{animation-play-state:paused!important}
 
-
-/* Keep motion alive, but release decorative compositing work during interaction. */
 body.is-scrolling .fx-scene:before,
 body.is-scrolling .fx-scene:after,
 body.is-scrolling .fx-ambient i,
@@ -92,10 +88,6 @@ body.text-selecting .marq div {
   animation-play-state: paused !important;
 }
 
-
-/* ── Detalles finos (V6): jerarquía y feedback, solo CSS y solo transform/opacity ───────────────── */
-
-/* Línea de progreso de scroll bajo la barra superior (CSS puro; si el navegador no lo soporta, no se ve). */
 @supports (animation-timeline:scroll()){
   .top{position:relative}
   .top:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;pointer-events:none;
@@ -104,23 +96,18 @@ body.text-selecting .marq div {
   @keyframes ronProg{to{scale:1 1}}
 }
 
-/* Títulos de sección con línea que se desvanece (estructura sin añadir peso visual). */
 .sec-h{display:flex;align-items:center;gap:14px}
 .sec-h:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.16),transparent)}
 
-/* Tarjeta de compra con filo de luz arriba: marca el punto de acción principal. */
 .buy{position:relative}
 .buy:before{content:"";position:absolute;left:20px;right:20px;top:0;height:1px;pointer-events:none;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent)}
 
-/* Cuando suena un beat, la fila activa y la barra de progreso tienen presencia (sin :has()). */
 .app.live .sk .rng::-webkit-slider-runnable-track{box-shadow:0 0 14px rgba(255,255,255,.22)}
 
 @media(max-width:899px){.buy:before{display:none}}
 @media(prefers-reduced-motion:reduce){.top:after{display:none}}
 
-
-/* Táctil: zonas de toque de 44px sin cambiar el aspecto (el área extra es invisible). */
 @media (pointer:coarse){
   .mbrand,.nfb,#b-pg,#ft-wa{position:relative}
   .mbrand:before,.nfb:before,#b-pg:before,#ft-wa:before{content:"";position:absolute;inset:-7px -6px}

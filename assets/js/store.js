@@ -1,13 +1,10 @@
-/* RONALL PROD · store.js (V51) — tienda como APP: vistas (Beats · Catálogo · Private · Contacto) con transiciones.
-   Reutiliza core.js (carrito, checkout, audio cifrado, analítica), lic.js (licencias), news.js (campana) y ui.js (efectos). */
 (async () => {
 'use strict';
 const R = RON, U = RonUI, { $, $$, esc, money, S, P } = R, D = document, root = D.documentElement;
-const SHOW_TAGS = true;   /* false = oculta los #tags en pantalla (el buscador sigue usándolos) */
+const SHOW_TAGS = true;
 R.boot();
 const LS = { get(k, d) { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 
-/* ───────── Splash ───────── */
 const intro = $('#intro'), t0 = performance.now(), ifill = $('#in-f');
 $('#in-t').innerHTML = [...'RONALL PROD'].map((c, i) => `<span class="l" style="--i:${i}">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
 let prog = 0, target = .15, introDone = false, hid = false;
@@ -22,10 +19,9 @@ const hideIntro = async () => {
     root.classList.remove('booting'); kick(vEl(curView || 'home')); placeNav(); U.adaptive();
   }, 140);
 };
-setTimeout(hideIntro, 4200);   /* red de seguridad: nunca se queda cargando */
+setTimeout(hideIntro, 4200);
 (D.fonts && D.fonts.ready || Promise.resolve()).then(() => { bump(.45); placeNav(); }).catch(() => {});
 
-/* ───────── Datos ───────── */
 let beats = [];
 bump(.55);
 try {
@@ -33,9 +29,9 @@ try {
   if (!r.ok) throw new Error('HTTP ' + r.status);
   beats = ((await r.json()).beats || []).filter(b => b.active !== false);
 } catch (e) {
-  console.warn('[RONALL] No se pudo cargar el catálogo público:', e);
+  console.warn('[RONALL] No se pudo cargar el catalogo público:', e);
   const off = D.createElement('div'); off.className = 'offline'; off.setAttribute('role', 'alert');
-  off.innerHTML = '<span>No se pudo cargar el catálogo.</span><button class="btn" type="button">Reintentar</button>';
+  off.innerHTML = '<span>No se pudo cargar el catalogo.</span><button class="btn" type="button">Reintentar</button>';
   off.querySelector('button').onclick = () => location.reload(); D.body.appendChild(off);
 }
 const at = b => (R.at ? R.at(b) : 0);
@@ -43,10 +39,8 @@ beats.sort((a, b) => at(b) - at(a));
 bump(.8);
 const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArray(x) ? x : []).catch(() => []);
 
-/* ───────── Texto / tags ───────── */
 const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9# ]+/g, ' ').replace(/\s+/g, ' ').trim();
 const tc = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '');
-/* Tags visibles: sin alias duplicados ("ynjay" si ya existe "yn jay") ni los que repiten nombre, tipo o género */
 const tagsOf = b => {
   const seen = new Set([tc(b.name), tc(b.type), tc(b.genre)]), out = [];
   for (const t of (b.tags || [])) { const s = String(t).trim().replace(/^#/, ''), k = tc(s); if (!k || seen.has(k)) continue; seen.add(k); out.push(s); }
@@ -55,7 +49,6 @@ const tagsOf = b => {
 const ago = b => (R.ago ? R.ago(b) : '');
 const sub = b => [b.type, b.bpm && b.bpm + ' BPM', b.key].filter(Boolean).map(esc).concat(ago(b) ? [`<span class="ag">${esc(ago(b))}</span>`] : []).join(' · ');
 
-/* ───────── Buscador: sin tildes, palabras sueltas, prefijos, tags, 1 error de tecleo, #tag y bpm:130-150 ───────── */
 const near = (a, b) => {
   if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, e = 0;
   while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++e > 1) return false; if (a.length > b.length) i++; else if (a.length < b.length) j++; else { i++; j++; } }
@@ -73,7 +66,6 @@ const matches = (b, p) => {
   return p.words.every(w => x.text.includes(w) || (w.length >= 4 && x.words.some(v => near(w, v))));
 };
 
-/* ───────── Estado ───────── */
 const st = { q: '', g: '', sort: 'new', view: LS.get('ron_view', 'grid') === 'list' ? 'list' : 'grid' };
 let cur = null, view = beats.slice(), lui = null, firstDraw = true;
 const sortFns = {
@@ -89,7 +81,6 @@ const compute = () => {
   return view;
 };
 
-/* ───────── Vistas (navegación tipo app) ───────── */
 const VIEWS = ['home', 'catalogo', 'privado', 'contacto'], ORD = Object.fromEntries(VIEWS.map((v, i) => [v, i]));
 let curView = null;
 const vEl = id => $('#v-' + id);
@@ -127,7 +118,6 @@ function route(first) {
   show('home', { first, push: false });
 }
 
-/* ───────── Tarjetas / catálogo ───────── */
 const grid = $('#grid'), more = $('#more'), playIc = R.svg('play', 22), pauseIc = R.svg('pause', 22);
 const isPlaying = b => !!(P.cur && P.cur.id === b.id && !P.audio.paused);
 const card = (b, i) => {
@@ -143,7 +133,7 @@ function drawMore() {
 function draw() {
   compute();
   grid.classList.toggle('list', st.view === 'list'); grid.classList.toggle('again', !firstDraw); firstDraw = false;
-  grid.innerHTML = view.length ? view.map(card).join('') : `<div class="empty-s"><b>Sin resultados</b><span>Prueba con otra palabra, un género o un rango como bpm:130-150.</span><button class="btn" type="button" data-reset>Ver todo el catálogo</button></div>`;
+  grid.innerHTML = view.length ? view.map(card).join('') : `<div class="empty-s"><b>Sin resultados</b><span>Prueba con otra palabra, un género o un rango como bpm:130-150.</span><button class="btn" type="button" data-reset>Ver todo el catalogo</button></div>`;
   $('#count').textContent = (st.q || st.g) ? `${view.length} de ${beats.length}` : `${beats.length} ${beats.length === 1 ? 'beat' : 'beats'}`;
   $('#f-clr').hidden = !st.q; P.setList(view.length ? view : beats);
   $$('#seg button').forEach(x => x.classList.toggle('on', x.dataset.view === st.view));
@@ -184,7 +174,6 @@ const onCard = e => {
   g.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('bc')) { e.preventDefault(); e.target.click(); } });
 });
 
-/* ───────── Beat seleccionado (hero + compra) ───────── */
 const art = $('#art'), im = $('#cimg'), tot = $('#tot'), add = $('#b-add'), buy = $('#b-buy'), cplay = $('#cplay'), cpi = $('#cpi'), ring = $('#ring');
 const refresh = k => {
   add.disabled = !k || !cur; buy.disabled = !k || !cur;
@@ -226,7 +215,6 @@ $('#b-cp').onclick = () => cur && R.copy(R.beatUrl(cur), 'Enlace copiado');
 $('#b-sh').onclick = () => cur && R.share(cur);
 $('#mtk').onclick = () => { const b = P.cur; if (!b) return; const x = beats.find(v => v.id === b.id); if (x) { if (!cur || cur.id !== x.id) select(x, { noHash: true }); show('home'); } };
 
-/* Estado de reproducción → hero, tarjetas y anillo de progreso */
 function sync() {
   const on = !!(cur && isPlaying(cur));
   cpi.innerHTML = R.svg(on ? 'pause' : 'play', 34); cplay.setAttribute('aria-label', on ? 'Pausar' : 'Reproducir');
@@ -239,23 +227,19 @@ function sync() {
 P.ev.addEventListener('state', sync); P.ev.addEventListener('load', sync);
 P.ev.addEventListener('time', e => { if (cur && P.cur && P.cur.id === cur.id && e.detail.d) ring.style.setProperty('--p', (e.detail.t / e.detail.d).toFixed(4)); });
 
-/* Licencia EXCLUSIVE vendida (remoto, sin bloquear) */
 soldPromise.then(sold => {
   let ch = false; beats.forEach(b => { if (sold.includes(b.id) && !b.exclusiveSold) { b.exclusiveSold = true; ch = true; } });
   if (ch) { if (cur) { $('#sold').hidden = !cur.exclusiveSold; renderLics(); } draw(); }
 }).catch(() => {});
 
-/* Beats nuevos detectados por news.js */
 addEventListener('ron:newbeats', e => { (e.detail || []).forEach(n => { if (!beats.some(b => b.id === n.id)) beats.push(n); }); beats.sort(sortFns.new); idx.clear(); chipsBuild(); draw(); });
 
-/* ───────── Marquee ───────── */
 (function marquee() {
   const words = [...beats.map(b => b.name), 'Beats', 'Instrumentales', 'RONALL PROD'].filter(Boolean);
   const half = words.map(w => `<span>${esc(w)}</span>`).join(''); $('#mq').innerHTML = half + half;
   requestAnimationFrame(() => { const m = $('#mq'); let n = 0; while (m.scrollWidth < innerWidth * 2.2 && n++ < 6) m.innerHTML += half + half; });
 })();
 
-/* ───────── Navegación y atajos ───────── */
 $$('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
 $('#tsearch').onclick = () => { show('catalogo'); setTimeout(() => $('#f-q').focus({ preventScroll: true }), 480); };
 $('#ct-wa').href = $('#ft-wa').href = R.wa('Hola Ronall Prod 👋 Quiero más información.');
@@ -276,7 +260,6 @@ addEventListener('popstate', routeSoon);
 addEventListener('hashchange', routeSoon);
 addEventListener('resize', placeNav);
 
-/* ───────── Arranque ───────── */
 chipsBuild();
 $('#f-sort').value = st.sort;
 const qp = new URLSearchParams(location.search);

@@ -1,30 +1,19 @@
-/* ============================================================================
-   RONALL PROD · CONFIGURACIÓN CENTRAL  (único sitio para editar datos de marca)
-   Se usa en: marketplace, páginas de beat, private.html, panel.html y tools/build.mjs
-   ============================================================================ */
 window.SITE = {
   brand: { name: "RONALL PROD", short: "RonALL", tagline: "Instrumentales con identidad. Producción hecha a mano." },
 
-  // URL pública definitiva (GitHub Pages). Sin barra final.
   url: "https://ronallprod.github.io",
 
   currency: "USD",
 
   paypal: { me: "https://www.paypal.com/paypalme/Ronallprod" },
 
-  // ⚠️ CONFIRMAR ANTES DEL LANZAMIENTO: en el proyecto original el enlace de WhatsApp usaba 573042831505
-  // y el texto visible mostraba +57 323 977 8898. Aquí se deja el del ENLACE original como valor de trabajo.
-  // Cambia este número y TODO el sitio (público, privado, panel, YouTube) se actualiza.
   whatsapp: { number: "573042831505", confirmed: false },
 
   supabase: {
     url: "https://kwmofbiiwvpojtkvlmxz.supabase.co",
-    key: "sb_publishable_HL_vNXAUhonkIgq7RRaPmQ_ojk54lmW"   // tienda, pedidos y analítica pública
+    key: "sb_publishable_HL_vNXAUhonkIgq7RRaPmQ_ojk54lmW"
   },
 
-  // UNIFICADO: el catálogo privado (accesos, clave AES de los .bin y métricas) vive en el MISMO
-  // proyecto que la tienda. privateSupabase apunta al mismo proyecto que supabase.
-  // La clave AES de ese proyecto (tabla ron_secret) debe ser la que cifró los .bin: ver sql/03_unificar_proyecto.sql
   privateSupabase: {
     url: "https://kwmofbiiwvpojtkvlmxz.supabase.co",
     key: "sb_publishable_HL_vNXAUhonkIgq7RRaPmQ_ojk54lmW"
@@ -32,17 +21,11 @@ window.SITE = {
 
   producer: { name: "RONALL PROD", legalName: "[Nombre legal del productor — por definir]", country: "[por definir]", email: "[por definir]" },
 
-  // Clave AES-GCM de los PREVIEWS públicos (inevitablemente pública: el navegador debe poder descifrar).
-  // La genera tools/add-beat.py la primera vez. NO es la clave del catálogo privado.
   previewKey: "hamy+oo+h/A5eYbjiP9iTI1WVi7md/vzcE5DfJd1Zk4=",
 
-  // Plantilla de descripción para YouTube. Variables: {URL} {NAME} {TYPE} {WHATSAPP} {WA_LINK}
   youtubeTemplate:
 "RONALL PROD\n\n🎧 Listen / Purchase: {URL}\n\nLicenses available: Basic / Premium / Unlimited / Exclusive.\n\nContact: {WHATSAPP}\n{WA_LINK}",
 
-  /* COMBO: descuento automático en el carrito según cuántos beats distintos lleve el cliente.
-     [cantidad mínima de beats, % de descuento]. Las licencias EXCLUSIVE nunca se rebajan
-     (cuentan para llegar al combo, pero conservan su precio). Pon tiers: [] para desactivarlo. */
   bundle: { tiers: [[2, 10], [3, 15], [4, 20]] },
 
   catalog: {
@@ -50,12 +33,6 @@ window.SITE = {
     types: ["YN Jay Type Beat"]
   },
 
-  /* LICENCIAS — precios y condiciones EDITABLES.
-     Precios en USD :
-     BASIC 17 (antes 20, tachado) · PREMIUM 30 · UNLIMITED 60 · EXCLUSIVE 200.
-     Campo opcional `was`: precio anterior que se muestra tachado junto al precio actual.
-     ⚠️ Los campos que dicen "Por definir" NO se muestran al público; complétalos antes de vender para que aparezcan.
-     Cada beat puede sobrescribir el precio (campo prices en data/catalog.json / panel). */
   licenses: {
     basic: {
       name: "BASIC", price: 17, was: 20, exclusive: false,

@@ -1,9 +1,3 @@
-/* RONALL PROD · fx.js (V65) — motor de motion graphics.
-   · Fondo WebGL con postprocesado: portada líquida (domain warp), zoom-blur, bloom, aberración cromática, grano.
-   · Péndulos amortiguados (portada + título) con ruido ambiental perpetuo, motion blur por velocidad.
-   · Vidrio líquido (filtro SVG de desplazamiento) para rail, player, carrito y licencias.
-   · Eventos aleatorios (golpe de zoom, destello, empujón de péndulo) y rueda → carril horizontal del catálogo.
-   Un solo bucle rAF. Se pausa con la pestaña oculta. Sin dependencias. Respeta reduced-motion y modo lite. */
 (() => {
   'use strict';
   const D = document, root = D.documentElement;
@@ -13,18 +7,18 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const rnd = (a, b) => a + Math.random() * (b - a);
 
-  /* ───────── Estado compartido ───────── */
   const S = {
-    punch: 0,          // golpe de zoom/aberración (decae)
-    kick: 0,           // golpe de 808 (decae rápido)
-    lv: 0,             // nivel de audio simulado (lee --lv de la portada)
-    px: 0, py: 0,      // puntero suavizado (-1..1)
-    tx: 0, ty: 0,      // puntero objetivo
-    vel: 0,            // velocidad del puntero suavizada
-    mix: 1, mixT: 1,   // transición líquida entre portadas
+    punch: 0,
+    kick: 0,
+    lv: 0,
+    px: 0, py: 0,
+    tx: 0, ty: 0,
+    vel: 0,
+    mix: 1, mixT: 1,
+    shock: 1, shockA: 0,
   };
-  const P1 = { a: 0, w: 0 };   // péndulo de la portada (grados, grados/s)
-  const P2 = { a: 0, w: 0 };   // péndulo del título (arrastrado por el primero)
+  const P1 = { a: 0, w: 0 };
+  const P2 = { a: 0, w: 0 };
 
   let artEl = null;
   const el = {
@@ -36,15 +30,16 @@
   };
   grab();
 
-  /* ───────── API pública ───────── */
   const FX = window.RonFX = {
-    kick(a = 1) { S.kick = Math.min(1.2, Math.max(S.kick, a)); },
+    kick(a = 1) {
+      S.kick = Math.min(1.2, Math.max(S.kick, a)); S.punch = Math.max(S.punch, a * .3);
+      S.shock = 0; S.shockA = Math.min(1.2, a); P1.w += (Math.random() < .5 ? -1 : 1) * a * 5;
+    },
     punch(a = 1) { S.punch = Math.min(1.4, Math.max(S.punch, a)); },
     push(v) { P1.w += v; P2.w += v * .6; },
     flare() { const a = $('.art'); if (!a) return; a.classList.remove('flare'); void a.offsetWidth; a.classList.add('flare'); setTimeout(() => a.classList.remove('flare'), 1500); },
   };
 
-  /* ───────── WebGL ───────── */
   let gl = null, prog = null, uni = {}, texA = null, texB = null, canvas = null, glOK = false;
   const lite = () => root.classList.contains('lite');
 
@@ -57,7 +52,7 @@ precision mediump float;
 varying vec2 v;
 uniform sampler2D uA,uB;
 uniform vec2 uRes,uPtr;
-uniform float uT,uMix,uLv,uPunch,uVel,uKick;
+uniform float uT,uMix,uLv,uPunch,uVel,uKick,uShock,uShockA;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}
@@ -70,22 +65,23 @@ vec3 art(vec2 uv,float liquid){
 void main(){
   float asp=uRes.x/uRes.y;
   vec2 p=(v-.5)*vec2(asp,1.);
-  float zoom=1.7-uPunch*.14-uLv*.03-uKick*.26;
+  float cz=min(1.,1./asp)*.86;
+  float zoom=cz*(1.-uPunch*.08-uLv*.03-uKick*.17);
+  vec2 sp=(v-.5)*vec2(asp,1.);
+  float sl=length(sp);
+  float ring=exp(-pow((sl-uShock*.95)*7.5,2.))*(1.-uShock)*uShockA;
+  p+=normalize(sp+1e-4)*ring*.04;
   p*=zoom;
-  float c=cos(uT*.006),s=sin(uT*.006);p=mat2(c,-s,s,c)*p;
-  /* domain warp líquido */
+  float ang=sin(uT*.05)*.045;float c=cos(ang),s=sin(ang);p=mat2(c,-s,s,c)*p;
   vec2 q=vec2(fbm(p*1.7+vec2(uT*.03,0.)),fbm(p*1.7+vec2(5.2,uT*.034)));
   p+=(q-.5)*(.10+uLv*.04+uPunch*.04+uKick*.05);
-  /* onda del puntero */
   vec2 ptr=uPtr*vec2(asp,1.)*.5*zoom;
   vec2 d=p-ptr;float dl=length(d);
   p+=normalize(d+1e-4)*sin(dl*16.-uT*2.6)*exp(-dl*4.2)*(.006+uVel*.012);
-  vec2 uv=p+.5+vec2(.06,0.);
-  /* transición líquida entre portadas */
+  vec2 uv=p+.5+vec2(.03,0.);
   float w=fbm(uv*3.+uT*.05);
   float liquid=smoothstep(0.,1.,clamp(uMix*1.7-w*.7,0.,1.));
   uv+=(q-.5)*sin(uMix*3.14159)*.18;
-  /* zoom blur radial + chroma */
   vec2 ctr=vec2(.56,.5);
   vec3 col=vec3(0.);float tw=0.;
   float amt=.018+uPunch*.06+uVel*.012+uKick*.12;
@@ -100,15 +96,12 @@ void main(){
   col.r=mix(col.r,art(uv+(uv-ctr)*ca,liquid).r,.55);
   col.b=mix(col.b,art(uv-(uv-ctr)*ca,liquid).b,.55);
   float l=dot(col,vec3(.3,.59,.11));
-  /* niveles: negro profundo, plata */
   float base=clamp((l-.18)*1.25,0.,1.);
   vec3 g=vec3(base)*vec3(.94,.96,1.);
   float bloom=pow(base,2.6)*(.55+uLv*.5+uPunch*.4+uKick*.9);
-  g=g*(.15+uLv*.05)+bloom*.22;
-  /* haces de luz que barren la escena */
+  g=g*(.19+uLv*.06+ring*.5)+bloom*.24+ring*.06;
   float sw=smoothstep(.55,1.,sin((p.x*1.3+p.y*.7)*3.1+uT*.22+q.x*2.4));
   g+=sw*.022*(.6+uLv);
-  /* viñeta + scanlines + grano */
   float vg=smoothstep(1.05,.18,length((v-vec2(.56,.48))*vec2(asp*.62,1.)));
   g*=.06+.94*vg;
   g+=(h(gl_FragCoord.xy+fract(uT)*91.)-.5)*.05;
@@ -136,7 +129,7 @@ void main(){
       const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      ['uA', 'uB', 'uRes', 'uPtr', 'uT', 'uMix', 'uLv', 'uPunch', 'uVel', 'uKick'].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
+      ['uA', 'uB', 'uRes', 'uPtr', 'uT', 'uMix', 'uLv', 'uPunch', 'uVel', 'uKick', 'uShock', 'uShockA'].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
       texA = mkTex(); texB = mkTex();
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texA); gl.uniform1i(uni.uA, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texB); gl.uniform1i(uni.uB, 1);
@@ -149,7 +142,7 @@ void main(){
   }
   function size() {
     if (!canvas) return;
-    const k = Math.min(devicePixelRatio || 1, 1.5) * .42;
+    const k = Math.min(devicePixelRatio || 1, 1.5) * .5;
     const w = Math.max(2, Math.round(innerWidth * k)), h = Math.max(2, Math.round(innerHeight * k));
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
   }
@@ -158,7 +151,6 @@ void main(){
     if (!glOK || !img || !img.complete || !img.naturalWidth) return;
     const src = img.currentSrc || img.src; if (src === curSrc) return;
     try {
-      /* B = portada nueva; A = la anterior. Antes de subir, lo visible (B) pasa a A. */
       if (hasTex) swapTex();
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texB);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -182,60 +174,61 @@ void main(){
     if (el.img.complete) go();
   }
 
-  /* ───────── Péndulos ───────── */
   function stepPendulum(P, k, c, drive, dt) {
     const acc = -k * Math.sin(P.a * Math.PI / 180) * 57.2958 - c * P.w + drive;
     P.w += acc * dt; P.a += P.w * dt; P.a = clamp(P.a, -6, 6);
   }
 
-  /* ───────── Bucle único ───────── */
+  const q = (v, st) => v < st ? '0' : (Math.round(v / st) * st).toFixed(2);
+  const put = (e, k, v) => { const c = e._c || (e._c = {}); if (c[k] !== v) { c[k] = v; e.style.setProperty(k, v); } };
   let last = 0, T = 0, raf = 0, glTog = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - last) / 1000 || .016); last = now; T += dt;
 
-    /* puntero suavizado + velocidad */
     const ox = S.px, oy = S.py;
     S.px += (S.tx - S.px) * Math.min(1, dt * 4.2); S.py += (S.ty - S.py) * Math.min(1, dt * 4.2);
     const sp = Math.hypot(S.px - ox, S.py - oy) / Math.max(dt, .001);
     S.vel += (clamp(sp * .5, 0, 1) - S.vel) * Math.min(1, dt * 6);
-    S.punch *= Math.pow(.04, dt);       // decae ~ .8s
-    S.kick *= Math.pow(.0008, dt);      // 808: decae en ~.25s
+    S.punch *= Math.pow(.04, dt);
+    S.kick *= Math.pow(.0008, dt);
     const lvRaw = artEl ? parseFloat(artEl.style.getPropertyValue('--lv')) || 0 : 0;
     S.lv += (lvRaw - S.lv) * Math.min(1, dt * 5);
     if (S.mix < S.mixT) S.mix = Math.min(S.mixT, S.mix + dt / 1.5);
 
-    /* ruido ambiental: movimiento aleatorio perpetuo (suma de senos incommensurables) */
     const amb = Math.sin(T * .71) * .9 + Math.sin(T * 1.37 + 1.3) * .6 + Math.sin(T * .29 + 4.1) * 1.1;
     stepPendulum(P1, 8.5, .6, amb * .2 * (1 + S.lv * .8), dt);
     stepPendulum(P2, 15, .95, -P1.w * .9 - P1.a * 1.8, dt);
 
-    /* aplicar transformaciones (solo escribe si cambió lo suficiente) */
+    S.shock = Math.min(1, S.shock + dt / .62);
     if (el.art) {
-      el.art.style.setProperty('--pend', P1.a.toFixed(3) + 'deg');
-      el.art.style.setProperty('--ptx', (S.px * 6).toFixed(2) + 'px');
-      el.art.style.setProperty('--pty', (S.py * 4).toFixed(2) + 'px');
-      el.art.style.setProperty('--mb', clamp(Math.abs(P1.w) * .02 + S.vel * .5, 0, 1.2).toFixed(2));
+      put(el.art, '--pend', P1.a.toFixed(2) + 'deg');
+      put(el.art, '--ptx', (S.px * 6).toFixed(1) + 'px');
+      put(el.art, '--pty', (S.py * 4).toFixed(1) + 'px');
+      put(el.art, '--mb', q(clamp(Math.abs(P1.w) * .02 + S.vel * .5, 0, 1.2), .2));
+      put(el.art, '--kk', S.kick > .01 ? S.kick.toFixed(2) : '0');
     }
     if (el.info) {
-      el.info.style.setProperty('--pend2', (P2.a * .35).toFixed(3) + 'deg');
-      el.info.style.setProperty('--ptx', (S.px * -8).toFixed(2) + 'px');
-      el.info.style.setProperty('--pty', (S.py * -4).toFixed(2) + 'px');
+      const m2 = q(clamp(Math.abs(P2.w) * .012, 0, .8), .2);
+      put(el.info, '--pend2', (P2.a * .35).toFixed(2) + 'deg');
+      put(el.info, '--ptx', (S.px * -8).toFixed(1) + 'px');
+      put(el.info, '--pty', (S.py * -4).toFixed(1) + 'px');
+      put(el.info, '--mb2', m2);
+      el.info.classList.toggle('mb', +m2 > 0);
     }
-    if (el.marq) el.marq.style.setProperty('--skew', (P1.w * -.02 - S.px * .5).toFixed(3) + 'deg');
+    if (el.marq) put(el.marq, '--skew', (P1.w * -.02 - S.px * .5).toFixed(2) + 'deg');
 
-    /* WebGL */
     glTog ^= 1;
-    if (glOK && hasTex && glTog) {
+    if (glOK && hasTex && (glTog || S.kick > .02 || S.shock < 1)) {
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
       gl.uniform2f(uni.uPtr, S.px, -S.py);
-      gl.uniform1f(uni.uT, T % 600); gl.uniform1f(uni.uMix, S.mix); gl.uniform1f(uni.uLv, S.lv);
+      gl.uniform1f(uni.uT, T % 628.3185); gl.uniform1f(uni.uMix, S.mix); gl.uniform1f(uni.uLv, S.lv);
       gl.uniform1f(uni.uPunch, S.punch); gl.uniform1f(uni.uKick, S.kick); gl.uniform1f(uni.uVel, S.vel);
+      gl.uniform1f(uni.uShock, S.shock); gl.uniform1f(uni.uShockA, S.shockA);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
   }
 
-  /* ───────── Entradas ───────── */
   function pointer() {
     addEventListener('pointermove', e => {
       S.tx = clamp((e.clientX / innerWidth) * 2 - 1, -1, 1);
@@ -250,10 +243,20 @@ void main(){
     }, true);
   }
 
-  /* Rueda → desplazamiento horizontal suave del carril del catálogo */
   function lane() {
     const g = $('#grid'); if (!g) return;
-    let target = 0, raf2 = 0;
+    let target = 0, raf2 = 0, lastL = g.scrollLeft, v = 0, braf = 0;
+    const blurLoop = () => {
+      v *= .86;
+      const b = q(clamp(Math.abs(v) * .05, 0, 2.5), .25);
+      put(g, '--sb', b); g.classList.toggle('mb', +b > 0);
+      braf = +b > 0 ? requestAnimationFrame(blurLoop) : 0;
+    };
+    g.addEventListener('scroll', () => {
+      if (g.classList.contains('list')) return;
+      const l = g.scrollLeft; v = v * .5 + (l - lastL); lastL = l;
+      if (!braf) braf = requestAnimationFrame(blurLoop);
+    }, { passive: true });
     const tick = () => {
       const d = target - g.scrollLeft;
       if (Math.abs(d) < .5) { raf2 = 0; return; }
@@ -270,7 +273,6 @@ void main(){
     }, { passive: false });
   }
 
-  /* Eventos aleatorios, espaciados y suaves: la escena respira, no se agita */
   function chaos() {
     const next = () => setTimeout(() => {
       if (!D.hidden) {
@@ -284,7 +286,6 @@ void main(){
     next();
   }
 
-  /* Letras: el efecto del hover (brillo + salto) se dispara solo, a ratos: alguna letra suelta o una ola */
   function letters() {
     const live = () => $$('.view.active :is(h1,.h2) .l, body.pg h1 .l').filter(l => l.offsetParent);
     const hot = (l, ms = 750) => { l.classList.add('hot'); setTimeout(() => l.classList.remove('hot'), ms); };
@@ -305,7 +306,6 @@ void main(){
     setTimeout(run, 2600);
   }
 
-  /* Si el sistema pide menos movimiento, la app se muestra completa igualmente y ofrece este interruptor. */
   function motionToggle() {
     if (!osReduce) return;
     const b = D.createElement('button'); b.type = 'button'; b.className = 'motion-toggle';
@@ -325,7 +325,6 @@ void main(){
       if (D.hidden) { cancelAnimationFrame(raf); raf = 0; }
       else if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
     });
-    /* si el equipo va justo, ui.js añade .lite: se apaga el fondo GL y vuelve el horneado */
     new MutationObserver(() => {
       if (lite() && glOK) { glOK = false; root.classList.remove('fx-on'); if (canvas) canvas.remove(); }
     }).observe(root, { attributes: true, attributeFilter: ['class'] });

@@ -1,4 +1,3 @@
-/* RONALL PROD · beat.js (V52) — página individual de beat. Misma lógica de compra y mismo sistema visual que la tienda. */
 (async () => {
 'use strict';
 const R = RON, U = RonUI, { $, $$, money, S } = R, D = document, root = D.documentElement, ROOT = root.dataset.root || '';
@@ -7,7 +6,6 @@ const b = JSON.parse($('#beat-data').textContent);
 const soldPromise = Promise.resolve().then(() => R.sold()).then(x => Array.isArray(x) ? x : []).catch(() => []);
 R.track('beat', { beat: b.id });
 
-/* Efectos */
 const art = $('#art'), view = $('#v-home');
 U.letters($('#bp-ttl'), b.name);
 U.scene(ROOT + (b.thumb || b.cover)); U.sheen(); U.tilt(art); U.reveal(view); U.scrollFx(view); U.adaptive();
@@ -17,7 +15,6 @@ const nav = U.indicator($('#nav')), dock = U.indicator($('#dock .nav'));
 const placeNav = () => { nav(); dock(); };
 placeNav(); (D.fonts && D.fonts.ready || Promise.resolve()).then(placeNav).catch(() => {}); setTimeout(placeNav, 400);
 
-/* Reproducción */
 const play = $('#bp-play'), pi = $('#bp-pi'), ring = $('#ring');
 const sync = () => {
   const on = R.P.cur && R.P.cur.id === b.id && !R.P.audio.paused;
@@ -28,10 +25,8 @@ play.onclick = () => { U.vib(10); R.P.play(b, [b]); };
 R.P.ev.addEventListener('state', sync); R.P.ev.addEventListener('load', sync);
 R.P.ev.addEventListener('time', e => { if (R.P.cur && R.P.cur.id === b.id && e.detail.d) ring.style.setProperty('--p', (e.detail.t / e.detail.d).toFixed(4)); });
 sync();
-/* Autoplay: el navegador puede bloquearlo; en ese caso basta tocar play. */
 R.P.preload(b);
 
-/* Compra */
 const tot = $('#bp-tot'), add = $('#bp-add'), buy = $('#bp-buy'), im = $('#cimg'); let ui = null;
 const refresh = k => {
   add.disabled = !k; buy.disabled = !k;

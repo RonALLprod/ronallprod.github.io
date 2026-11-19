@@ -1,8 +1,5 @@
-/* RONALL-VISUAL-2026-11-11-V13 · lic.js */
-/* selector de licencias reutilizable (home + página de beat) */
 (()=>{const R=window.RON,S=R.S;
  const ok=v=>v&&!/^por definir$/i.test(String(v).trim());
- /* Detalle de una licencia. Los campos "Por definir" NO se muestran al público. */
  R.licDetails=k=>{const L=S.licenses[k];if(!L)return'';
   const inc=[`Formatos: ${L.formats.map(R.esc).join(' + ')}`,ok(L.distribution)&&`Distribución: ${R.esc(L.distribution)}`,ok(L.monetization)&&`Monetización: ${R.esc(L.monetization)}`,...L.permissions.map(R.esc)].filter(Boolean);
   const res=L.restrictions.map(R.esc);

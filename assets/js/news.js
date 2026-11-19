@@ -1,4 +1,3 @@
-/* news.js — edad relativa, campana de novedades y avisos de beats nuevos */
 (()=>{
 const R=window.RON,D=document,{$,esc}=R,LS=localStorage,J='data/beats.public.json';
 const g=(k,d)=>{try{return JSON.parse(LS.getItem(k))??d}catch(e){return d}},s=(k,v)=>{try{LS.setItem(k,JSON.stringify(v))}catch(e){}};
