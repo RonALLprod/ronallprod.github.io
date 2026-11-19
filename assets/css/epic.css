@@ -1,0 +1,48 @@
+/* RONALL V70 · capa epic: postproceso, orden y pulido. Se carga al final. */
+
+/* Grano de película vivo (solo transform, barato en GPU) */
+html:not(.lite):not(.rm) body .scene .grain{inset:-60%;opacity:.07;animation:ronGrain .8s steps(1) infinite;will-change:transform}
+@keyframes ronGrain{
+  0%{transform:translate3d(0,0,0)}10%{transform:translate3d(-5%,-8%,0)}20%{transform:translate3d(-12%,4%,0)}
+  30%{transform:translate3d(6%,-14%,0)}40%{transform:translate3d(-4%,16%,0)}50%{transform:translate3d(-14%,8%,0)}
+  60%{transform:translate3d(12%,0,0)}70%{transform:translate3d(0,12%,0)}80%{transform:translate3d(-8%,10%,0)}
+  90%{transform:translate3d(10%,6%,0)}100%{transform:translate3d(0,0,0)}
+}
+
+/* Motion blur direccional del carril (el filtro lo inyecta fx.js) */
+html body .grid.mbx{filter:url(#ronMbx)}
+
+/* Menos capas de GPU: una por letra era demasiado */
+html body h1 .l,html body .h2 .l{will-change:auto}
+
+/* Orden: ritmo vertical del hero y alineación de cabeceras */
+html body #v-home .info{gap:clamp(14px,2.4vh,26px)}
+html body .sec-top{align-items:baseline}
+html body .split{align-items:start}
+html body .lics{gap:12px}
+
+/* Orden: escalonado del carril más sutil, sigue habiendo ritmo */
+html body .grid:not(.list) .bc:nth-child(even){translate:0 14px}
+html body .grid:not(.list) .bc:nth-child(odd){translate:0 -6px}
+html body .grid:not(.list){scroll-padding-inline:var(--gut)}
+
+/* Tarjetas: barrido de luz al pasar */
+html body .grid:not(.list) .bc-i::before{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.2) 50%,transparent 60%);
+  transform:translateX(-130%);transition:transform 1.2s var(--soft)
+}
+html body .grid:not(.list) .bc:hover .bc-i::before{transform:translateX(130%)}
+
+/* Tarjeta sonando: pulso de luz */
+html body .grid:not(.list) .bc.playing .bc-i{border-color:#fff;animation:ronPlay 2.6s ease-in-out infinite alternate}
+@keyframes ronPlay{from{box-shadow:0 0 0 1px #fff,0 0 60px -20px rgba(255,255,255,.35)}to{box-shadow:0 0 0 1px #fff,0 0 120px -16px rgba(255,255,255,.65)}}
+html.rm body .grid:not(.list) .bc.playing .bc-i{animation:none}
+
+/* Foco: al pasar sobre una tarjeta las demás se apagan (reusa la transición de filter) */
+@media(hover:hover){
+  html body .grid:not(.list):hover .bc:not(:hover):not(.playing):not(.sel) .bc-i img{filter:grayscale(.9) contrast(1.05) brightness(.62)}
+}
+
+/* Chips */
+html body .chip:not(.on):hover{border-color:var(--hair2);background:rgba(255,255,255,.06)}

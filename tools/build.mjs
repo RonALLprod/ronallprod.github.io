@@ -2,7 +2,7 @@ import fs from 'fs';import path from 'path';import {fileURLToPath} from 'url';
 const R=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const S=new Function('window',fs.readFileSync(R+'/config/site-config.js','utf8')+';return window.SITE')({});
 const cat=JSON.parse(fs.readFileSync(R+'/data/catalog.json','utf8'));
-const BUILD='V69.2'
+const BUILD='V70.0'
 const tc=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const live=cat.beats.filter(b=>b.visibility==='public'&&b.active!==false);
@@ -26,7 +26,7 @@ for(const b of live){
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${img}">
 <link rel="icon" type="image/png" href="../../favicon.png"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><link rel="manifest" href="../../manifest.webmanifest">
 <link rel="preload" href="../../assets/fonts/kosmos.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="../../assets/fonts/acidic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../assets/css/ronall.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/identity.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/workspace.css?v=${BUILD}">
+<link rel="stylesheet" href="../../assets/css/ronall.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/identity.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/workspace.css?v=${BUILD}"><link rel="stylesheet" href="../../assets/css/epic.css?v=${BUILD}">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g,'\\u003c')}</script>
 <script>(function(){var d=document.documentElement;d.classList.add('js');try{var c=navigator.connection||{};if(c.saveData||(navigator.deviceMemory&&navigator.deviceMemory<=1))d.classList.add('lite')}catch(e){}})();document.write('<script src="../../config/site-config.js?t='+Date.now()+'"></'+'script>')</script></head><body class="pg beat-product">
 <div class="scene" aria-hidden="true"><div class="bgc a"></div><div class="bgc b"></div><i class="orb o1"></i><i class="orb o2"></i><div class="scan"></div><div class="grain"></div><div class="vig"></div></div>

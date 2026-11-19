@@ -16,6 +16,7 @@
     vel: 0,
     mix: 1, mixT: 1,
     shock: 1, shockA: 0,
+    cx: 0, cy: 0,
   };
   const sp = () => ({ x: 0, v: 0 });
   const M = { X: sp(), Y: sp(), R: sp(), Z: sp(), heat: 0, flash: 0, flashS: 0, dir: 1, ik: 1, ikT: 1, lastHit: 0,
@@ -59,6 +60,7 @@
       S.kick = Math.min(1.2, Math.max(S.kick, a)); hit(a);
       S.shock = 0; S.shockA = Math.min(1.2, a); P1.w += (Math.random() < .5 ? -1 : 1) * a * 5;
     },
+    shake(a = .5) { hit(a); },
     punch(a = 1) { S.kick = Math.min(1.2, Math.max(S.kick, a)); },
     push(v) { P1.w += v; P2.w += v * .6; },
     flare() { const a = $('.art'); if (!a) return; a.classList.remove('flare'); void a.offsetWidth; a.classList.add('flare'); setTimeout(() => a.classList.remove('flare'), 1500); },
@@ -77,7 +79,8 @@ precision mediump float;
 varying vec2 v;
 uniform sampler2D uA,uB;
 uniform vec2 uRes,uPtr,uOff;
-uniform float uT,uMix,uLv,uFlash,uVel,uShock,uShockA,uRot,uScl,uFade,uSettled,uDim,uTaps;
+uniform float uT,uMix,uLv,uFlash,uVel,uShock,uShockA,uRot,uScl,uFade,uSettled,uDim,uTaps,uSlice;
+uniform vec2 uCam;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){
   vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f);
@@ -105,6 +108,11 @@ void main(){
   vec2 d=p-ptr;float dl=length(d);
   p+=normalize(d+1e-4)*sin(dl*16.-uT*2.6)*exp(-dl*4.2)*(uVel*.012);
   vec2 uv=p+.5+vec2(.03,0.);
+  if(uSlice>.01){
+    float band=floor(v.y*22.);
+    float rr=h(vec2(band,floor(uT*18.)));
+    uv.x+=step(.9,rr)*(h(vec2(band,7.))-.5)*.035*uSlice;
+  }
   float liquid=1.;
   if(uSettled<.5){
     float w=fbm(uv*3.+uT*.05);
@@ -119,12 +127,12 @@ void main(){
   for(int i=0;i<9;i++){
     if(float(i)>=nT)break;
     float f=float(i)/(nT-1.);
-    vec2 u2=ctr+(uv-ctr)*(1.-amt*f);
+    vec2 u2=ctr+(uv-ctr)*(1.-amt*f)+uCam*(f-.5);
     float wgt=1.-f*.6;
     col+=art(u2,liquid)*wgt;tw+=wgt;
   }
   col/=tw;
-  float ca=.002+uFlash*.014;
+  float ca=.002+uFlash*.014+length(uCam)*.3;
   col.r=mix(col.r,art(uv+(uv-ctr)*ca,liquid).r,.55);
   col.b=mix(col.b,art(uv-(uv-ctr)*ca,liquid).b,.55);
   float l=dot(col,vec3(.3,.59,.11));
@@ -134,10 +142,15 @@ void main(){
   g=g*(.19+uLv*.06+ring*.5)+bloom*.24+ring*.06;
   float sw=smoothstep(.55,1.,sin((p.x*1.3+p.y*.7)*3.1+uT*.22+q.x*2.4));
   g+=sw*.022*(.6+uLv);
+  if(uFlash>.1){
+    vec3 st=art(uv+vec2(.035,0.),liquid)+art(uv-vec2(.035,0.),liquid);
+    float sl2=dot(st,vec3(.3,.59,.11))*.5;
+    g+=pow(clamp((sl2-.4)*1.6,0.,1.),2.)*uFlash*.07;
+  }
   float vg=1.-smoothstep(.18,1.05,length((v-vec2(.56,.48))*vec2(asp*.62,1.)));
   g*=.06+.94*vg;
   g*=uDim*uFade;
-  g+=(h(gl_FragCoord.xy+fract(uT)*91.)-.5)*.05*uFade;
+  g+=(h(gl_FragCoord.xy+fract(uT)*91.)-.5)*.05*(1.+uFlash*.8)*uFade;
   g*=.97+.03*sin(gl_FragCoord.y*1.6);
   gl_FragColor=vec4(g,1.);
 }`;
@@ -163,7 +176,7 @@ void main(){
       const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      ['uA', 'uB', 'uRes', 'uPtr', 'uOff', 'uT', 'uMix', 'uLv', 'uFlash', 'uVel', 'uShock', 'uShockA', 'uRot', 'uScl', 'uFade', 'uSettled', 'uDim', 'uTaps'].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
+      ['uA', 'uB', 'uRes', 'uPtr', 'uOff', 'uT', 'uMix', 'uLv', 'uFlash', 'uVel', 'uShock', 'uShockA', 'uRot', 'uScl', 'uFade', 'uSettled', 'uDim', 'uTaps', 'uSlice', 'uCam'].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
       texA = mkTex(); texB = mkTex();
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texA); gl.uniform1i(uni.uA, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texB); gl.uniform1i(uni.uB, 1);
@@ -264,7 +277,7 @@ void main(){
   const q = (v, st) => v < st ? '0' : (Math.round(v / st) * st).toFixed(2);
   const put = (e, k, v) => { const c = e._c || (e._c = {}); if (c[k] !== v) { c[k] = v; e.style.setProperty(k, v); } };
   const ease = (dt, k) => 1 - Math.exp(-dt * k);
-  let last = 0, T = 0, raf = 0, mxAcc = 0, vtN = 0, skip = 0;
+  let last = 0, T = 0, raf = 0, mxAcc = 0, vtN = 0, skip = 0, pox = 0, poy = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - last) / 1000 || .016); last = now; T += dt;
@@ -280,6 +293,12 @@ void main(){
     S.lv += (lvRaw - S.lv) * ease(dt, 7);
     if (S.mix < S.mixT) S.mix = Math.min(S.mixT, S.mix + dt / 1.9);
     camera(dt);
+    {
+      const asp = canvas ? canvas.width / canvas.height : 1, zm = Math.min(1, 1 / asp) * .86 / sceneNow.scl, kc = ease(dt, 26), idt = Math.max(dt, .004);
+      S.cx += (clamp((sceneNow.ox - pox) / idt * zm * .018, -.045, .045) - S.cx) * kc;
+      S.cy += (clamp((sceneNow.oy - poy) / idt * zm * .018, -.045, .045) - S.cy) * kc;
+      pox = sceneNow.ox; poy = sceneNow.oy;
+    }
 
     const amb = Math.sin(T * .71) * .9 + Math.sin(T * 1.37 + 1.3) * .6 + Math.sin(T * .29 + 4.1) * 1.1;
     stepPendulum(P1, 8.5, .6, amb * .2 * (1 + S.lv * .8), dt);
@@ -307,7 +326,9 @@ void main(){
       half = half || (root.classList.contains('vt') && ++vtN % 2 === 0); // 30 fps durante transiciones de sección
       if (half && ++skip % 2 === 0) { half = tier === 0 && ema > 28; return; }
       const mixE = S.mix >= 1 ? 1 : sstep(S.mix);
-      const flash = M.flashS, amtHi = flash > .15 || S.vel > .4 || M.fade < .98;
+      const flash = M.flashS, camV = Math.abs(S.cx) + Math.abs(S.cy);
+      const amtHi = flash > .15 || S.vel > .4 || M.fade < .98 || camV > .004;
+      const idle = flash < .02 && S.vel < .05 && camV < .0015 && S.mix >= 1;
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
       gl.uniform2f(uni.uPtr, S.px, -S.py); gl.uniform2f(uni.uOff, sceneNow.ox, sceneNow.oy);
       gl.uniform1f(uni.uT, T % 628.3185); gl.uniform1f(uni.uMix, mixE); gl.uniform1f(uni.uLv, S.lv);
@@ -315,7 +336,9 @@ void main(){
       gl.uniform1f(uni.uShock, S.shock); gl.uniform1f(uni.uShockA, S.shockA);
       gl.uniform1f(uni.uRot, sceneNow.rot); gl.uniform1f(uni.uScl, sceneNow.scl);
       gl.uniform1f(uni.uFade, sstep(M.fade)); gl.uniform1f(uni.uSettled, S.mix >= 1 ? 1 : 0);
-      gl.uniform1f(uni.uDim, DIM); gl.uniform1f(uni.uTaps, amtHi ? 9 : 5);
+      gl.uniform1f(uni.uDim, DIM); gl.uniform1f(uni.uTaps, amtHi ? 9 : (idle ? 2 : 5));
+      gl.uniform2f(uni.uCam, S.cx, S.cy);
+      gl.uniform1f(uni.uSlice, clamp((flash - .6) * 2.2, 0, 1));
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
   }
@@ -327,7 +350,8 @@ void main(){
       mxAcc += clamp(e.movementX || 0, -40, 40);
     }, { passive: true });
     D.addEventListener('click', e => {
-      if (e.target.closest('[data-go]')) { FX.punch(.6); FX.push(rnd(-10, 10)); }
+      if (e.target.closest('[data-go]')) { FX.punch(.6); FX.push(rnd(-10, 10)); FX.shake(.5); }
+      else if (e.target.closest('.lic')) { FX.punch(.4); FX.shake(.3); }
       else if (e.target.closest('#b-add,#bp-add')) { FX.punch(1); FX.flare(); }
       else if (e.target.closest('.play,.bc-pl,#mpp')) { FX.punch(.55); FX.push(rnd(-8, 8)); }
     }, true);
@@ -336,10 +360,23 @@ void main(){
   function lane() {
     const g = $('#grid'); if (!g) return;
     let target = 0, raf2 = 0, lastL = g.scrollLeft, v = 0, braf = 0;
+    const SAF = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+    let svgG = null, lastB = '';
+    if (!SAF) {
+      try {
+        const svg = D.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.setAttribute('aria-hidden', 'true');
+        svg.style.cssText = 'position:absolute;width:0;height:0;pointer-events:none';
+        svg.innerHTML = '<filter id="ronMbx" x="-2%" y="0" width="104%" height="100%" color-interpolation-filters="sRGB"><feGaussianBlur id="ronMbxG" stdDeviation="0 0"/></filter>';
+        D.body.appendChild(svg); svgG = svg.querySelector('#ronMbxG');
+      } catch (e) { svgG = null; }
+    }
     const blurLoop = () => {
       v *= .86;
-      const b = q(clamp(Math.abs(v) * .05, 0, 2.5), .25);
-      put(g, '--sb', b); g.classList.toggle('mb', +b > 0);
+      const dir = !!svgG && !lite();
+      const b = q(clamp(Math.abs(v) * (dir ? .09 : .05), 0, dir ? 7 : 2.5), dir ? .5 : .25);
+      if (dir) { if (b !== lastB) { lastB = b; svgG.setAttribute('stdDeviation', (+b) + ' 0'); } g.classList.toggle('mbx', +b > 0); }
+      else { put(g, '--sb', b); g.classList.toggle('mb', +b > 0); }
       braf = +b > 0 ? requestAnimationFrame(blurLoop) : 0;
     };
     g.addEventListener('scroll', () => {
@@ -369,7 +406,7 @@ void main(){
         const r = Math.random();
         if (r < .5) FX.push(rnd(-12, 12));
         else if (r < .8) FX.punch(rnd(.2, .35));
-        else { FX.flare(); }
+        else { FX.flare(); FX.shake(.22); }
       }
       next();
     }, rnd(9000, 16000));
