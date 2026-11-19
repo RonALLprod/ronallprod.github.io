@@ -134,7 +134,7 @@ void main(){
   g=g*(.19+uLv*.06+ring*.5)+bloom*.24+ring*.06;
   float sw=smoothstep(.55,1.,sin((p.x*1.3+p.y*.7)*3.1+uT*.22+q.x*2.4));
   g+=sw*.022*(.6+uLv);
-  float vg=smoothstep(1.05,.18,length((v-vec2(.56,.48))*vec2(asp*.62,1.)));
+  float vg=1.-smoothstep(.18,1.05,length((v-vec2(.56,.48))*vec2(asp*.62,1.)));
   g*=.06+.94*vg;
   g*=uDim*uFade;
   g+=(h(gl_FragCoord.xy+fract(uT)*91.)-.5)*.05*uFade;
