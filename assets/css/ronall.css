@@ -431,10 +431,8 @@ body.has-mini{--miniH:112px}
 @media(max-width:420px){.grid{grid-template-columns:1fr 1fr}.lic{padding:18px}.tot{font-size:56px}.mq span{font-size:34px}}
 
 /* ───────── Modo lite (equipos justos) y movimiento reducido: mismo diseño, menos GPU ───────── */
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
-  html.js .rvb{opacity:1;transform:none;filter:none}html.booting .view .st{opacity:1}
-}
+html.rm *,html.rm *::before,html.rm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+html.rm.js .rvb{opacity:1;transform:none;filter:none}html.rm.booting .view .st{opacity:1}
 /* La tipografía display se reserva para titulares sin acentos; la interfaz mantiene glifos completos. */
 .empty b,.empty-s b{font:800 17px/1.2 var(--ui);letter-spacing:.08em;text-transform:uppercase}
 
@@ -519,7 +517,7 @@ html.lite .view.enter,html.lite .view.leave{animation-duration:.72s!important}
 html.lite .art::after,html.lite .bc::before,html.lite .glass::before,html.lite .pane::before{display:block}
 @media(max-width:899px){.rail{background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.055)),rgba(5,5,5,.8)}.hero{gap:22px}.art-w{width:min(78%,420px)}#v-home .more{margin-bottom:36px}#v-home .split{padding-top:28px}}
 @media(max-width:560px){h1{font-size:clamp(42px,12vw,68px);line-height:.98}.more .sec-top{align-items:center}.more .hs{gap:12px}.bc:hover{--ty:0px}}
-@media(prefers-reduced-motion:reduce){.swap .l,.view.enter .st{animation:none!important}}
+html.rm .swap .l,html.rm .view.enter .st{animation:none!important}
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -691,10 +689,8 @@ html.js .rvb.in{filter:none;transform:none}
   .play{width:72px;height:72px}
   .more .hs{gap:12px}
 }
-@media(prefers-reduced-motion:reduce){
-  .art-w::before{animation:none;opacity:.7}
-  .view.enter .st,.swap .l{animation:none!important}
-}
+html.rm .art-w::before{animation:none;opacity:.7}
+html.rm .view.enter .st,html.rm .swap .l{animation:none!important}
 
 
 /* V56 · Catálogo adaptable: chips en carril horizontal, controles en su propia fila. */

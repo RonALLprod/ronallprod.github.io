@@ -268,11 +268,13 @@ html body :where(a,button,input,select,summary,[tabindex]):focus-visible{outline
   html body .art-w{width:min(74%,380px,36dvh)}
 }
 
-/* ═══ MOVIMIENTO REDUCIDO ═════════════════════════════════════════════ */
-@media(prefers-reduced-motion:reduce){
-  html body h1.swap .l{animation:none}
-  html body .art-w,html body .hero .info{transform:none;rotate:0deg;translate:0 0}
-  html body #v-home .marq{transform:none}
-  html.live body .mini .tk img{animation:none}
-  html body .art img.swap,html body .art.flare::after{animation:none}
-}
+/* ═══ MOVIMIENTO REDUCIDO (solo si la persona lo pidió con el interruptor) ═══ */
+html.rm body h1.swap .l{animation:none}
+html.rm body .art-w,html.rm body .hero .info{transform:none;rotate:0deg;translate:0 0}
+html.rm body #v-home .marq{transform:none}
+html.rm.live body .mini .tk img{animation:none}
+html.rm body .art img.swap,html.rm body .art.flare::after{animation:none}
+
+/* Interruptor de movimiento (solo aparece si el sistema pide menos movimiento) */
+.motion-toggle{position:fixed;z-index:60;right:14px;bottom:calc(var(--tab,0px) + var(--miniH,0px) + 10px);padding:8px 12px;border:1px solid var(--hair2);border-radius:4px 12px 4px 12px;background:rgba(0,0,0,.6);color:#fff;font:600 11px/1 var(--ui);letter-spacing:.06em;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:.7;transition:opacity .3s}
+.motion-toggle:hover{opacity:1}

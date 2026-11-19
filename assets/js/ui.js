@@ -5,7 +5,7 @@
 (() => {
   'use strict';
   const D = document, root = D.documentElement;
-  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const reduce = !!window.__reduce;
   const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
   const $ = (s, r = D) => r.querySelector(s), $$ = (s, r = D) => [...r.querySelectorAll(s)];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

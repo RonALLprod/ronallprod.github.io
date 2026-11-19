@@ -7,7 +7,8 @@
 (() => {
   'use strict';
   const D = document, root = D.documentElement;
-  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const reduce = !!window.__reduce;
+  const osReduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
   const $ = (s, r = D) => r.querySelector(s), $$ = (s, r = D) => [...r.querySelectorAll(s)];
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const rnd = (a, b) => a + Math.random() * (b - a);
@@ -279,7 +280,16 @@ void main(){
     next();
   }
 
+  /* Si el sistema pide menos movimiento, la app se muestra completa igualmente y ofrece este interruptor. */
+  function motionToggle() {
+    if (!osReduce) return;
+    const b = D.createElement('button'); b.type = 'button'; b.className = 'motion-toggle';
+    b.textContent = reduce ? 'Activar movimiento' : 'Reducir movimiento';
+    b.addEventListener('click', () => { try { localStorage.setItem('ronMotion', reduce ? 'on' : 'off'); } catch (e) {} location.reload(); });
+    D.body.appendChild(b);
+  }
   function boot() {
+    motionToggle();
     grab();
     glOK = initGL();
     if (glOK) watchCover();

@@ -91,6 +91,4 @@ body.license-window-open .dock,body.license-window-open .rail{filter:brightness(
 @media(max-height:700px) and (max-width:899px){
 #v-home .art-w{width:min(61vw,25vh,245px)}#v-home .hero{gap:6px}#v-home .info{gap:7px}#v-home h1{font-size:clamp(32px,8.5vw,48px)}
 }
-@media(prefers-reduced-motion:reduce){
-.license-window,.license-backdrop,.license-window::before,.license-launch,.bc,.art-w,.play{animation:none!important;transition:none!important;transform:none!important}
-}
+html.rm .license-window,html.rm .license-backdrop,html.rm .license-window::before,html.rm .license-launch,html.rm .bc,html.rm .art-w,html.rm .play{animation:none!important;transition:none!important;transform:none!important}
