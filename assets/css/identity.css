@@ -1,38 +1,274 @@
-/* RONALL PROD · V60
-   Directional refinements over the original Kosmos / bloom / glass art direction.
-   No component reset: keep the signature rail, wordmark, marquee, type and motion.
+/* RONALL PROD · V65 — REMASTER «APP / MOTION GRAPHICS»
+   Capa final de identidad (se carga DESPUÉS de ronall.css y workspace.css).
+   Qué es: una app sin scroll de página. Negro profundo, plata, Kosmos/Acidic.
+   Fondo WebGL (fx.js) con postprocesado; péndulos; motion blur; vidrio líquido; zooms suaves.
+   Solo CSS + fx.js: no cambia el JS de negocio, precios, licencias ni rutas.
 */
-@media (min-width:900px){
-  :root{--rail:232px}
-  .rail{width:208px}
-  .fl{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) auto;
-    align-items:center;
-    gap:14px;
-  }
-  .chips{
-    display:flex;
-    flex-wrap:nowrap;
-    min-width:0;
-    overflow-x:auto;
-    overflow-y:hidden;
-    scrollbar-width:none;
-    padding:2px 2px 8px;
-    -webkit-overflow-scrolling:touch;
-  }
-  .chips::-webkit-scrollbar{display:none}
-  .chip{flex:0 0 auto;white-space:nowrap}
+
+:root{
+  --hair:rgba(255,255,255,.14);
+  --hair2:rgba(255,255,255,.34);
+  --bloom:0 0 26px rgba(255,255,255,.36),0 0 90px rgba(255,255,255,.15);
+  --cut:34px;
+  --soft:cubic-bezier(.16,1,.3,1);
+  --glide:cubic-bezier(.22,.9,.28,1);
 }
-@media (min-width:900px) and (max-width:1120px){
+@media(min-width:900px){:root{--rail:232px}}
+
+/* ═══ ESCENA: canvas WebGL + capas de postproceso ═════════════════════ */
+.fx-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:auto}
+html.fx-on .scene .bgc,html.fx-on .scene .orb{display:none}
+html body .scene .vig{background:radial-gradient(120% 92% at 58% 46%,transparent 30%,rgba(0,0,0,.72) 100%)}
+html body .scene .grain{opacity:.06;mix-blend-mode:screen}
+html body .scene .scan{opacity:.8}
+
+/* ═══ APP: ninguna pantalla hace scroll de página ═════════════════════ */
+html body .view{overflow:hidden;padding-bottom:calc(var(--tab) + var(--miniH) + 12px)}
+html body .view .foot{display:none!important}
+html body #v-privado .wrap,html body #v-contacto .wrap{height:100%;display:flex;flex-direction:column;justify-content:center;padding-top:0}
+
+/* Transiciones de pantalla: zoom + motion blur + desplazamiento (nada seco) */
+@keyframes vin{from{opacity:0;transform:translate3d(calc(var(--dir)*110px),0,0) scale(1.08);filter:blur(18px)}}
+@keyframes vout{to{opacity:0;transform:translate3d(calc(var(--dir)*-90px),0,0) scale(.93);filter:blur(16px)}}
+@keyframes rise{from{opacity:0;transform:translate3d(0,34px,0) scale(.97);filter:blur(14px)}}
+html body .view.enter{animation-duration:1.05s;animation-timing-function:var(--soft)}
+html body .view.leave{animation-duration:.6s}
+
+/* ═══ VIDRIO LÍQUIDO ══════════════════════════════════════════════════ */
+html body .glass,html body .pane{
+  background:
+    radial-gradient(300px circle at var(--mx,28%) var(--my,0%),rgba(255,255,255,.15),transparent 60%),
+    linear-gradient(150deg,rgba(255,255,255,.075),rgba(255,255,255,.012) 55%,rgba(255,255,255,.04)),
+    rgba(4,4,4,.5);
+  border-color:var(--hair);
+}
+html body .rail,html body .mini,html body .license-window,html body .drawer,html body .nfp{
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  backdrop-filter:blur(20px) saturate(1.6);
+}
+/* Chromium: además deforma lo que hay detrás (refracción). Si no se entiende, queda el blur de arriba. */
+html body .rail,html body .mini,html body .drawer{
+  backdrop-filter:blur(16px) saturate(1.7) url(#ron-liquid);
+}
+
+/* ═══ RAIL ════════════════════════════════════════════════════════════ */
+@media(min-width:900px){
+  html body .rail{width:208px;border-radius:30px 8px 30px 8px}
+  html body .rail .nav button:hover{transform:translateX(6px)}
+}
+html body .brand b{letter-spacing:.01em;text-shadow:0 0 18px rgba(255,255,255,.4)}
+html body .brand img{transition:transform 1.2s var(--soft)}
+html body .brand:hover img{transform:rotate(360deg) scale(1.08)}
+
+/* ═══ HOME: péndulo, parallax y bloom ═════════════════════════════════ */
+html body #v-home .hero{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}
+
+/* Portada colgada de un pivote: oscila (fx.js escribe --pend/--ptx/--pty/--mb) */
+html body .art-w,html body #v-home .art-w,html body #v-home .art-w:hover{
+  position:relative;transform-origin:50% -26%;
+  transform:rotate(var(--pend,0deg));
+  translate:var(--ptx,0) var(--pty,0);
+  will-change:transform;
+}
+/* Título: segundo péndulo, arrastrado por el primero */
+html body .hero .info{transform-origin:0 0;rotate:var(--pend2,0deg);translate:var(--ptx,0) var(--pty,0);will-change:transform}
+
+html body .art img{
+  border-radius:var(--cut) 10px var(--cut) 10px;
+  filter:grayscale(.92) contrast(1.18) brightness(.98) blur(calc(var(--mb,0)*1px));
+  border-color:rgba(255,255,255,.28);
+  box-shadow:0 0 0 1px rgba(255,255,255,.05),0 0 130px -26px rgba(255,255,255,.4),0 60px 110px -26px #000;
+}
+html body .art:hover img{filter:grayscale(.4) contrast(1.12) blur(calc(var(--mb,0)*1px))}
+html body .art::after{border-radius:var(--cut) 10px var(--cut) 10px}
+html body .art.flare::after{animation:ronFlare 1.4s var(--soft)}
+@keyframes ronFlare{from{background-position:130% 0;opacity:1}to{background-position:-30% 0;opacity:1}}
+html body .art img.swap{animation:ronArtIn 1.4s var(--soft)}
+@keyframes ronArtIn{from{opacity:0;transform:scale(1.18) rotate(-3deg);filter:grayscale(1) blur(26px)}}
+
+/* Marco fantasma + marcas de registro */
+html body .art-w::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  border:1px solid var(--hair);border-radius:var(--cut) 10px var(--cut) 10px;
+  transform:translate3d(16px,16px,0);transition:transform 1.1s var(--soft)
+}
+html body .art-w:hover::after{transform:translate3d(26px,26px,0)}
+html body .art-w::before{
+  content:"";position:absolute;inset:-14px;z-index:2;pointer-events:none;opacity:.7;
+  background:
+    linear-gradient(#fff,#fff) 0 0/16px 1px no-repeat,linear-gradient(#fff,#fff) 0 0/1px 16px no-repeat,
+    linear-gradient(#fff,#fff) 100% 0/16px 1px no-repeat,linear-gradient(#fff,#fff) 100% 0/1px 16px no-repeat,
+    linear-gradient(#fff,#fff) 0 100%/16px 1px no-repeat,linear-gradient(#fff,#fff) 0 100%/1px 16px no-repeat,
+    linear-gradient(#fff,#fff) 100% 100%/16px 1px no-repeat,linear-gradient(#fff,#fff) 100% 100%/1px 16px no-repeat;
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.6))
+}
+
+@media(min-width:900px){
+  html body #v-home .art-w{justify-self:end;margin-right:clamp(10px,2.4vw,38px)}
+  html body #v-home .info{z-index:3;margin-right:clamp(-70px,-4vw,-22px)}
+}
+
+/* Título: Kosmos con bloom; cada letra entra con motion blur y luego se mece */
+html body h1{
+  color:#fff;letter-spacing:-.02em;
+  text-shadow:0 0 26px rgba(255,255,255,.4),0 0 90px rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.6);
+}
+html body #v-home h1{font-size:clamp(54px,8.6vw,132px);line-height:.88}
+html body #v-home h1.long{font-size:clamp(42px,6.2vw,96px)}
+html body h1 .l,html body .h2 .l{display:inline-block;will-change:transform}
+html body h1.swap .l{
+  animation:
+    ronLetter 1.25s var(--soft) calc(var(--i)*42ms) backwards,
+    ronSway 7s ease-in-out calc(var(--i)*-.55s) infinite alternate;
+}
+@keyframes ronLetter{
+  from{opacity:0;transform:translate3d(-.5em,.45em,0) rotate(-18deg) skewX(-16deg) scale(1.55);filter:blur(16px)}
+  60%{filter:blur(2px)}
+}
+@keyframes ronSway{from{rotate:-1.3deg;translate:0 -.014em}to{rotate:1.3deg;translate:0 .016em}}
+
+html body .kicker{letter-spacing:.34em;font-size:11px;color:rgba(255,255,255,.78)}
+html body .kicker::before{width:56px;transform-origin:left;animation:ronLine 1.4s var(--soft) both}
+@keyframes ronLine{from{transform:scaleX(0)}}
+
+html body .meta{gap:0}
+html body .meta span{
+  padding:0 16px 0 0;margin-right:16px;border:0;border-radius:0;background:none;
+  border-right:1px solid var(--hair2);font:700 11px/1 var(--ui);letter-spacing:.24em;text-transform:uppercase;color:#fff
+}
+html body .meta span:last-child{border-right:0;margin-right:0;padding-right:0;font-family:var(--num);letter-spacing:.08em;font-size:15px;font-weight:400;color:rgba(255,255,255,.8)}
+html body .tgs button,html body .tgs a{font-size:12px;letter-spacing:.04em}
+
+/* Play: pulso, anillo de progreso, zoom elástico */
+html body .play{box-shadow:0 0 0 1px rgba(255,255,255,.7),0 0 70px rgba(255,255,255,.45),0 26px 50px -10px #000}
+html body .play:hover{transform:scale(1.12)}
+html body .ring .rt{stroke:rgba(255,255,255,.18)}
+
+html body .license-launch{border-radius:4px 16px 4px 16px;background:transparent;border-color:var(--hair2);box-shadow:none;overflow:hidden}
+html body .license-launch:hover{background:#fff;color:#000;border-color:#fff;box-shadow:0 0 44px -8px rgba(255,255,255,.7)}
+html body .license-launch:hover .launch-k,html body .license-launch:hover i{color:#000}
+
+/* Marquesina inclinada por la velocidad del péndulo */
+html body #v-home .marq{border-color:var(--hair);background:none;transform:skewX(var(--skew,0deg));will-change:transform}
+html body .mq span{-webkit-text-stroke:1px rgba(255,255,255,.3);color:transparent}
+html body .mq span:nth-child(3n){color:rgba(255,255,255,.92);-webkit-text-stroke:0;text-shadow:var(--bloom)}
+
+/* ═══ CATÁLOGO: carril horizontal (sin scroll de página) ══════════════ */
+html body #v-catalogo .wrap.cat-top{
+  max-width:none;height:100%;display:flex;flex-direction:column;padding-top:clamp(18px,3.4vh,40px)
+}
+html body #v-catalogo .sec-top{margin-bottom:12px}
+html body #v-catalogo .h2{font-size:clamp(40px,6vw,92px);line-height:.9;text-shadow:var(--bloom)}
+html body .cnt2{font-family:var(--num);letter-spacing:.1em}
+
+html body .tools{padding:0;background:none;border:0;box-shadow:none;border-radius:0;margin-bottom:10px;gap:12px}
+html body .tools::before,html body .tools::after{display:none}
+html body .sbx input{height:48px;border-radius:4px 18px 4px 18px;background:rgba(0,0,0,.55);border-color:var(--hair);transition:box-shadow .6s var(--soft),border-color .3s,background .3s}
+html body .chips{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:2px 2px 6px;min-width:0}
+html body .chips::-webkit-scrollbar{display:none}
+html body .chip{flex:0 0 auto;white-space:nowrap;border-radius:4px 12px 4px 12px;background:transparent;border-color:var(--hair);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+html body .chip.tg{text-transform:none}
+html body .chip.on{background:#fff;color:#000;box-shadow:0 0 30px rgba(255,255,255,.34)}
+@media(min-width:900px){
+  html body .fl{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px}
+}
+
+html body .grid:not(.list){
+  flex:1;min-height:0;display:flex;align-items:center;gap:clamp(20px,3vw,48px);
+  overflow-x:auto;overflow-y:hidden;overscroll-behavior:contain;scrollbar-width:none;
+  scroll-snap-type:x proximity;
+  padding:6px var(--gut) 8px;margin-inline:calc(var(--gut)*-1);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 4%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 4%,#000 94%,transparent);
+}
+html body .grid:not(.list)::-webkit-scrollbar{display:none}
+html body .grid:not(.list) .bc{
+  flex:none;height:calc(100% - 26px);max-height:640px;aspect-ratio:4/5;scroll-snap-align:center;
+  background:none;border:0;box-shadow:none;border-radius:0;overflow:visible
+}
+html body .grid:not(.list) .bc:nth-child(even){translate:0 22px}
+html body .grid:not(.list) .bc:nth-child(odd){translate:0 -10px}
+html body .grid:not(.list) .bc::after{display:none}
+html body .grid:not(.list) .bc-i{
+  position:absolute;inset:0;aspect-ratio:auto;margin:0;border-radius:var(--cut) 8px var(--cut) 8px;
+  border:1px solid var(--hair);box-shadow:0 40px 80px -36px #000;
+  transition:box-shadow .9s var(--soft),border-color .4s,transform 1s var(--soft)
+}
+html body .grid:not(.list) .bc-i::after{background:linear-gradient(180deg,transparent 38%,rgba(0,0,0,.92))}
+html body .grid:not(.list) .bc:hover .bc-i{border-color:var(--hair2);box-shadow:0 0 100px -20px rgba(255,255,255,.45),0 40px 80px -36px #000;transform:scale(1.025)}
+html body .grid:not(.list) .bc.sel .bc-i{border-color:#fff;box-shadow:0 0 0 1px #fff,0 0 90px -16px rgba(255,255,255,.5)}
+html body .grid:not(.list) .bc-i img{transition:transform 1.4s var(--soft),filter .8s var(--soft)}
+html body .grid:not(.list) .bc:hover .bc-i img{transform:scale(1.14)}
+html body .grid:not(.list) .bc-b{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:0 22px 20px;pointer-events:none}
+html body .grid:not(.list) .bc-b h3{font-size:clamp(28px,2.8vw,44px);line-height:.95;text-shadow:var(--bloom)}
+html body .grid:not(.list) .bc-b p{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+html body .grid:not(.list) .bc-pr{font-size:24px}
+html body .bc-ty{border-radius:3px;background:rgba(0,0,0,.6);font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+html body .bc-pl{box-shadow:0 0 44px rgba(255,255,255,.5)}
+html body .bc-go{pointer-events:auto}
+
+/* Vista lista: columna con scroll interno propio */
+html body .grid.list{flex:1;min-height:0;display:grid;align-content:start;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+html body .grid.list .bc{border-radius:4px 18px 4px 18px;background:none;border-color:var(--hair);box-shadow:none}
+
+/* ═══ LICENCIAS ═══════════════════════════════════════════════════════ */
+html body .license-window{border-radius:6px 28px 6px 28px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.015) 40%),rgba(3,3,3,.9);border-color:var(--hair2)}
+html body .window-heading h2{font-size:clamp(30px,4vw,52px);text-shadow:var(--bloom)}
+html body .lic{border-radius:4px 16px 4px 16px;background:rgba(255,255,255,.015);border-color:var(--hair);box-shadow:none;transition:transform .7s var(--soft),border-color .3s,background .4s,box-shadow .6s var(--soft)}
+html body .lic:hover{transform:translateX(5px);border-color:var(--hair2)}
+html body .lic.sel{transform:scale(1.012);background:rgba(255,255,255,.07);border-color:#fff;box-shadow:inset 3px 0 0 #fff,0 0 54px -14px rgba(255,255,255,.45)}
+html body .lic .lp,html body .tot{font-family:var(--num)}
+html body .lic em{border-radius:2px;letter-spacing:.18em}
+html body .buy,html body .license-window-body .buy{border-radius:4px 20px 4px 20px;background:rgba(255,255,255,.025);border-color:var(--hair);box-shadow:none}
+html body .lic-info{border-radius:4px 14px 4px 14px;background:none}
+
+/* ═══ CARRITO / PLAYER / BOTONES ══════════════════════════════════════ */
+html body .drawer{border-radius:6px 28px 6px 28px;border-color:var(--hair2)}
+html body .mini{border-radius:6px 24px 6px 24px;border-color:var(--hair);background:rgba(4,4,4,.62)}
+html body .mini .bar i{box-shadow:0 0 12px #fff}
+html body .mini .tk img{transition:border-radius 1.2s var(--soft),box-shadow .6s}
+html.live body .mini .tk img{border-radius:50%;animation:ronSpin 16s linear infinite}
+@keyframes ronSpin{to{rotate:360deg}}
+html body .cartb{border-radius:4px 16px 4px 16px}
+html body .btn{border-radius:4px 14px 4px 14px}
+html body .ib{border-radius:50%}
+
+/* ═══ FOCO ════════════════════════════════════════════════════════════ */
+html body :where(a,button,input,select,summary,[tabindex]):focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* ═══ MÓVIL: portada primero, título después; carril táctil ═══════════ */
+@media(max-width:899px){
+  html body .hero .art-w{order:-1}
+  html body .hero .info{order:0}
+  html body .rail{width:auto;border-radius:99px}
+  html body .art-w{transform-origin:50% -18%}
+  html body .art-w::after{transform:translate3d(9px,9px,0)}
+  html body .art-w::before{inset:-9px}
+  html body .art img,html body .art::after{border-radius:26px 8px 26px 8px}
+  html body #v-home h1{font-size:clamp(40px,12.4vw,62px)}
+  html body #v-home h1.long{font-size:clamp(32px,9.2vw,50px)}
+  html body .meta span{font-size:10px;padding-right:12px;margin-right:12px}
+  html body .grid:not(.list){gap:16px}
+  html body .grid:not(.list) .bc{height:calc(100% - 22px);scroll-snap-type:x mandatory}
+  html body .grid:not(.list) .bc-i{border-radius:22px 6px 22px 6px}
+  html body .grid:not(.list) .bc-b{padding:0 14px 14px}
+  html body .grid:not(.list) .bc-b h3{font-size:clamp(22px,7vw,32px)}
+  html body .grid:not(.list) .bc-go{display:inline}
+  html body .license-window{border-radius:22px 22px 0 0}
+  html body .rail,html body .mini,html body .drawer{backdrop-filter:blur(16px) saturate(1.5)}
+}
+@media(min-width:900px) and (max-width:1120px){
   :root{--gut:26px;--rail:224px}
-  .rail{width:200px}
-  .hero{gap:32px}
-  .art-w{width:min(100%,420px)}
+  html body .rail{width:200px}
+  html body #v-home .hero{gap:32px}
+  html body #v-home .art-w{width:min(100%,400px)}
+  html body #v-home .info{margin-right:0}
 }
-@media (max-width:899px){
-  /* Preserve the original mobile signature: cover first, title second. */
-  .hero .art-w{order:-1}
-  .hero .info{order:0}
-  .rail{width:auto}
+
+/* ═══ MOVIMIENTO REDUCIDO ═════════════════════════════════════════════ */
+@media(prefers-reduced-motion:reduce){
+  html body h1.swap .l{animation:none}
+  html body .art-w,html body .hero .info{transform:none;rotate:0deg;translate:0 0}
+  html body #v-home .marq{transform:none}
+  html.live body .mini .tk img{animation:none}
+  html body .art img.swap,html body .art.flare::after{animation:none}
 }
