@@ -138,6 +138,7 @@ void main(){
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texA); gl.uniform1i(uni.uA, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texB); gl.uniform1i(uni.uB, 1);
     } catch (e) { return false; }
+    canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); glOK = false; root.classList.remove('fx-on'); canvas.style.display = 'none'; });
     scene.insertBefore(canvas, scene.firstChild);
     root.classList.add('fx-on');
     size(); addEventListener('resize', size, { passive: true });
