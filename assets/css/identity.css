@@ -46,11 +46,6 @@ html body .rail,html body .mini,html body .license-window,html body .drawer,html
   -webkit-backdrop-filter:blur(20px) saturate(1.6);
   backdrop-filter:blur(20px) saturate(1.6);
 }
-/* Chromium: además deforma lo que hay detrás (refracción). Si no se entiende, queda el blur de arriba. */
-html body .rail,html body .mini,html body .drawer{
-  backdrop-filter:blur(16px) saturate(1.7) url(#ron-liquid);
-}
-
 /* ═══ RAIL ════════════════════════════════════════════════════════════ */
 @media(min-width:900px){
   html body .rail{width:208px;border-radius:30px 8px 30px 8px}
@@ -182,7 +177,7 @@ html body .grid:not(.list){
 }
 html body .grid:not(.list)::-webkit-scrollbar{display:none}
 html body .grid:not(.list) .bc{
-  flex:none;height:calc(100% - 26px);max-height:640px;aspect-ratio:4/5;scroll-snap-align:center;
+  flex:none;height:calc(100% - 56px);max-height:620px;aspect-ratio:4/5;scroll-snap-align:center;
   background:none;border:0;box-shadow:none;border-radius:0;overflow:visible
 }
 html body .grid:not(.list) .bc:nth-child(even){translate:0 22px}
@@ -248,20 +243,27 @@ html body :where(a,button,input,select,summary,[tabindex]):focus-visible{outline
   html body #v-home h1.long{font-size:clamp(32px,9.2vw,50px)}
   html body .meta span{font-size:10px;padding-right:12px;margin-right:12px}
   html body .grid:not(.list){gap:16px}
-  html body .grid:not(.list) .bc{height:calc(100% - 22px);scroll-snap-type:x mandatory}
+  html body .grid:not(.list) .bc{height:calc(100% - 50px)}
   html body .grid:not(.list) .bc-i{border-radius:22px 6px 22px 6px}
   html body .grid:not(.list) .bc-b{padding:0 14px 14px}
   html body .grid:not(.list) .bc-b h3{font-size:clamp(22px,7vw,32px)}
   html body .grid:not(.list) .bc-go{display:inline}
   html body .license-window{border-radius:22px 22px 0 0}
-  html body .rail,html body .mini,html body .drawer{backdrop-filter:blur(16px) saturate(1.5)}
-}
+  }
 @media(min-width:900px) and (max-width:1120px){
   :root{--gut:26px;--rail:224px}
   html body .rail{width:200px}
   html body #v-home .hero{gap:32px}
   html body #v-home .art-w{width:min(100%,400px)}
   html body #v-home .info{margin-right:0}
+}
+
+/* ═══ SEGURIDAD: si no cabe, la pantalla se desplaza en vez de cortarse ═══ */
+@media(max-height:780px){html body .view{overflow-y:auto}html body #v-catalogo{overflow:hidden}}
+@media(max-width:899px){
+  html body .view{overflow-y:auto}
+  html body #v-catalogo{overflow:hidden}
+  html body .art-w{width:min(74%,380px,36dvh)}
 }
 
 /* ═══ MOVIMIENTO REDUCIDO ═════════════════════════════════════════════ */

@@ -12,19 +12,6 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const rnd = (a, b) => a + Math.random() * (b - a);
 
-  /* ───────── Vidrio líquido: filtro SVG (se usa vía backdrop-filter:url(#ron-liquid)) ───────── */
-  (function liquidGlass() {
-    const w = D.createElement('div');
-    w.setAttribute('aria-hidden', 'true');
-    w.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';
-    w.innerHTML = '<svg width="0" height="0" focusable="false"><defs>' +
-      '<filter id="ron-liquid" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
-      '<feTurbulence type="fractalNoise" baseFrequency=".010 .016" numOctaves="2" seed="11" result="t"/>' +
-      '<feDisplacementMap in="SourceGraphic" in2="t" scale="22" xChannelSelector="R" yChannelSelector="G"/></filter>' +
-      '</defs></svg>';
-    D.body.appendChild(w);
-  })();
-
   /* ───────── Estado compartido ───────── */
   const S = {
     punch: 0,          // golpe de zoom/aberración (decae)
@@ -59,7 +46,11 @@
   const lite = () => root.classList.contains('lite');
 
   const VS = 'attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
-  const FS = `precision mediump float;
+  const FS = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 v;
 uniform sampler2D uA,uB;
 uniform vec2 uRes,uPtr;
@@ -76,7 +67,7 @@ vec3 art(vec2 uv,float liquid){
 void main(){
   float asp=uRes.x/uRes.y;
   vec2 p=(v-.5)*vec2(asp,1.);
-  float zoom=1.28-uPunch*.16-uLv*.035;
+  float zoom=1.7-uPunch*.18-uLv*.04;
   p*=zoom;
   float c=cos(uT*.012),s=sin(uT*.012);p=mat2(c,-s,s,c)*p;
   /* domain warp líquido */
@@ -110,13 +101,13 @@ void main(){
   float base=clamp((l-.18)*1.25,0.,1.);
   vec3 g=vec3(base)*vec3(.94,.96,1.);
   float bloom=pow(base,2.6)*(.55+uLv*.5+uPunch*.5);
-  g=g*(.30+uLv*.06)+bloom*.5;
+  g=g*(.15+uLv*.05)+bloom*.22;
   /* haces de luz que barren la escena */
   float sw=smoothstep(.55,1.,sin((p.x*1.3+p.y*.7)*3.1+uT*.22+q.x*2.4));
   g+=sw*.022*(.6+uLv);
   /* viñeta + scanlines + grano */
   float vg=smoothstep(1.05,.18,length((v-vec2(.56,.48))*vec2(asp*.62,1.)));
-  g*=.18+.82*vg;
+  g*=.06+.94*vg;
   g+=(h(gl_FragCoord.xy+fract(uT)*91.)-.5)*.05;
   g*=.97+.03*sin(gl_FragCoord.y*1.6);
   gl_FragColor=vec4(g,1.);
@@ -211,7 +202,7 @@ void main(){
 
     /* ruido ambiental: movimiento aleatorio perpetuo (suma de senos incommensurables) */
     const amb = Math.sin(T * .71) * .9 + Math.sin(T * 1.37 + 1.3) * .6 + Math.sin(T * .29 + 4.1) * 1.1;
-    stepPendulum(P1, 8.5, .55, amb * (1 + S.lv * 1.6), dt);
+    stepPendulum(P1, 8.5, .6, amb * .45 * (1 + S.lv * 1.4), dt);
     stepPendulum(P2, 15, .95, -P1.w * .9 - P1.a * 1.8, dt);
 
     /* aplicar transformaciones (solo escribe si cambió lo suficiente) */
@@ -232,7 +223,7 @@ void main(){
     if (glOK && hasTex) {
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
       gl.uniform2f(uni.uPtr, S.px, -S.py);
-      gl.uniform1f(uni.uT, T); gl.uniform1f(uni.uMix, S.mix); gl.uniform1f(uni.uLv, S.lv);
+      gl.uniform1f(uni.uT, T % 600); gl.uniform1f(uni.uMix, S.mix); gl.uniform1f(uni.uLv, S.lv);
       gl.uniform1f(uni.uPunch, S.punch); gl.uniform1f(uni.uVel, S.vel);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
