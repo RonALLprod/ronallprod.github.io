@@ -161,6 +161,7 @@
     let armed = true, quietMs = 0, hitPeak = 0, lastHit = -Infinity;
     const art = o.art, lv5 = [0, 0, 0, 0, 0];
     const EQB = [[35, 120], [120, 300], [300, 1000], [1000, 4000], [4000, 12000]];
+    const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
     const makeEnv = () => ({ fast: 0, slow: 0, noise: 0, rise: 0, prevFast: 0 });
     let subEnv = makeEnv(), bodyEnv = makeEnv();
 
