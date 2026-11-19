@@ -103,7 +103,7 @@ function show(id, o = {}) {
   if (!o.first) kick(to);
   curView = id; navSync();
   if (!o.first && o.push !== false) { try { history.pushState(null, '', urlFor(id)); } catch (e) {} }
-  U.reveal(to); U.scrollFx(to);
+  U.reveal(to);
   if (id === 'catalogo') draw();
   U.vib(6);
 }
@@ -258,7 +258,7 @@ let routeFrame = 0;
 const routeSoon = () => { if (routeFrame) return; routeFrame = requestAnimationFrame(() => { routeFrame = 0; route(false); }); };
 addEventListener('popstate', routeSoon);
 addEventListener('hashchange', routeSoon);
-addEventListener('resize', placeNav);
+let rzN = 0; addEventListener('resize', () => { if (!rzN) rzN = requestAnimationFrame(() => { rzN = 0; placeNav(); }); }, { passive: true });
 
 chipsBuild();
 $('#f-sort').value = st.sort;

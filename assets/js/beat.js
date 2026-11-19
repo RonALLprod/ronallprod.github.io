@@ -8,7 +8,7 @@ R.track('beat', { beat: b.id });
 
 const art = $('#art'), view = $('#v-home');
 U.letters($('#bp-ttl'), b.name);
-U.scene(ROOT + (b.thumb || b.cover)); U.sheen(); U.tilt(art); U.reveal(view); U.scrollFx(view); U.adaptive();
+U.scene(ROOT + (b.thumb || b.cover)); U.sheen(); U.tilt(art); U.reveal(view); U.adaptive();
 U.pulse(R.P.audio, { art });
 const place = () => { try { U.indicator($('#nav'))(); U.indicator($('#dock .nav'))(); } catch (e) {} };
 const nav = U.indicator($('#nav')), dock = U.indicator($('#dock .nav'));

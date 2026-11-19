@@ -245,7 +245,7 @@ h1.long{font-size:clamp(38px,5.6vw,86px)}
 .play .ring{position:absolute;left:-11px;top:-11px;width:calc(100% + 22px);height:calc(100% + 22px);transform:rotate(-90deg);pointer-events:none;overflow:visible}
 .ring circle{fill:none;stroke-width:1.8}
 .ring .rt{stroke:rgba(255,255,255,.14)}
-.ring .rp{stroke:#fff;stroke-linecap:round;stroke-dasharray:301.6;stroke-dashoffset:calc(301.6*(1 - var(--p,0)));filter:drop-shadow(0 0 5px #fff);transition:stroke-dashoffset .3s linear}
+.ring .rp{stroke:#fff;stroke-linecap:round;stroke-dasharray:301.6;stroke-dashoffset:calc(301.6*(1 - var(--p,0)));filter:drop-shadow(0 0 5px #fff)}
 .play::before,.play::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);opacity:0;pointer-events:none}
 .live .play::before{animation:pring 2.4s var(--out) infinite}.live .play::after{animation:pring 2.4s var(--out) 1.2s infinite}
 @keyframes pring{from{opacity:.8;transform:scale(1)}to{opacity:0;transform:scale(2)}}

@@ -66,7 +66,7 @@ void main(){
   float asp=uRes.x/uRes.y;
   vec2 p=(v-.5)*vec2(asp,1.);
   float cz=min(1.,1./asp)*.86;
-  float zoom=cz*(1.-uPunch*.08-uLv*.03-uKick*.17);
+  float zoom=cz*(1.-uPunch*.08-uLv*.03-uKick*.17+sin(uT*.33)*.012);
   vec2 sp=(v-.5)*vec2(asp,1.);
   float sl=length(sp);
   float ring=exp(-pow((sl-uShock*.95)*7.5,2.))*(1.-uShock)*uShockA;
@@ -137,12 +137,21 @@ void main(){
     canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); glOK = false; root.classList.remove('fx-on'); canvas.style.display = 'none'; });
     scene.insertBefore(canvas, scene.firstChild);
     root.classList.add('fx-on');
-    size(); addEventListener('resize', size, { passive: true });
+    size(); let rz = 0; addEventListener('resize', () => { if (!rz) rz = requestAnimationFrame(() => { rz = 0; size(); }); }, { passive: true });
     return true;
+  }
+  const DPR = Math.min(devicePixelRatio || 1, 1.5), Q_MIN = .26, Q_MAX = DPR * .72;
+  let qk = DPR * .5, qCool = 90, ema = 16.7, slow = 0;
+  function adapt(dt) {
+    ema += (dt * 1000 - ema) * .06;
+    if (--qCool > 0) return;
+    if (ema > 21 && qk > Q_MIN) { qk = Math.max(Q_MIN, qk * .86); qCool = 24; size(); }
+    else if (ema < 15 && qk < Q_MAX) { qk = Math.min(Q_MAX, qk * 1.07); qCool = 70; size(); }
+    if (ema > 42 && qk <= Q_MIN * 1.01) { if (++slow > 90) root.classList.add('lite'); } else slow = 0;
   }
   function size() {
     if (!canvas) return;
-    const k = Math.min(devicePixelRatio || 1, 1.5) * .5;
+    const k = qk;
     const w = Math.max(2, Math.round(innerWidth * k)), h = Math.max(2, Math.round(innerHeight * k));
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
   }
@@ -181,19 +190,22 @@ void main(){
 
   const q = (v, st) => v < st ? '0' : (Math.round(v / st) * st).toFixed(2);
   const put = (e, k, v) => { const c = e._c || (e._c = {}); if (c[k] !== v) { c[k] = v; e.style.setProperty(k, v); } };
-  let last = 0, T = 0, raf = 0, glTog = 0;
+  const ease = (dt, k) => 1 - Math.exp(-dt * k);
+  let last = 0, T = 0, raf = 0, mxAcc = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - last) / 1000 || .016); last = now; T += dt;
+    adapt(dt);
+    if (mxAcc) { P1.w += mxAcc * .05; mxAcc = 0; }
 
     const ox = S.px, oy = S.py;
-    S.px += (S.tx - S.px) * Math.min(1, dt * 4.2); S.py += (S.ty - S.py) * Math.min(1, dt * 4.2);
+    const ep = ease(dt, 4.4); S.px += (S.tx - S.px) * ep; S.py += (S.ty - S.py) * ep;
     const sp = Math.hypot(S.px - ox, S.py - oy) / Math.max(dt, .001);
-    S.vel += (clamp(sp * .5, 0, 1) - S.vel) * Math.min(1, dt * 6);
+    S.vel += (clamp(sp * .5, 0, 1) - S.vel) * ease(dt, 6);
     S.punch *= Math.pow(.04, dt);
     S.kick *= Math.pow(.0008, dt);
     const lvRaw = artEl ? parseFloat(artEl.style.getPropertyValue('--lv')) || 0 : 0;
-    S.lv += (lvRaw - S.lv) * Math.min(1, dt * 5);
+    S.lv += (lvRaw - S.lv) * ease(dt, 7);
     if (S.mix < S.mixT) S.mix = Math.min(S.mixT, S.mix + dt / 1.5);
 
     const amb = Math.sin(T * .71) * .9 + Math.sin(T * 1.37 + 1.3) * .6 + Math.sin(T * .29 + 4.1) * 1.1;
@@ -218,8 +230,7 @@ void main(){
     }
     if (el.marq) put(el.marq, '--skew', (P1.w * -.02 - S.px * .5).toFixed(2) + 'deg');
 
-    glTog ^= 1;
-    if (glOK && hasTex && (glTog || S.kick > .02 || S.shock < 1)) {
+    if (glOK && hasTex) {
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
       gl.uniform2f(uni.uPtr, S.px, -S.py);
       gl.uniform1f(uni.uT, T % 628.3185); gl.uniform1f(uni.uMix, S.mix); gl.uniform1f(uni.uLv, S.lv);
@@ -233,8 +244,7 @@ void main(){
     addEventListener('pointermove', e => {
       S.tx = clamp((e.clientX / innerWidth) * 2 - 1, -1, 1);
       S.ty = clamp((e.clientY / innerHeight) * 2 - 1, -1, 1);
-      const mx = e.movementX || 0;
-      if (mx) { P1.w += clamp(mx, -40, 40) * .05; }
+      mxAcc += clamp(e.movementX || 0, -40, 40);
     }, { passive: true });
     D.addEventListener('click', e => {
       if (e.target.closest('[data-go]')) { FX.punch(.8); FX.push(rnd(-10, 10)); }

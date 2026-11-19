@@ -9,27 +9,6 @@
   const lite = () => root.classList.contains('lite');
   const vib = ms => { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(ms); } catch (e) {} };
 
-  let mbNode = null, mbRaf = 0;
-  function mbInit() {
-    if (mbNode) return mbNode;
-    const w = D.createElement('div');
-    w.setAttribute('aria-hidden', 'true'); w.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
-    w.innerHTML = '<svg width="0" height="0"><filter id="ron-mb" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB"><feGaussianBlur id="ron-mbg" stdDeviation="0 0"/></filter></svg>';
-    D.body.appendChild(w); mbNode = $('#ron-mbg', w); return mbNode;
-  }
-  function motionBlur(el, o = {}) {
-    if (!el || reduce || lite()) return;
-    const g = mbInit(), x = o.x ?? 18, y = o.y ?? 0, dur = o.dur || 800, t0 = performance.now(), mine = ++mbRaf;
-    el.style.filter = 'url(#ron-mb)';
-    const f = now => {
-      if (mine !== mbRaf) { el.style.filter = ''; return; }
-      const k = Math.min(1, (now - t0) / dur), e = Math.pow(1 - k, 3);
-      g.setAttribute('stdDeviation', (x * e).toFixed(2) + ' ' + (y * e).toFixed(2));
-      if (k < 1) requestAnimationFrame(f); else { el.style.filter = ''; g.setAttribute('stdDeviation', '0 0'); }
-    };
-    requestAnimationFrame(f);
-  }
-
   function letters(el, text) {
     if (!el) return;
     const value = String(text ?? '');
@@ -68,7 +47,7 @@
 
   let layer = 0, sceneSeq = 0;
   function bake(img) {
-    const N = 192, c = D.createElement('canvas'); c.width = c.height = N;
+    const N = 128, c = D.createElement('canvas'); c.width = c.height = N;
     const x = c.getContext('2d'); try { x.filter = 'blur(5px)'; } catch (e) {}
     x.drawImage(img, -12, -12, N + 24, N + 24); x.filter = 'none';
     const d = x.getImageData(0, 0, N, N), p = d.data, glow = D.createElement('canvas'); glow.width = glow.height = N;
@@ -164,11 +143,6 @@
     setTimeout(() => $$('.rvb:not(.in)', view).forEach(e => e.classList.add('in')), 4500);
   }
 
-  function scrollFx(view) {
-    if (!view || view._sfx || reduce) return; view._sfx = 1; let raf = 0;
-    view.addEventListener('scroll', () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; view.style.setProperty('--sy', Math.min(view.scrollTop, 900)); }); }, { passive: true });
-  }
-
   function indicator(nav) {
     const ind = $('.ind', nav); if (!ind) return () => {};
     const place = () => {
@@ -178,13 +152,21 @@
       ind.style.width = b.offsetWidth + 'px'; ind.style.height = b.offsetHeight + 'px';
       ind.style.transform = `translate3d(${x}px,${y}px,0)`; ind.classList.add('on');
     };
-    addEventListener('resize', place);
+    let rz = 0; addEventListener('resize', () => { if (!rz) rz = requestAnimationFrame(() => { rz = 0; place(); }); }, { passive: true });
     return place;
   }
 
   function pulse(audio, o = {}) {
-    let raf = 0, lastKick = 0, bassS = 0, avg = 0, last = 0, prevE = 0, fluxAvg = 0;
-    const art = o.art;
+    let raf = 0, lastKick = 0, bassS = 0, avg = 0, last = 0, prevE = 0, fluxAvg = 0, eqs = [], eqT = -1e9;
+    const art = o.art, lv5 = [0, 0, 0, 0, 0], EQB = [[35, 120], [120, 300], [300, 1000], [1000, 4000], [4000, 12000]];
+    const eqList = t => {
+      if (t - eqT > 400) {
+        eqT = t; eqs = $$('.eq').filter(e => { const c = e.closest('.bc'); return !c || c.classList.contains('playing'); });
+        eqs.forEach(e => e.classList.add('rx'));
+      }
+      return eqs;
+    };
+    const eqOff = () => { eqs.forEach(e => { e.classList.remove('rx'); [...e.children].forEach(x => { x.style.transform = ''; x._s = null; }); }); eqs = []; eqT = -1e9; };
     const setup = () => {
       if (!audio || audio._ron) return audio && audio._ron;
       try {
@@ -192,7 +174,7 @@
         const ctx = new AC(), src = ctx.createMediaElementSource(audio), an = ctx.createAnalyser();
         an.fftSize = 2048; an.smoothingTimeConstant = .2; src.connect(an); an.connect(ctx.destination);
         const hz = ctx.sampleRate / an.fftSize, bin = f => Math.max(1, Math.round(f / hz));
-        audio._ron = { ctx, an, bins: new Uint8Array(an.frequencyBinCount), s0: bin(35), s1: bin(140), p1: bin(260) };
+        audio._ron = { ctx, an, bins: new Uint8Array(an.frequencyBinCount), s0: bin(35), s1: bin(140), p1: bin(260), eq: EQB.map(([x, y]) => [bin(x), Math.max(bin(x), bin(y))]) };
       } catch (e) { audio._ron = null; }
       return audio._ron;
     };
@@ -211,6 +193,16 @@
         }
         bassS += (e - bassS) * .5;
         v = Math.min(1, bassS * 1.25);
+        for (let i = 0; i < 5; i++) {
+          const r = Math.min(1, band(A.bins, A.eq[i][0], A.eq[i][1]) * (1.1 + i * .4));
+          lv5[i] += (r - lv5[i]) * (r > lv5[i] ? .6 : .2);
+        }
+        for (const q of eqList(t)) {
+          for (let i = 0; i < 5 && i < q.children.length; i++) {
+            const sc = (.12 + lv5[i] * .88).toFixed(2), c = q.children[i];
+            if (c._s !== sc) { c._s = sc; c.style.transform = 'scaleY(' + sc + ')'; }
+          }
+        }
       } else {
         if (t - last < 33) return; last = t; const k = t / 1000;
         v = Math.min(1, Math.max(0, .5 + .32 * Math.sin(k * 5.4) + .2 * Math.sin(k * 2.3 + 1.2) * Math.sin(k * 9.1)));
@@ -221,7 +213,7 @@
       root.classList.add('live'); const A = setup(); if (A && A.ctx.state === 'suspended') A.ctx.resume().catch(() => {});
       if (!raf && !reduce && !D.hidden) raf = requestAnimationFrame(tick);
     };
-    const off = () => { root.classList.remove('live'); cancelAnimationFrame(raf); raf = 0; prevE = 0; if (art) art.style.setProperty('--lv', 0); };
+    const off = () => { root.classList.remove('live'); cancelAnimationFrame(raf); raf = 0; prevE = 0; eqOff(); if (art) art.style.setProperty('--lv', 0); };
     if (audio) { audio.addEventListener('play', on); audio.addEventListener('playing', on); audio.addEventListener('pause', off); audio.addEventListener('ended', off); }
     D.addEventListener('visibilitychange', () => { if (D.hidden) { cancelAnimationFrame(raf); raf = 0; } else if (audio && !audio.paused) on(); });
     if (audio && !audio.paused) on();
@@ -237,5 +229,5 @@
     }, 3600);
   }
 
-  window.RonUI = { reduce, fine, absUrl, vib, motionBlur, letters, count, scene, tilt, sheen, reveal, scrollFx, indicator, pulse, adaptive };
+  window.RonUI = { reduce, fine, absUrl, vib, letters, count, scene, tilt, sheen, reveal, indicator, pulse, adaptive };
 })();
