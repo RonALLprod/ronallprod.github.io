@@ -157,96 +157,185 @@
   }
 
   function pulse(audio, o = {}) {
-    let raf = 0, lastKick = 0, bassS = 0, last = 0, prevE = 0, fluxAvg = 0, floor = 0, quietSince = 0, armed = true, warmupUntil = 0, eqs = [], eqT = -1e9;
-    const art = o.art, lv5 = [0, 0, 0, 0, 0], EQB = [[35, 120], [120, 300], [300, 1000], [1000, 4000], [4000, 12000]];
+    let raf = 0, lastFrame = 0, bassS = 0, eqs = [], eqT = -1e9;
+    let armed = true, quietMs = 0, hitPeak = 0, lastHit = -Infinity;
+    const art = o.art, lv5 = [0, 0, 0, 0, 0];
+    const EQB = [[35, 120], [120, 300], [300, 1000], [1000, 4000], [4000, 12000]];
+    const makeEnv = () => ({ fast: 0, slow: 0, noise: 0, rise: 0, prevFast: 0 });
+    let subEnv = makeEnv(), bodyEnv = makeEnv();
+
     const eqList = t => {
       if (t - eqT > 400) {
-        eqT = t; eqs = $$('.eq').filter(e => { const c = e.closest('.bc'); return !c || c.classList.contains('playing'); });
+        eqT = t;
+        eqs = $$('.eq').filter(e => { const c = e.closest('.bc'); return !c || c.classList.contains('playing'); });
         eqs.forEach(e => e.classList.add('rx'));
       }
       return eqs;
     };
-    const eqOff = () => { eqs.forEach(e => { e.classList.remove('rx'); [...e.children].forEach(x => { x.style.transform = ''; x._s = null; }); }); eqs = []; eqT = -1e9; };
+    const eqOff = () => {
+      eqs.forEach(e => { e.classList.remove('rx'); [...e.children].forEach(x => { x.style.transform = ''; x._s = null; }); });
+      eqs = []; eqT = -1e9;
+    };
+    const makeBandTap = (ctx, source, low, high) => {
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass'; hp.frequency.value = low; hp.Q.value = .707;
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = high; lp.Q.value = .707;
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0;
+      const mute = ctx.createGain();
+      mute.gain.value = 0;
+      source.connect(hp); hp.connect(lp); lp.connect(analyser);
+      analyser.connect(mute); mute.connect(ctx.destination);
+      return { analyser, data: new Float32Array(analyser.fftSize) };
+    };
     const setup = () => {
       if (!audio || audio._ron) return audio && audio._ron;
       try {
-        const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
-        const ctx = new AC(), src = ctx.createMediaElementSource(audio), an = ctx.createAnalyser();
-        an.fftSize = 2048; an.smoothingTimeConstant = .08; src.connect(an); an.connect(ctx.destination);
-        const hz = ctx.sampleRate / an.fftSize, bin = f => Math.max(1, Math.round(f / hz));
-        audio._ron = { ctx, an, bins: new Uint8Array(an.frequencyBinCount), s0: bin(36), s1: bin(105), s2: bin(180), p1: bin(260), eq: EQB.map(([x, y]) => [bin(x), Math.max(bin(x), bin(y))]) };
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        const ctx = new AC(), source = ctx.createMediaElementSource(audio), analyser = ctx.createAnalyser();
+        analyser.fftSize = 2048;
+        analyser.smoothingTimeConstant = .12;
+        source.connect(analyser); analyser.connect(ctx.destination);
+        let detectors = null;
+        try {
+          detectors = {
+            sub: makeBandTap(ctx, source, 24, 145),
+            body: makeBandTap(ctx, source, 85, 280),
+          };
+        } catch (e) { detectors = null; }
+        const hz = ctx.sampleRate / analyser.fftSize, bin = f => Math.max(1, Math.round(f / hz));
+        audio._ron = {
+          ctx, analyser, bins: new Uint8Array(analyser.frequencyBinCount),
+          eq: EQB.map(([x, y]) => [bin(x), Math.max(bin(x), bin(y))]),
+          detectors,
+        };
       } catch (e) { audio._ron = null; }
       return audio._ron;
     };
-    const band = (bins, a, b) => { let s = 0; for (let i = a; i <= b; i++) s += bins[i]; return s / ((b - a + 1) * 255); };
+    const band = (bins, a, b) => {
+      let sum = 0;
+      for (let i = a; i <= b; i++) sum += bins[i];
+      return sum / ((b - a + 1) * 255);
+    };
+    const rms = tap => {
+      tap.analyser.getFloatTimeDomainData(tap.data);
+      let sum = 0;
+      for (let i = 0; i < tap.data.length; i++) sum += tap.data[i] * tap.data[i];
+      return Math.sqrt(sum / tap.data.length);
+    };
+    const updateEnv = (state, value, dt) => {
+      const fastTau = value > state.fast ? .018 : .075;
+      const slowTau = value > state.slow ? .11 : .22;
+      state.fast += (value - state.fast) * (1 - Math.exp(-dt / fastTau));
+      state.slow += (value - state.slow) * (1 - Math.exp(-dt / slowTau));
+      if (value < state.noise * 2.2 + .012) {
+        state.noise += (value - state.noise) * (value < state.noise ? .12 : .012);
+      }
+      state.rise = Math.max(0, state.fast - state.prevFast);
+      state.prevFast = state.fast;
+      return state.fast - state.slow;
+    };
+    const resetDetector = () => {
+      subEnv = makeEnv(); bodyEnv = makeEnv();
+      armed = true; quietMs = 0; hitPeak = 0; lastHit = -Infinity;
+      bassS = 0; lastFrame = 0;
+    };
+    const detect808 = (A, t, dt) => {
+      const subRms = rms(A.detectors.sub);
+      const bodyRms = rms(A.detectors.body);
+      const prominence = updateEnv(subEnv, subRms, dt);
+      const bodyProminence = updateEnv(bodyEnv, bodyRms, dt);
+
+      // Adaptive gates follow the noise floor and the sustained bass level.
+      const gate = Math.max(.012, subEnv.noise * 2.6 + .004, subEnv.slow * .22);
+      const promGate = Math.max(.006, subEnv.slow * .25, subEnv.noise * 1.5);
+      const riseGate = Math.max(.0035, subEnv.slow * .085, subEnv.noise * .8);
+
+      // Re-arm only after the low-frequency envelope has genuinely fallen.
+      if (!armed) {
+        hitPeak = Math.max(hitPeak, subEnv.fast);
+        const releaseGate = Math.max(gate * 1.15, hitPeak * .52);
+        if (subEnv.fast < releaseGate && subRms < hitPeak * .65) quietMs += dt * 1000;
+        else quietMs = 0;
+        if (quietMs >= 36) { armed = true; quietMs = 0; hitPeak = 0; }
+      }
+
+      if (armed && t - lastHit >= 145 && subRms > gate &&
+          prominence > promGate && subEnv.rise > riseGate) {
+        const pScore = clamp((prominence - promGate) / (promGate * 3), 0, 1);
+        const aScore = clamp((subEnv.rise - riseGate) / (riseGate * 4), 0, 1);
+        const bScore = clamp(bodyProminence / Math.max(.01, prominence * 1.6), 0, 1);
+        const strength = clamp(.22 + pScore * .18 + aScore * .18 + bScore * .10, .22, .70);
+        lastHit = t; armed = false; quietMs = 0; hitPeak = subEnv.fast;
+        if (window.RonFX && RonFX.kick) RonFX.kick(strength);
+      }
+
+      // Smooth low-end intensity drives the continuous visual response, not hit counting.
+      const level = clamp((subEnv.fast - subEnv.noise * 1.4) * 13.5 + bodyEnv.fast * 1.8, 0, 1);
+      bassS += (level - bassS) * (level > bassS ? .42 : .18);
+      return bassS;
+    };
     const tick = t => {
       raf = requestAnimationFrame(tick);
-      const A = audio && audio._ron; let v;
-      if (A) {
-        A.an.getByteFrequencyData(A.bins);
-        // Detección de transitorios: prioriza subgrave, ataque rápido y caída real.
-        // El suelo se adapta lentamente al subir y rápido al bajar, evitando disparos por 808 sostenidos.
-        const sub = band(A.bins, A.s0, A.s1);
-        const body = band(A.bins, A.s1 + 1, A.s2);
-        const e = Math.min(1, sub * .84 + body * .16);
-        const rise = Math.max(0, e - prevE); prevE = e;
-        const falling = e < floor;
-        floor += (e - floor) * (falling ? .12 : .008);
-        fluxAvg += (rise - fluxAvg) * (rise > fluxAvg ? .08 : .025);
-        const prominence = e - floor;
-        const onsetGate = Math.max(.035, fluxAvg * 2.8 + .018);
-        const subFocus = sub / (body + .02);
+      const A = audio && audio._ron;
+      if (!A) return;
+      A.analyser.getByteFrequencyData(A.bins);
+      const dt = lastFrame ? clamp((t - lastFrame) / 1000, .004, .05) : 1 / 60;
+      lastFrame = t;
+      let v = 0;
 
-        // Un solo impulso por golpe: se rearma cuando el grave realmente cae.
-        if (e < floor + .045) {
-          if (!quietSince) quietSince = t;
-          if (t - quietSince >= 78) armed = true;
-        } else quietSince = 0;
-
-        if (t >= warmupUntil && armed && t - lastKick > 180 &&
-            rise > onsetGate && prominence > .09 && sub > .18 &&
-            subFocus > .72 && e > .20) {
-          lastKick = t; armed = false;
-          const strength = clamp((prominence - .075) * 4.8 + (rise - onsetGate) * 2.5, .28, 1.05);
-          if (window.RonFX && RonFX.kick) RonFX.kick(strength);
-        }
-        bassS += (e - bassS) * .5;
-        v = Math.min(1, bassS * 1.25);
-        for (let i = 0; i < 5; i++) {
-          const r = Math.min(1, band(A.bins, A.eq[i][0], A.eq[i][1]) * (1.1 + i * .4));
-          lv5[i] += (r - lv5[i]) * (r > lv5[i] ? .6 : .2);
-        }
-        for (const q of eqList(t)) {
-          for (let i = 0; i < 5 && i < q.children.length; i++) {
-            const sc = (.12 + lv5[i] * .88).toFixed(2), c = q.children[i];
-            if (c._s !== sc) { c._s = sc; c.style.transform = 'scaleY(' + sc + ')'; }
-          }
-        }
+      if (A.detectors && A.detectors.sub && A.detectors.body) {
+        v = detect808(A, t, dt);
       } else {
-        if (t - last < 33) return; last = t; const k = t / 1000;
-        v = Math.min(1, Math.max(0, .5 + .32 * Math.sin(k * 5.4) + .2 * Math.sin(k * 2.3 + 1.2) * Math.sin(k * 9.1)));
+        // Graceful visual fallback on browsers without filter-node support; no kick triggers.
+        const low = band(A.bins, A.eq[0][0], A.eq[0][1]);
+        bassS += (clamp(low * 1.4, 0, 1) - bassS) * .18;
+        v = bassS;
+      }
+
+      for (let i = 0; i < 5; i++) {
+        const target = Math.min(1, band(A.bins, A.eq[i][0], A.eq[i][1]) * (1.1 + i * .4));
+        lv5[i] += (target - lv5[i]) * (target > lv5[i] ? .6 : .2);
+      }
+      for (const q of eqList(t)) {
+        for (let i = 0; i < 5 && i < q.children.length; i++) {
+          const sc = (.12 + lv5[i] * .88).toFixed(2), c = q.children[i];
+          if (c._s !== sc) { c._s = sc; c.style.transform = 'scaleY(' + sc + ')'; }
+        }
       }
       if (art) art.style.setProperty('--lv', v.toFixed(3));
     };
     const on = () => {
-      root.classList.add('live'); const A = setup(); if (A && A.ctx.state === 'suspended') A.ctx.resume().catch(() => {});
+      root.classList.add('live');
+      const A = setup();
+      if (A && A.ctx.state === 'suspended') A.ctx.resume().catch(() => {});
       if (!raf && !reduce && !D.hidden) {
-        lastKick = 0; bassS = 0; prevE = 0; fluxAvg = 0; floor = 0; quietSince = 0; armed = true;
-        warmupUntil = performance.now() + 260;
+        resetDetector();
         raf = requestAnimationFrame(tick);
       }
     };
     const off = () => {
-      root.classList.remove('live'); cancelAnimationFrame(raf); raf = 0;
-      prevE = 0; fluxAvg = 0; floor = 0; quietSince = 0; armed = true;
-      eqOff(); if (art) art.style.setProperty('--lv', 0);
+      root.classList.remove('live');
+      cancelAnimationFrame(raf); raf = 0;
+      resetDetector(); eqOff();
+      if (art) art.style.setProperty('--lv', 0);
     };
-    if (audio) { audio.addEventListener('play', on); audio.addEventListener('playing', on); audio.addEventListener('pause', off); audio.addEventListener('ended', off); }
-    D.addEventListener('visibilitychange', () => { if (D.hidden) { cancelAnimationFrame(raf); raf = 0; } else if (audio && !audio.paused) on(); });
+    if (audio) {
+      audio.addEventListener('play', on);
+      audio.addEventListener('playing', on);
+      audio.addEventListener('pause', off);
+      audio.addEventListener('ended', off);
+    }
+    D.addEventListener('visibilitychange', () => {
+      if (D.hidden) { cancelAnimationFrame(raf); raf = 0; }
+      else if (audio && !audio.paused) on();
+    });
     if (audio && !audio.paused) on();
     return { on, off };
   }
-
   function adaptive() {
     if (lite() || reduce) return;
     setTimeout(() => {
