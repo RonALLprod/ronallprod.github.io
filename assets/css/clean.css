@@ -1,0 +1,56 @@
+/* V72 · orden + movimiento. Se carga al final y consolida los overrides anteriores. */
+
+/* ───────── Catálogo: cuadrícula ordenada, scroll vertical ───────── */
+html body #v-catalogo{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.22) transparent}
+html body #v-catalogo .wrap.cat-top{max-width:1320px;height:auto;min-height:0;display:block;padding-top:clamp(18px,3vh,32px);padding-bottom:28px}
+@media(min-width:900px){html body #v-catalogo .wrap.cat-top{padding-top:clamp(44px,7vh,72px)}}
+
+html body #v-catalogo .sec-top{align-items:baseline;margin-bottom:18px}
+html body #v-catalogo .h2{font-size:clamp(38px,5.4vw,80px)}
+html body .tools{margin-bottom:clamp(20px,3vh,32px)}
+html body .chips{-webkit-mask:linear-gradient(90deg,#000 92%,transparent);mask:linear-gradient(90deg,#000 92%,transparent)}
+
+html body .grid:not(.list){
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(200px,20vw,270px),1fr));
+  gap:clamp(16px,2vw,28px);align-items:start;align-content:start;justify-content:stretch;
+  flex:none;overflow:visible;margin-inline:0;padding:4px 0 8px;
+  -webkit-mask:none;mask:none;scroll-snap-type:none
+}
+html body .grid:not(.list) .bc{flex:none;width:auto;height:auto;max-height:none;aspect-ratio:4/5;translate:none;scroll-snap-align:none}
+html body .grid:not(.list) .bc:nth-child(even),html body .grid:not(.list) .bc:nth-child(odd){translate:none}
+html body .grid:not(.list) .bc-b h3{font-size:clamp(20px,1.9vw,30px);line-height:1}
+html body .grid:not(.list) .bc-b p{font-size:10.5px;letter-spacing:.1em}
+html body .grid:not(.list) .bc-pr{font-size:20px}
+html body .grid.list{flex:none;overflow:visible;gap:10px}
+html body #ruler{display:none!important}
+
+@media(max-width:560px){
+  html body .grid:not(.list){grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  html body .grid:not(.list) .bc-b{padding:0 12px 12px}
+  html body .grid:not(.list) .bc-b h3{font-size:clamp(16px,5vw,20px)}
+  html body .grid:not(.list) .bc-pr{font-size:16px}
+  html body .grid:not(.list) .bc-go{display:none}
+  html body .grid:not(.list) .bc-ty{font-size:10px;padding:4px 9px}
+}
+@media(max-width:340px){html body .grid:not(.list){grid-template-columns:1fr}}
+
+/* ───────── Home: el título ya no se monta sobre la portada ───────── */
+@media(min-width:900px){
+  html body #v-home .info{margin-right:0;min-width:0}
+  html body #v-home h1{font-size:clamp(44px,6.4vw,104px)}
+  html body #v-home h1.long{font-size:clamp(36px,4.8vw,78px)}
+  html body #v-home .art-w{margin-right:0}
+}
+
+/* ───────── Movimiento ───────── */
+@keyframes cleanCard{from{opacity:0;translate:0 30px;scale:.94}}
+@keyframes cleanUp{from{opacity:0;translate:0 18px}}
+@keyframes cleanChip{from{opacity:0;translate:0 10px;scale:.9}}
+@keyframes cleanPop{40%{scale:1.22;opacity:.6}}
+@keyframes cleanSheen{from{translate:-120% 0}to{translate:120% 0}}
+
+html:not(.rm) body #grid .bc{animation:cleanCard .7s var(--soft,cubic-bezier(.16,1,.3,1)) backwards!important;animation-delay:calc(var(--i,0)*55ms)!important}
+html:not(.rm) body .view.enter .chip{animation:cleanChip .55s var(--soft,cubic-bezier(.16,1,.3,1)) backwards}
+html:not(.rm) body .view.enter .fr,
+html:not(.rm) body .view.enter .sbx{animation:cleanUp .6s var(--soft,cubic-bezier(.16,1,.3,1)) backwards}
+html:not(.rm) body #count.pop{animation:cleanPop .42s cubic-bezier(.2,1.4,.3,1)}
