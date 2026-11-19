@@ -1,6 +1,12 @@
-/* RONALL V70 · capa epic: postproceso, orden y pulido. Se carga al final. */
+/* RONALL V71 · capa final: profundidad 3D, sombras, postproceso, orden y ritmo.
+   Se carga la última. Todo respeta html.rm (reducir movimiento) y html.lite. */
 
-/* Grano de película vivo (solo transform, barato en GPU) */
+:root{
+  --hit:cubic-bezier(.2,1.4,.3,1);
+  --sp1:clamp(10px,1.4vh,16px);--sp2:clamp(16px,2.4vh,26px);--sp3:clamp(28px,5vh,56px);
+}
+
+/* ───────── Escena: postproceso en capas ───────── */
 html:not(.lite):not(.rm) body .scene .grain{inset:-60%;opacity:.07;animation:ronGrain .8s steps(1) infinite;will-change:transform}
 @keyframes ronGrain{
   0%{transform:translate3d(0,0,0)}10%{transform:translate3d(-5%,-8%,0)}20%{transform:translate3d(-12%,4%,0)}
@@ -8,41 +14,123 @@ html:not(.lite):not(.rm) body .scene .grain{inset:-60%;opacity:.07;animation:ron
   60%{transform:translate3d(12%,0,0)}70%{transform:translate3d(0,12%,0)}80%{transform:translate3d(-8%,10%,0)}
   90%{transform:translate3d(10%,6%,0)}100%{transform:translate3d(0,0,0)}
 }
+html body .scene::before{ /* letterbox fino */
+  content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(#000,#000) top/100% clamp(8px,1.8vh,22px) no-repeat,linear-gradient(#000,#000) bottom/100% clamp(8px,1.8vh,22px) no-repeat;opacity:.9
+}
+html body .scene::after{ /* fuga de luz con cada golpe */
+  content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(70% 55% at 72% 18%,rgba(255,255,255,calc(var(--beat,0)*.2)),transparent 70%),
+             linear-gradient(100deg,transparent 35%,rgba(255,255,255,calc(var(--beat,0)*.07)) 50%,transparent 65%)
+}
+html body .scene .vig{transform:scale(calc(1 + var(--beat,0)*.05))}
 
-/* Motion blur direccional del carril (el filtro lo inyecta fx.js) */
+/* Motion blur direccional del carril (lo inyecta fx.js) */
 html body .grid.mbx{filter:url(#ronMbx)}
-
-/* Menos capas de GPU: una por letra era demasiado */
 html body h1 .l,html body .h2 .l{will-change:auto}
 
-/* Orden: ritmo vertical del hero y alineación de cabeceras */
-html body #v-home .info{gap:clamp(14px,2.4vh,26px)}
-html body .sec-top{align-items:baseline}
-html body .split{align-items:start}
-html body .lics{gap:12px}
+/* ───────── Hero: 3D real con capas, sombra dinámica y brillo ───────── */
+html body .art{transform-style:preserve-3d}
+html body .art::before{ /* halo profundo detrás de la portada */
+  transform:translateZ(-110px) scale(calc(1.1 + var(--lv,0)*.1))!important
+}
+html body .art img{
+  transform:translateZ(0);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.06),
+    0 0 calc(110px + var(--kk,0)*130px) -24px rgba(255,255,255,.42),
+    calc(var(--sxp,0px)) 70px 120px -30px #000,
+    calc(var(--sxp,0px)*.4) 22px 40px -18px rgba(0,0,0,.85)
+}
+html body .art::after{transform:translateZ(1px)}
+html body .art-w,html body #v-home .art-w,html body #v-home .art-w:hover{scale:calc(1 + var(--kk,0)*.085)}
+html body #v-home .info{gap:var(--sp2)}
 
-/* Orden: escalonado del carril más sutil, sigue habiendo ritmo */
+/* Títulos: fantasma RGB-split que late + slam de letras */
+html body h1,html body #v-catalogo .h2{
+  text-shadow:
+    calc(var(--beat,0)*9px) 0 0 rgba(255,255,255,.22),
+    calc(var(--beat,0)*-9px) 0 0 rgba(255,255,255,.22),
+    0 0 26px rgba(255,255,255,.4),0 0 90px rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.6)
+}
+html body h1 .l.hot,html body .h2 .l.hot{transform:translateY(-.09em) scale(1.09) skewX(-6deg)}
+@keyframes ronLetter{
+  0%{opacity:0;transform:translate3d(0,-.7em,0) scale(2.2) skewX(-14deg);filter:blur(20px)}
+  55%{opacity:1;transform:translate3d(0,.05em,0) scale(.93) skewX(2deg);filter:blur(0)}
+  100%{opacity:1;transform:none;filter:none}
+}
+
+/* Play: anillo y brillo vivos */
+html body .play{box-shadow:0 0 0 1px rgba(255,255,255,.75),0 0 calc(70px + var(--beat,0)*80px) rgba(255,255,255,.5),0 26px 50px -10px #000}
+
+/* ───────── Orden: ritmo vertical y estructura ───────── */
+html body .split{align-items:start;gap:clamp(22px,3.4vw,48px)}
+html body .lics{gap:12px}
+html body .sec-top{align-items:baseline}
+html body .sec-h{display:flex;align-items:center;gap:18px}
+html body .sec-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--hair2,rgba(255,255,255,.3)),transparent)}
+html body .sec-top .sec-h{flex:1}
+html body .more{margin-top:var(--sp3)}
+html body .buy{box-shadow:var(--edge),0 50px 110px -40px #000,0 0 80px -40px rgba(255,255,255,.35)}
+html body .lic{transform-style:preserve-3d}
+html body .lic:hover{box-shadow:0 20px 50px -24px #000,0 0 40px -22px rgba(255,255,255,.5)}
+html body .lic.sel{box-shadow:inset 3px 0 0 #fff,0 24px 60px -26px #000,0 0 64px -14px rgba(255,255,255,.5)}
+html body .chip:not(.on):hover{border-color:var(--hair2,rgba(255,255,255,.3));background:rgba(255,255,255,.06)}
+
+/* ───────── Carril del catálogo: cartas con profundidad ───────── */
 html body .grid:not(.list) .bc:nth-child(even){translate:0 14px}
 html body .grid:not(.list) .bc:nth-child(odd){translate:0 -6px}
 html body .grid:not(.list){scroll-padding-inline:var(--gut)}
-
-/* Tarjetas: barrido de luz al pasar */
-html body .grid:not(.list) .bc-i::before{
-  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.2) 50%,transparent 60%);
-  transform:translateX(-130%);transition:transform 1.2s var(--soft)
+html body .grid:not(.list) .bc{perspective:900px}
+html body .grid:not(.list) .bc-i{
+  border-color:rgba(255,255,255,calc(.14 + var(--beat,0)*.45));
+  box-shadow:0 44px 70px -34px #000,0 14px 26px -14px rgba(0,0,0,.8)
 }
-html body .grid:not(.list) .bc:hover .bc-i::before{transform:translateX(130%)}
-
-/* Tarjeta sonando: pulso de luz */
+html body .grid:not(.list) .bc-i::before{ /* brillo que sigue al cursor */
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .5s var(--soft);
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,30%),rgba(255,255,255,.26),transparent 62%)
+}
+html body .grid:not(.list) .bc:hover .bc-i::before{opacity:1}
 html body .grid:not(.list) .bc.playing .bc-i{border-color:#fff;animation:ronPlay 2.6s ease-in-out infinite alternate}
-@keyframes ronPlay{from{box-shadow:0 0 0 1px #fff,0 0 60px -20px rgba(255,255,255,.35)}to{box-shadow:0 0 0 1px #fff,0 0 120px -16px rgba(255,255,255,.65)}}
-html.rm body .grid:not(.list) .bc.playing .bc-i{animation:none}
-
-/* Foco: al pasar sobre una tarjeta las demás se apagan (reusa la transición de filter) */
+@keyframes ronPlay{from{box-shadow:0 0 0 1px #fff,0 0 60px -20px rgba(255,255,255,.35),0 44px 70px -34px #000}to{box-shadow:0 0 0 1px #fff,0 0 130px -14px rgba(255,255,255,.7),0 44px 70px -34px #000}}
 @media(hover:hover){
-  html body .grid:not(.list):hover .bc:not(:hover):not(.playing):not(.sel) .bc-i img{filter:grayscale(.9) contrast(1.05) brightness(.62)}
+  html body .grid:not(.list):hover .bc:not(:hover):not(.playing):not(.sel) .bc-i img{filter:grayscale(.9) contrast(1.05) brightness(.6)}
 }
+html body .sbx input,html body .chip:not(.on){border-color:rgba(255,255,255,calc(.14 + var(--beat,0)*.2))}
+html body .rail,html body .mini{border-color:rgba(255,255,255,calc(.16 + var(--beat,0)*.35))}
 
-/* Chips */
-html body .chip:not(.on):hover{border-color:var(--hair2);background:rgba(255,255,255,.06)}
+/* ───────── Transiciones de sección: whip-pan con skew y blur ───────── */
+@keyframes ronVin{
+  0%{opacity:0;filter:blur(30px) brightness(1.6);transform:translate3d(calc(var(--dir,1)*150px),0,0) skewX(calc(var(--dir,1)*-9deg)) scale(1.09)}
+  45%{opacity:1;filter:blur(7px) brightness(1.2)}
+  100%{opacity:1;filter:none;transform:none}
+}
+@keyframes ronVout{
+  0%{opacity:1;filter:none}
+  100%{opacity:0;filter:blur(24px) brightness(.5);transform:translate3d(calc(var(--dir,1)*-120px),0,0) skewX(calc(var(--dir,1)*7deg)) scale(.94)}
+}
+@keyframes ronRise{
+  0%{opacity:0;filter:blur(16px);transform:translate3d(0,44px,0) scale(.96) skewY(1.5deg)}
+  60%{opacity:1;filter:blur(2px)}
+  100%{opacity:1;filter:none;transform:none}
+}
+@keyframes ronCardin{
+  0%{opacity:0;filter:blur(18px);transform:translate3d(90px,0,0) skewX(-8deg) scale(.9)}
+  65%{opacity:1;filter:blur(2px)}
+  100%{opacity:1;filter:none;transform:none}
+}
+html body .view.enter{animation-name:ronVin;animation-duration:1s}
+html body .view.leave{animation-name:ronVout;animation-duration:.55s}
+html body .view.enter .st{animation-name:ronRise}
+html body .grid:not(.list):not(.again) .bc{animation-name:ronCardin}
+
+/* ───────── Seguridad ───────── */
+@media(max-width:899px){
+  html body .scene::before{opacity:.7}
+  html body .art::before{transform:none!important}
+}
+html.rm body .scene::after,html.rm body .scene::before{display:none}
+html.rm body .view.enter,html.rm body .view.leave{animation:none}
+html.rm body .wrap{translate:none!important}
+html.rm body .grid:not(.list) .bc.playing .bc-i{animation:none}
+html.lite body .scene::after{display:none}

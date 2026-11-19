@@ -16,12 +16,12 @@
     vel: 0,
     mix: 1, mixT: 1,
     shock: 1, shockA: 0,
-    cx: 0, cy: 0,
+    cx: 0, cy: 0, wx: 0, inv: 0, mid: 0, hi: 0,
   };
   const sp = () => ({ x: 0, v: 0 });
   const M = { X: sp(), Y: sp(), R: sp(), Z: sp(), heat: 0, flash: 0, flashS: 0, dir: 1, ik: 1, ikT: 1, lastHit: 0,
     nz: 0, tA: 0, rate: .6, fade: 0, fadeOn: false, tr: 1 };
-  const AMP = .6, SHAKE = .4, DIM = .9;
+  const AMP = .85, SHAKE = .75, DIM = .95;
   const NT = new Float32Array(256); for (let i = 0; i < 256; i++) NT[i] = Math.random() * 2 - 1;
   const vn = x => { const i = Math.floor(x), f = x - i, u = f * f * f * (f * (f * 6 - 15) + 10); return NT[i & 255] + (NT[(i + 1) & 255] - NT[i & 255]) * u; };
   const nz2 = x => vn(x) * .72 + vn(x * 2.03 + 17.3) * .28;
@@ -45,22 +45,27 @@
   const P1 = { a: 0, w: 0 };
   const P2 = { a: 0, w: 0 };
 
-  let artEl = null;
+  let artEl = null, wraps = [];
   const el = {
     art: null, info: null, marq: null, img: null, artImg: null,
   };
   const grab = () => {
     el.art = $('.art-w'); el.info = $('.hero .info'); el.marq = $('#marq');
+    wraps = $$('.view > .wrap');
     el.artImg = $('.art img'); el.img = $('#cimg') || el.artImg; artEl = $('.art');
   };
   grab();
 
   const FX = window.RonFX = {
     kick(a = 1) {
+      a = Math.min(1.25, a * 1.5);
       S.kick = Math.min(1.2, Math.max(S.kick, a)); hit(a);
-      S.shock = 0; S.shockA = Math.min(1.2, a); P1.w += (Math.random() < .5 ? -1 : 1) * a * 5;
+      S.shock = 0; S.shockA = Math.min(1.2, a); P1.w += (Math.random() < .5 ? -1 : 1) * a * 6;
+      M.Z.v = Math.min(3.2, M.Z.v + a * .8);
+      if (a > .85 && T - lastInv > 1.2) { lastInv = T; S.inv = 1; }
     },
     shake(a = .5) { hit(a); },
+    whip(d = 1) { S.wx = d * .11; M.X.v += d * Wu() * 1.8; P1.w += d * 9; },
     punch(a = 1) { S.kick = Math.min(1.2, Math.max(S.kick, a)); },
     push(v) { P1.w += v; P2.w += v * .6; },
     flare() { const a = $('.art'); if (!a) return; a.classList.remove('flare'); void a.offsetWidth; a.classList.add('flare'); setTimeout(() => a.classList.remove('flare'), 1500); },
@@ -78,15 +83,15 @@ precision mediump float;
 #endif
 varying vec2 v;
 uniform sampler2D uA,uB;
-uniform vec2 uRes,uPtr,uOff;
-uniform float uT,uMix,uLv,uFlash,uVel,uShock,uShockA,uRot,uScl,uFade,uSettled,uDim,uTaps,uSlice;
-uniform vec2 uCam;
+uniform vec2 uRes,uPtr,uOff,uCam;
+uniform float uT,uMix,uLv,uFlash,uVel,uShock,uShockA,uRot,uScl,uFade,uSettled,uDim,uTaps,uSlice,uInv,uMid,uHi,uQ;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){
   vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f);
   return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);
 }
 float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*n(p);p=p*2.03+7.1;a*=.5;}return s;}
+float lm(vec3 c){return dot(c,vec3(.3,.59,.11));}
 vec3 art(vec2 uv,float liquid){
   vec3 b=texture2D(uB,uv).rgb;
   if(uSettled>.5) return b;
@@ -119,10 +124,12 @@ void main(){
     liquid=smoothstep(0.,1.,clamp(uMix*1.7-w*.7,0.,1.));
     uv+=(q-.5)*sin(uMix*3.14159)*.18;
   }
+  float dep=lm(art(uv,liquid))-.35;
+  uv-=uPtr*dep*.03+uCam*dep*1.6;
   vec2 ctr=vec2(.56,.5);
   vec3 col=vec3(0.);float tw=0.;
   float rev=1.-uFade;
-  float amt=.018+uFlash*.08+uVel*.012+rev*rev*.035;
+  float amt=.018+uFlash*.16+uVel*.02+rev*rev*.035;
   float nT=max(uTaps,2.);
   for(int i=0;i<9;i++){
     if(float(i)>=nT)break;
@@ -132,25 +139,47 @@ void main(){
     col+=art(u2,liquid)*wgt;tw+=wgt;
   }
   col/=tw;
-  float ca=.002+uFlash*.014+length(uCam)*.3;
+  float ca=.002+uFlash*.03+length(uCam)*.5;
   col.r=mix(col.r,art(uv+(uv-ctr)*ca,liquid).r,.55);
   col.b=mix(col.b,art(uv-(uv-ctr)*ca,liquid).b,.55);
-  float l=dot(col,vec3(.3,.59,.11));
+  float l=lm(col);
   float base=clamp((l-.18)*1.25,0.,1.);
   vec3 g=vec3(base)*vec3(.94,.96,1.);
   float bloom=pow(base,2.6)*(.55+uLv*.5+uFlash*.9);
-  g=g*(.19+uLv*.06+ring*.5)+bloom*.24+ring*.06;
+  g=g*(.19+uLv*.09+ring*.5)+bloom*(.24+uFlash*.12)+ring*.06;
+  g+=uFlash*.05;
   float sw=smoothstep(.55,1.,sin((p.x*1.3+p.y*.7)*3.1+uT*.22+q.x*2.4));
   g+=sw*.022*(.6+uLv);
+  if(uQ>.5){
+    float bl=0.;
+    float rad=.016+uFlash*.02+uLv*.012;
+    for(int i=0;i<8;i++){
+      float a=float(i)*.7853982+uT*.12;
+      float rr=rad*(1.+mod(float(i),2.)*1.1);
+      bl+=max(lm(art(uv+vec2(cos(a),sin(a))*rr,liquid))-.5,0.);
+    }
+    g+=bl*.125*(.3+uMid*.9+uFlash*.9+uLv*.4);
+  }
+  if(uQ>1.5){
+    vec2 dr=(ctr-uv)*.16;vec2 pp=uv;float ry=0.;
+    for(int i=0;i<6;i++){pp+=dr;ry+=max(lm(art(pp,liquid))-.62,0.)*(1.-float(i)*.14);}
+    g+=ry*.045*(.5+uLv*1.2+uFlash);
+  }
   if(uFlash>.1){
     vec3 st=art(uv+vec2(.035,0.),liquid)+art(uv-vec2(.035,0.),liquid);
-    float sl2=dot(st,vec3(.3,.59,.11))*.5;
+    float sl2=lm(st)*.5;
     g+=pow(clamp((sl2-.4)*1.6,0.,1.),2.)*uFlash*.07;
   }
+  vec2 pc=(v-(uPtr*.5+.5))*vec2(asp,1.);
+  g+=exp(-dot(pc,pc)*7.)*(.03+uLv*.04+uMid*.03)*uFade;
   float vg=1.-smoothstep(.18,1.05,length((v-vec2(.56,.48))*vec2(asp*.62,1.)));
   g*=.06+.94*vg;
+  g=mix(g,smoothstep(.03,.92,g),.45);
+  float scr=step(.9965,h(vec2(floor(v.x*asp*70.),floor(uT*9.))))*(.06+uHi*.12)*uFade;
+  g+=scr*(.4+uLv);
+  g=mix(g,1.-g*.85,uInv);
   g*=uDim*uFade;
-  g+=(h(gl_FragCoord.xy+fract(uT)*91.)-.5)*.05*(1.+uFlash*.8)*uFade;
+  g+=(h(gl_FragCoord.xy+fract(uT)*91.)-.5)*.05*(1.+uFlash*1.4+uHi*1.2)*uFade;
   g*=.97+.03*sin(gl_FragCoord.y*1.6);
   gl_FragColor=vec4(g,1.);
 }`;
@@ -176,7 +205,7 @@ void main(){
       const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      ['uA', 'uB', 'uRes', 'uPtr', 'uOff', 'uT', 'uMix', 'uLv', 'uFlash', 'uVel', 'uShock', 'uShockA', 'uRot', 'uScl', 'uFade', 'uSettled', 'uDim', 'uTaps', 'uSlice', 'uCam'].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
+      ['uA', 'uB', 'uRes', 'uPtr', 'uOff', 'uT', 'uMix', 'uLv', 'uFlash', 'uVel', 'uShock', 'uShockA', 'uRot', 'uScl', 'uFade', 'uSettled', 'uDim', 'uTaps', 'uSlice', 'uCam', 'uInv', 'uMid', 'uHi', 'uQ'].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
       texA = mkTex(); texB = mkTex();
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texA); gl.uniform1i(uni.uA, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texB); gl.uniform1i(uni.uB, 1);
@@ -277,7 +306,7 @@ void main(){
   const q = (v, st) => v < st ? '0' : (Math.round(v / st) * st).toFixed(2);
   const put = (e, k, v) => { const c = e._c || (e._c = {}); if (c[k] !== v) { c[k] = v; e.style.setProperty(k, v); } };
   const ease = (dt, k) => 1 - Math.exp(-dt * k);
-  let last = 0, T = 0, raf = 0, mxAcc = 0, vtN = 0, skip = 0, pox = 0, poy = 0;
+  let last = 0, T = 0, raf = 0, mxAcc = 0, vtN = 0, skip = 0, pox = 0, poy = 0, prevLv = 0, lastBeat = 0, avgLv = 0, lastInv = -9;
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - last) / 1000 || .016); last = now; T += dt;
@@ -291,13 +320,18 @@ void main(){
     S.kick *= Math.pow(.0008, dt);
     const lvRaw = artEl ? parseFloat(artEl.style.getPropertyValue('--lv')) || 0 : 0;
     S.lv += (lvRaw - S.lv) * ease(dt, 7);
+    {
+      const Bn = window.RonBands, on = !!Bn && root.classList.contains('live'), k = ease(dt, 10);
+      S.mid += ((on ? (Bn[1] + Bn[2]) * .5 : 0) - S.mid) * k;
+      S.hi += ((on ? (Bn[3] + Bn[4]) * .5 : 0) - S.hi) * k;
+    }
     if (S.mix < S.mixT) S.mix = Math.min(S.mixT, S.mix + dt / 1.9);
     camera(dt);
     {
       const asp = canvas ? canvas.width / canvas.height : 1, zm = Math.min(1, 1 / asp) * .86 / sceneNow.scl, kc = ease(dt, 26), idt = Math.max(dt, .004);
-      S.cx += (clamp((sceneNow.ox - pox) / idt * zm * .018, -.045, .045) - S.cx) * kc;
-      S.cy += (clamp((sceneNow.oy - poy) / idt * zm * .018, -.045, .045) - S.cy) * kc;
-      pox = sceneNow.ox; poy = sceneNow.oy;
+      S.cx += (clamp((sceneNow.ox - pox) / idt * zm * .05, -.09, .09) - S.cx) * kc;
+      S.cy += (clamp((sceneNow.oy - poy) / idt * zm * .05, -.09, .09) - S.cy) * kc;
+      pox = sceneNow.ox; poy = sceneNow.oy; S.wx *= Math.exp(-dt * 5); S.inv = Math.max(0, S.inv - dt * 14);
     }
 
     const amb = Math.sin(T * .71) * .9 + Math.sin(T * 1.37 + 1.3) * .6 + Math.sin(T * .29 + 4.1) * 1.1;
@@ -305,12 +339,21 @@ void main(){
     stepPendulum(P2, 15, .95, -P1.w * .9 - P1.a * 1.8, dt);
 
     S.shock = Math.min(1, S.shock + dt / .62);
+    put(root, '--beat', q(clamp(Math.max(S.kick, M.flashS * .9), 0, 1), .1));
+    {
+      const sx = clamp(M.X.x * 260, -9, 9).toFixed(1), sy = clamp(M.Y.x * 260, -7, 7).toFixed(1);
+      for (const w of wraps) {
+        const on = w.parentElement && w.parentElement.classList.contains('active'), v = on ? sx + 'px ' + sy + 'px' : '';
+        if (w._t !== v) { w._t = v; w.style.translate = v; }
+      }
+    }
     if (el.art) {
       put(el.art, '--pend', P1.a.toFixed(2) + 'deg');
       put(el.art, '--ptx', (S.px * 6).toFixed(1) + 'px');
       put(el.art, '--pty', (S.py * 4).toFixed(1) + 'px');
       put(el.art, '--mb', q(clamp(Math.abs(P1.w) * .02 + S.vel * .5, 0, 1.2), .2));
       put(el.art, '--kk', S.kick > .01 ? S.kick.toFixed(2) : '0');
+      put(el.art, '--sxp', (P1.a * -5 + S.px * -10).toFixed(1) + 'px');
     }
     if (el.info) {
       const m2 = q(clamp(Math.abs(P2.w) * .012, 0, .8), .2);
@@ -326,7 +369,7 @@ void main(){
       half = half || (root.classList.contains('vt') && ++vtN % 2 === 0); // 30 fps durante transiciones de sección
       if (half && ++skip % 2 === 0) { half = tier === 0 && ema > 28; return; }
       const mixE = S.mix >= 1 ? 1 : sstep(S.mix);
-      const flash = M.flashS, camV = Math.abs(S.cx) + Math.abs(S.cy);
+      const flash = M.flashS, camV = Math.abs(S.cx) + Math.abs(S.cy) + Math.abs(S.wx);
       const amtHi = flash > .15 || S.vel > .4 || M.fade < .98 || camV > .004;
       const idle = flash < .02 && S.vel < .05 && camV < .0015 && S.mix >= 1;
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
@@ -337,8 +380,11 @@ void main(){
       gl.uniform1f(uni.uRot, sceneNow.rot); gl.uniform1f(uni.uScl, sceneNow.scl);
       gl.uniform1f(uni.uFade, sstep(M.fade)); gl.uniform1f(uni.uSettled, S.mix >= 1 ? 1 : 0);
       gl.uniform1f(uni.uDim, DIM); gl.uniform1f(uni.uTaps, amtHi ? 9 : (idle ? 2 : 5));
-      gl.uniform2f(uni.uCam, S.cx, S.cy);
-      gl.uniform1f(uni.uSlice, clamp((flash - .6) * 2.2, 0, 1));
+      gl.uniform2f(uni.uCam, S.cx + S.wx, S.cy);
+      gl.uniform1f(uni.uInv, S.inv > .5 ? 1 : 0);
+      gl.uniform1f(uni.uMid, S.mid); gl.uniform1f(uni.uHi, S.hi);
+      gl.uniform1f(uni.uQ, (half || tier < 2) ? 0 : (tier >= 3 ? 2 : 1));
+      gl.uniform1f(uni.uSlice, clamp((flash - .85) * 6, 0, 1));
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
   }
@@ -350,7 +396,7 @@ void main(){
       mxAcc += clamp(e.movementX || 0, -40, 40);
     }, { passive: true });
     D.addEventListener('click', e => {
-      if (e.target.closest('[data-go]')) { FX.punch(.6); FX.push(rnd(-10, 10)); FX.shake(.5); }
+      if (e.target.closest('[data-go]')) { FX.punch(.8); FX.push(rnd(-10, 10)); FX.shake(.7); FX.whip(Math.random() < .5 ? -1 : 1); }
       else if (e.target.closest('.lic')) { FX.punch(.4); FX.shake(.3); }
       else if (e.target.closest('#b-add,#bp-add')) { FX.punch(1); FX.flare(); }
       else if (e.target.closest('.play,.bc-pl,#mpp')) { FX.punch(.55); FX.push(rnd(-8, 8)); }
@@ -406,10 +452,10 @@ void main(){
         const r = Math.random();
         if (r < .5) FX.push(rnd(-12, 12));
         else if (r < .8) FX.punch(rnd(.2, .35));
-        else { FX.flare(); FX.shake(.22); }
+        else { FX.flare(); FX.shake(.3); }
       }
       next();
-    }, rnd(9000, 16000));
+    }, rnd(5500, 10500));
     next();
   }
 
