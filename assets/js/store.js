@@ -108,8 +108,8 @@ function show(id, o = {}) {
   if (!o.first) kick(to);
   curView = id; navSync();
   if (!o.first && o.push !== false) { try { history.pushState(null, '', urlFor(id)); } catch (e) {} }
-  U.reveal(to);
   if (id === 'catalogo') draw();
+  U.reveal(to, !o.first);
   U.vib(6);
 }
 function route(first) {
