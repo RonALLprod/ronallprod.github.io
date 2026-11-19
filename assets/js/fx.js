@@ -502,17 +502,6 @@ void main(){
       if (ss !== ls) { ls = ss; st.textContent = ss; h.classList.toggle('rec', p); }
     };
   }
-  function cursor() {
-    if (reduce || !matchMedia('(hover:hover) and (pointer:fine)').matches) return;
-    const c = D.createElement('div'); c.className = 'cur'; c.setAttribute('aria-hidden', 'true'); c.innerHTML = '<i></i>'; D.body.appendChild(c);
-    let x = -100, y = -100, tx = -100, ty = -100, r = 0;
-    const loop = () => { x += (tx - x) * .24; y += (ty - y) * .24; c.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)'; r = (Math.abs(tx - x) + Math.abs(ty - y) > .3) ? requestAnimationFrame(loop) : 0; };
-    addEventListener('pointermove', e => { if (!c.classList.contains('vis')) { x = tx = e.clientX; y = ty = e.clientY; c.classList.add('vis'); } tx = e.clientX; ty = e.clientY; if (!r) r = requestAnimationFrame(loop); }, { passive: true });
-    D.addEventListener('pointerover', e => c.classList.toggle('on', !!(e.target.closest && e.target.closest('a,button,.bc,input,select,label,[data-go]'))), { passive: true });
-    D.addEventListener('pointerdown', () => c.classList.add('dn'), { passive: true });
-    D.addEventListener('pointerup', () => c.classList.remove('dn'), { passive: true });
-    D.documentElement.addEventListener('mouseleave', () => c.classList.remove('vis'));
-  }
   function ruler() {
     const g = $('#grid'), top = $('#v-catalogo .tools'); if (!g || !top || $('#ruler')) return;
     const r = D.createElement('div'); r.id = 'ruler'; r.setAttribute('aria-hidden', 'true'); r.innerHTML = '<i class="ph"></i>';
@@ -544,7 +533,7 @@ void main(){
   }
   function boot() {
     motionToggle();
-    grab(); artFx(); sceneLeak(); hud(); ruler(); bgword(); cursor();
+    grab(); artFx(); sceneLeak(); hud(); ruler(); bgword();
     glOK = initGL();
     if (glOK) watchCover();
     if (reduce) return;

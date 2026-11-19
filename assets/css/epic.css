@@ -136,19 +136,13 @@ html.rm body .grid:not(.list) .bc.playing .bc-i{animation:none}
 html.lite body .scene::after{display:none}
 
 
-/* V71.1 overlays: HUD, cursor, ruler and beat artwork response */
+/* V71.1 overlays: HUD, ruler and beat artwork response */
 #v-home{position:relative;isolation:isolate}
 #v-home::before{
   content:var(--bgword,"");position:absolute;z-index:-1;pointer-events:none;left:3vw;right:0;top:clamp(7rem,18vh,13rem);
   overflow:hidden;white-space:nowrap;text-overflow:clip;font-size:clamp(4rem,15vw,16rem);line-height:.8;
   font-weight:900;letter-spacing:-.085em;color:rgba(255,255,255,.035);filter:blur(.3px)
 }
-html:not(.rm) body{cursor:none}
-html:not(.rm) body a,html:not(.rm) body button,html:not(.rm) body input,html:not(.rm) body select,html:not(.rm) body label{cursor:none}
-.cur{position:fixed;z-index:10000;left:0;top:0;width:27px;height:27px;margin:-13.5px 0 0 -13.5px;border:1px solid rgba(255,255,255,.78);border-radius:50%;pointer-events:none;opacity:0;scale:.78;transition:opacity .18s,scale .2s cubic-bezier(.2,1.4,.3,1),border-color .18s;mix-blend-mode:difference}
-.cur i{position:absolute;inset:9px;border-radius:50%;background:#fff;opacity:.7}
-.cur.vis{opacity:1;scale:1}.cur.on{scale:1.55;border-color:#fff}.cur.dn{scale:.65}
-.cur.on i{inset:8px;opacity:1}
 #hud{position:fixed;inset:12px;z-index:9990;pointer-events:none;color:rgba(255,255,255,.58);font:10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em}
 #hud .c{position:absolute;width:22px;height:22px;border-color:rgba(255,255,255,.35);border-style:solid}
 #hud .tl{top:0;left:0;border-width:1px 0 0 1px}#hud .tr{top:0;right:0;border-width:1px 1px 0 0}
@@ -166,6 +160,5 @@ html:not(.rm) body a,html:not(.rm) body button,html:not(.rm) body input,html:not
 #ruler{position:relative;height:2px;margin:12px 0 20px;overflow:hidden;background:rgba(255,255,255,.1);transition:opacity .2s}
 #ruler .ph{position:absolute;left:0;top:0;width:clamp(36px,9%,90px);height:2px;background:rgba(255,255,255,.85);box-shadow:0 0 12px rgba(255,255,255,.5);will-change:transform}
 #ruler.off{opacity:0;pointer-events:none}
-@media(hover:none),(pointer:coarse){html:not(.rm) body,html:not(.rm) body a,html:not(.rm) body button{cursor:auto}}
-@media(max-width:680px){#hud{inset:7px}#hud .tc{top:3px;font-size:9px}#hud .c{width:14px;height:14px}#v-home::before{top:8rem;font-size:22vw}}
-@media(prefers-reduced-motion:reduce){.cur,#hud .dot{animation:none!important;transition:none!important}.scene .leak{transition:none!important}}
+@media(max-width:680px){#hud{inset:7px}#hud .tc{display:none}#hud .c{width:14px;height:14px}#v-home::before{top:8rem;font-size:22vw}}
+@media(prefers-reduced-motion:reduce){#hud .dot{animation:none!important;transition:none!important}.scene .leak{transition:none!important}}

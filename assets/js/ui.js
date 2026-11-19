@@ -146,10 +146,10 @@
       state.seq++;
       clearTimeout(state.timer);
       if (state.io) { state.io.disconnect(); state.io = null; }
-      $('.rvb', view).forEach(e => e.classList.remove('in'));
+      $$('.rvb', view).forEach(e => e.classList.remove('in'));
     }
 
-    const els = $('.rvb:not(.in)', view);
+    const els = $$('.rvb:not(.in)', view);
     if (!els.length) return;
     if (!('IntersectionObserver' in window) || reduce) {
       els.forEach(e => e.classList.add('in'));
@@ -171,7 +171,7 @@
     clearTimeout(state.timer);
     state.timer = setTimeout(() => {
       if (state.seq !== seq) return;
-      $('.rvb:not(.in)', view).forEach(e => e.classList.add('in'));
+      $$('.rvb:not(.in)', view).forEach(e => e.classList.add('in'));
     }, 4500);
   }
 
