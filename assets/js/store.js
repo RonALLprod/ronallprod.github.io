@@ -99,7 +99,7 @@ function show(id, o = {}) {
   if (!o.first) {
     root.classList.add('vt');
     clearTimeout(vtTimer);
-    vtTimer = setTimeout(() => root.classList.remove('vt'), 950);
+    vtTimer = setTimeout(() => root.classList.remove('vt'), 1600);
   }
   const dir = curView ? (ORD[id] >= ORD[curView] ? 1 : -1) : 1;
   if (from) { clearTimeout(from._leaveTimer); from.style.setProperty('--dir', dir); from.classList.remove('active', 'enter', 'leave'); from.classList.add('leave'); from._leaveTimer = setTimeout(() => from.classList.remove('leave'), 540); }
