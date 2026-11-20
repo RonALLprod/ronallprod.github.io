@@ -123,4 +123,4 @@ body:before{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;
 .mnav.on a{opacity:1;transform:none;transition-delay:calc(var(--i)*70ms + 300ms)}.mnav a small{font:11px 'Courier New',monospace;letter-spacing:.2em;color:var(--dim);margin-left:10px;vertical-align:middle}
 @media(max-width:860px){.nav{display:none}.burger{display:grid}.hdr .wrap{gap:12px}.mini .in{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:10px 12px}
 .mini .sk,.mini .vl{display:none}.mini .bar{display:block}.mini .tk img{width:46px;height:46px}.mini .ctl .nx,.mini .ctl .pv{display:none}body.has-mini{--mini:78px}.wrap{width:calc(100% - 28px)}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+@media not all{*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}

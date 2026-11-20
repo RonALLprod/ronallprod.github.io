@@ -60,7 +60,7 @@ h1,h2,h3,.row .t b,.card b,.tile b{text-wrap:balance}
  .fx-ambient{opacity:.76!important}
  .mini,.drawer,.tabs{-webkit-backdrop-filter:blur(8px)!important;backdrop-filter:blur(8px)!important}
 }
-@media(prefers-reduced-motion:reduce){
+@media not all{
  .fx-scene:before{animation-duration:58s!important}
  .fx-scene:after{animation-duration:66s!important}
  .fx-ambient i{animation-duration:62s!important}
@@ -106,7 +106,7 @@ body.text-selecting .marq div {
 .app.live .sk .rng::-webkit-slider-runnable-track{box-shadow:0 0 14px rgba(255,255,255,.22)}
 
 @media(max-width:899px){.buy:before{display:none}}
-@media(prefers-reduced-motion:reduce){.top:after{display:none}}
+@media not all{.top:after{display:none}}
 
 @media (pointer:coarse){
   .mbrand,.nfb,#b-pg,#ft-wa{position:relative}

@@ -158,4 +158,4 @@ html.lite body .scene::after{display:none}
 .art{position:relative;z-index:1}
 .art-fl{position:absolute;z-index:3;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .12s;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.4) 50%,transparent 72%);mix-blend-mode:screen}
 @media(max-width:680px){#hud{inset:7px}#hud .tc{display:none}#hud .c{width:14px;height:14px}#v-home::before{top:8rem;font-size:22vw}}
-@media(prefers-reduced-motion:reduce){#hud .dot{animation:none!important;transition:none!important}.scene .leak{transition:none!important}}
+@media not all{#hud .dot{animation:none!important;transition:none!important}.scene .leak{transition:none!important}}

@@ -67,7 +67,7 @@ html:not(.rm) body .view.enter .ctc .btn{animation-timing-function:var(--soft,cu
 html:not(.rm) body #count.pop{animation:cleanPop .5s var(--soft,cubic-bezier(.16,1,.3,1))}
 
 /* micro-interacciones */
-html:not(.rm) body .ib,html:not(.rm) body .seg button,html:not(.rm) body .nav button,html:not(.rm) body .cartb,html:not(.rm) body .btn,html:not(.rm) body .lnk,html:not(.rm) body .tgs span{
+html:not(.rm) body .ib,html:not(.rm) body .seg button,html:not(.rm) body .nav button,html:not(.rm) body .cartb,html:not(.rm) body .btn,html:not(.rm) body .lnk,html:not(.rm) body .tgs button{
   transition:transform .45s var(--spring,cubic-bezier(.34,1.56,.64,1)),background .3s,color .3s,border-color .3s,box-shadow .5s
 }
 html:not(.rm) body .ib:hover,html:not(.rm) body .cartb:hover,html:not(.rm) body .btn:hover{transform:translateY(-3px)}
@@ -82,11 +82,11 @@ html:not(.rm) body .sbx input{transition:box-shadow .5s,border-color .3s,backgro
 html:not(.rm) body .sbx input:focus{transform:translateY(-2px);box-shadow:0 0 0 1px #fff,0 18px 50px -20px rgba(255,255,255,.45)}
 html:not(.rm) body .sel2 select{transition:border-color .3s,box-shadow .5s,transform .4s var(--soft,cubic-bezier(.16,1,.3,1))}
 html:not(.rm) body .sel2 select:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.4)}
-html:not(.rm) body .tgs span:hover{color:#fff;translate:0 -2px}
+html:not(.rm) body .tgs button:hover{color:#fff;translate:0 -2px}
 html:not(.rm) body .grid.list .bc{transition:transform .5s var(--soft,cubic-bezier(.16,1,.3,1)),border-color .3s,background .3s}
 html:not(.rm) body .grid.list .bc:hover{background:rgba(255,255,255,.05)}
 
-@media(prefers-reduced-motion:reduce){
+@media not all{
   html body #grid .bc,html body .view.enter .chip,html body .view.enter .fr,html body .view.enter .sbx,html body .view.enter .foot{animation:none!important}
 }
 
@@ -132,12 +132,12 @@ html:not(.rm) body .lockbg{animation:cleanFloat 7s ease-in-out infinite}
 html:not(.rm) body :is(.priv .btn.fill,.ctc .btn.fill,.license-launch){outline:1px solid transparent;animation:cleanRing 2.6s cubic-bezier(.2,.6,.3,1) infinite}
 html:not(.rm) body .nav button.on>svg{animation:cleanBounce .6s var(--spring,cubic-bezier(.34,1.56,.64,1))}
 html:not(.rm) body .chip.on{animation:cleanChipGlow 2.2s ease-in-out infinite alternate}
-html:not(.rm) body .view.enter .tgs span,
+html:not(.rm) body .view.enter .tgs button,
 html:not(.rm) body .view.enter .meta span{animation:cleanTag .6s var(--soft,cubic-bezier(.16,1,.3,1)) backwards}
-html:not(.rm) body .view.enter .tgs span:nth-child(1){animation-delay:.35s}
-html:not(.rm) body .view.enter .tgs span:nth-child(2){animation-delay:.42s}
-html:not(.rm) body .view.enter .tgs span:nth-child(3){animation-delay:.49s}
-html:not(.rm) body .view.enter .tgs span:nth-child(n+4){animation-delay:.56s}
+html:not(.rm) body .view.enter .tgs button:nth-child(1){animation-delay:.35s}
+html:not(.rm) body .view.enter .tgs button:nth-child(2){animation-delay:.42s}
+html:not(.rm) body .view.enter .tgs button:nth-child(3){animation-delay:.49s}
+html:not(.rm) body .view.enter .tgs button:nth-child(n+4){animation-delay:.56s}
 html:not(.rm) body .view.enter .meta span:nth-child(1){animation-delay:.3s}
 html:not(.rm) body .view.enter .meta span:nth-child(2){animation-delay:.4s}
 html:not(.rm) body .view.enter .acts>*{animation:cleanUp .6s var(--soft,cubic-bezier(.16,1,.3,1)) backwards}
@@ -241,7 +241,7 @@ html:not(.rm) body .license-layer.is-open .window-mark{animation:cleanWin .5s .0
   html body .license-window-body .trust{display:none}
   html body .window-foot{display:none}
 }
-@media(prefers-reduced-motion:reduce){
+@media not all{
   html body :is(.brand img,.lockbg,.license-launch,.chip.on,.nav button.on>svg,.license-layer .lic,.license-layer .buy){animation:none!important}
 }
 
@@ -372,3 +372,10 @@ html body .license-window-body .buy .btn.fill{background:#fff;color:#000;box-sha
 html body .license-window-body .buy .btn:not(.fill){background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.22);box-shadow:none}
 html body .license-window .lic-info{border-radius:16px;background:rgba(255,255,255,.04);box-shadow:none}
 @media(max-width:760px){html body .license-layer .license-window{border-radius:24px 24px 0 0}html body .license-window-body .buy{background:rgba(22,22,26,.92);box-shadow:none}}
+
+
+/* ═════════ V74.1 · Movimiento: solo se reduce con el botón del sitio (html.rm) ═════════ */
+html.rm *,html.rm *::before,html.rm *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+
+/* ═════════ V74.1 · La sección Beats ocupa toda el área (antes se encogía en pantallas altas) ═════════ */
+html body #v-home{position:absolute;inset:0}
