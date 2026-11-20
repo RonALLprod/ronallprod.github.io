@@ -157,8 +157,5 @@ html.lite body .scene::after{display:none}
 .art-sh{position:absolute;z-index:0;inset:5% -4% -7%;border-radius:inherit;pointer-events:none;opacity:.3;filter:blur(32px);background:radial-gradient(ellipse at 50% 45%,rgba(255,255,255,.32),rgba(0,0,0,.8) 64%,transparent 78%)}
 .art{position:relative;z-index:1}
 .art-fl{position:absolute;z-index:3;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .12s;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.4) 50%,transparent 72%);mix-blend-mode:screen}
-#ruler{position:relative;height:2px;margin:12px 0 20px;overflow:hidden;background:rgba(255,255,255,.1);transition:opacity .2s}
-#ruler .ph{position:absolute;left:0;top:0;width:clamp(36px,9%,90px);height:2px;background:rgba(255,255,255,.85);box-shadow:0 0 12px rgba(255,255,255,.5);will-change:transform}
-#ruler.off{opacity:0;pointer-events:none}
 @media(max-width:680px){#hud{inset:7px}#hud .tc{display:none}#hud .c{width:14px;height:14px}#v-home::before{top:8rem;font-size:22vw}}
 @media(prefers-reduced-motion:reduce){#hud .dot{animation:none!important;transition:none!important}.scene .leak{transition:none!important}}

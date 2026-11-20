@@ -502,22 +502,6 @@ void main(){
       if (ss !== ls) { ls = ss; st.textContent = ss; h.classList.toggle('rec', p); }
     };
   }
-  function ruler() {
-    const g = $('#grid'), top = $('#v-catalogo .tools'); if (!g || !top || $('#ruler')) return;
-    const r = D.createElement('div'); r.id = 'ruler'; r.setAttribute('aria-hidden', 'true'); r.innerHTML = '<i class="ph"></i>';
-    top.insertAdjacentElement('afterend', r);
-    const ph = r.firstChild; let raf = 0;
-    const upd = () => {
-      raf = 0; const max = g.scrollWidth - g.clientWidth, k = max > 0 ? g.scrollLeft / max : 0;
-      ph.style.transform = 'translate3d(' + (k * Math.max(0, r.clientWidth - 2)).toFixed(1) + 'px,0,0)';
-      r.classList.toggle('off', g.classList.contains('list') || max <= 0);
-    };
-    g.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
-    addEventListener('resize', upd, { passive: true });
-    r.addEventListener('pointerdown', e => { const b = r.getBoundingClientRect(), max = g.scrollWidth - g.clientWidth; g.scrollTo({ left: ((e.clientX - b.left) / b.width) * max, behavior: 'smooth' }); });
-    if ('MutationObserver' in window) new MutationObserver(() => { if (!raf) raf = requestAnimationFrame(upd); }).observe(g, { attributes: true, attributeFilter: ['class'], childList: true });
-    setTimeout(upd, 700);
-  }
   function bgword() {
     const t = $('#ttl'), v = $('#v-home'); if (!t || !v) return;
     const set = () => { const n = (t.textContent || '').trim(); v.style.setProperty('--bgword', n ? JSON.stringify(n) : '""'); };
@@ -533,7 +517,7 @@ void main(){
   }
   function boot() {
     motionToggle();
-    grab(); artFx(); sceneLeak(); hud(); ruler(); bgword();
+    grab(); artFx(); sceneLeak(); hud(); bgword();
     glOK = initGL();
     if (glOK) watchCover();
     if (reduce) return;
