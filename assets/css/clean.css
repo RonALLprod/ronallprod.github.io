@@ -257,3 +257,87 @@ html body .license-window-body .buy .btn{white-space:nowrap}
   html body .license-window-body .buy .btn{font-size:13px;padding:0 10px;gap:7px;min-height:48px}
   html body .license-window-body .buy .tot{font-size:40px}
 }
+
+
+/* ═════════ V73 · Blur de transición adaptativo ═════════
+   El blur vive solo en la sección que entra/sale (una capa de GPU), nunca en sus hijos.
+   --tb lo ajusta motion.js según el equipo; con .tb0 se cae a la versión sin blur. */
+:root{--tb:16px}
+@keyframes tbIn{
+  0%{opacity:0;filter:blur(var(--tb));transform:translate3d(calc(var(--dir,1)*64px),0,0) scale(1.035)}
+  50%{opacity:1;filter:blur(calc(var(--tb)*.3))}
+  100%{opacity:1;filter:blur(0);transform:none}
+}
+@keyframes tbOut{
+  0%{opacity:1;filter:blur(0)}
+  100%{opacity:0;filter:blur(calc(var(--tb)*.85));transform:translate3d(calc(var(--dir,1)*-40px),0,0) scale(.975)}
+}
+@keyframes tbInLite{0%{opacity:0;transform:translate3d(calc(var(--dir,1)*44px),0,0)}100%{opacity:1;transform:none}}
+@keyframes tbOutLite{0%{opacity:1}100%{opacity:0;transform:translate3d(calc(var(--dir,1)*-28px),0,0)}}
+html:not(.rm) body .view.enter{animation:tbIn .72s var(--out,cubic-bezier(.16,1,.3,1)) backwards;will-change:opacity,transform,filter}
+html:not(.rm) body .view.leave{animation:tbOut .4s cubic-bezier(.5,0,.75,.4) both;will-change:opacity,transform,filter}
+html.tb0:not(.rm) body .view.enter{animation-name:tbInLite;animation-duration:.55s}
+html.tb0:not(.rm) body .view.leave{animation-name:tbOutLite;animation-duration:.3s}
+/* rail/dock/mini están fuera de la sección animada: su blur es barato, se conserva */
+html.vt body :is(.rail,.dock,.mini,.nfp){-webkit-backdrop-filter:blur(16px) saturate(1.5)!important;backdrop-filter:blur(16px) saturate(1.5)!important;background-color:transparent!important}
+
+/* ═════════ V73 · Liquid glass (panel de licencias) ═════════ */
+html body .license-layer .license-backdrop{background:rgba(0,0,0,.4)}
+html body .license-layer.is-open .license-backdrop{background:rgba(0,0,0,.46)}
+html body .license-layer .license-window{
+  border-radius:30px;border:1px solid rgba(255,255,255,.2);
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.05) 36%,rgba(255,255,255,.03) 62%,rgba(255,255,255,.14) 100%),
+    rgba(12,12,16,.36);
+  -webkit-backdrop-filter:blur(22px) saturate(1.9) brightness(1.08);backdrop-filter:blur(22px) saturate(1.9) brightness(1.08);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.7),inset 1.5px 0 0 rgba(255,255,255,.26),inset 0 -1.5px 0 rgba(255,255,255,.18),
+    inset 0 0 70px rgba(255,255,255,.07),0 44px 110px -30px rgba(0,0,0,.85),0 0 0 .5px rgba(255,255,255,.1)
+}
+html.lq body .license-layer .license-window{
+  -webkit-backdrop-filter:url(#lqd) blur(9px) saturate(1.9) brightness(1.1);backdrop-filter:url(#lqd) blur(9px) saturate(1.9) brightness(1.1)
+}
+/* reflejo especular que sigue al puntero */
+html body .license-layer .license-window::before,
+html body .license-layer.is-open .license-window::before{
+  content:"";position:absolute;inset:0;left:0;top:0;width:auto;height:auto;z-index:0;border-radius:inherit;pointer-events:none;
+  opacity:1;animation:none;
+  background:radial-gradient(85% 65% at var(--mx,18%) var(--my,0%),rgba(255,255,255,.27),rgba(255,255,255,.06) 40%,transparent 64%),
+             linear-gradient(115deg,transparent 28%,rgba(255,255,255,.08) 45%,transparent 58%)
+}
+html body .license-window>.license-window-head,html body .license-window>.license-window-body,html body .license-window>.window-foot{position:relative;z-index:1}
+html body .license-window-head{background:none;border-bottom-color:rgba(255,255,255,.16)}
+html body .window-heading h2{text-shadow:0 2px 24px rgba(0,0,0,.35)}
+html body .window-heading p{color:rgba(255,255,255,.72)}
+html body .window-foot{background:rgba(255,255,255,.035);border-top-color:rgba(255,255,255,.14);color:rgba(255,255,255,.5)}
+html body .window-close{border-radius:50%;border-color:rgba(255,255,255,.3);background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.06));box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+
+/* filas de cristal */
+html body .license-layer .license-window .lic{
+  border-radius:20px;border:1px solid rgba(255,255,255,.2);
+  background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -12px 22px -16px rgba(255,255,255,.2),0 12px 30px -20px rgba(0,0,0,.7)
+}
+html body .license-layer .license-window .lic:hover{border-color:rgba(255,255,255,.5);background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.06))}
+html body .license-layer .license-window .lic.sel{
+  border-color:rgba(255,255,255,.8);background:linear-gradient(135deg,rgba(255,255,255,.3),rgba(255,255,255,.09));
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.85),0 0 0 1px rgba(255,255,255,.3),0 0 54px -14px rgba(255,255,255,.55),0 18px 44px -20px rgba(0,0,0,.7)
+}
+html body .license-window .lic .ld{color:rgba(255,255,255,.78)}
+html body .license-window .lic .lf{color:rgba(255,255,255,.66)}
+html body .license-window .lic em{border-radius:99px;background:rgba(255,255,255,.92);color:#000}
+
+/* resumen de compra: losa de cristal */
+html body .license-window-body .buy{
+  border-radius:24px;border:1px solid rgba(255,255,255,.26);
+  background:linear-gradient(160deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 55%,rgba(255,255,255,.1));
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.6),inset 0 -14px 30px -20px rgba(255,255,255,.2),0 24px 60px -30px rgba(0,0,0,.7)
+}
+html body .license-window-body .buy .btn{border-radius:99px}
+html body .license-window-body .buy .btn.fill{background:linear-gradient(180deg,#fff,#d9d9d9);color:#000;border-color:#fff;box-shadow:inset 0 1px 0 #fff,inset 0 -6px 12px -6px rgba(0,0,0,.18),0 12px 34px -12px rgba(255,255,255,.6)}
+html body .license-window-body .buy .btn:not(.fill){background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.06));border-color:rgba(255,255,255,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+html body .license-window .lic-info{border-radius:20px;border-color:rgba(255,255,255,.2);background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+
+@media(max-width:760px){
+  html body .license-layer .license-window{border-radius:28px 28px 0 0}
+  html body .license-window-body .buy{border-radius:0;border-width:1px 0 0;background:rgba(16,16,20,.84);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+}

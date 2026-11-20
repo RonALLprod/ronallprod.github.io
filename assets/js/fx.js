@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const D = document, root = D.documentElement;
+  const busyNow = () => root.classList.contains('vt') || root.classList.contains('license-window-open');
   const reduce = !!window.__reduce;
   const osReduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
   const $ = (s, r = D) => r.querySelector(s), $$ = (s, r = D) => [...r.querySelectorAll(s)];
@@ -220,7 +221,7 @@ void main(){
   const DPR = Math.min(devicePixelRatio || 1, 1.25), TIERS = [.3, .4, .5, .6, .72];
   let tier = 1, qk = DPR * TIERS[tier], qCool = 120, ema = 16.7, slow = 0, base = 16.7, good = 0, lastDown = -1e9, half = false;
   function adapt(dt) {
-    if (root.classList.contains('vt')) { qCool = Math.max(qCool, 40); return; }
+    if (busyNow()) { qCool = Math.max(qCool, 40); return; }
     const ms = dt * 1000; ema += (ms - ema) * .05; if (ms < base) base += (ms - base) * .05; else base += (ms - base) * .002;
     if (--qCool > 0) return;
     if (ema > Math.max(24, base * 1.45) && tier > 0) { tier--; lastDown = T; good = 0; qCool = 90; qk = DPR * TIERS[tier]; size(); }
@@ -362,7 +363,7 @@ void main(){
     if (el.marq) put(el.marq, '--skew', (P1.w * -.02 - S.px * .5).toFixed(2) + 'deg');
 
     if (glOK && hasTex) {
-      half = half || (root.classList.contains('vt') && ++vtN % 2 === 0); // 30 fps durante transiciones de sección
+      half = half || (busyNow() && ++vtN % 2 === 0); // 30 fps durante transiciones de sección
       if (half && ++skip % 2 === 0) { half = tier === 0 && ema > 28; return; }
       const mixE = S.mix >= 1 ? 1 : sstep(S.mix);
       const flash = M.flashS, camV = Math.abs(S.cx) + Math.abs(S.cy) + Math.abs(S.wx);
@@ -376,7 +377,7 @@ void main(){
       gl.uniform1f(uni.uRot, sceneNow.rot); gl.uniform1f(uni.uScl, sceneNow.scl);
       gl.uniform1f(uni.uFade, sstep(M.fade)); gl.uniform1f(uni.uSettled, S.mix >= 1 ? 1 : 0);
       gl.uniform1f(uni.uDim, DIM);
-      const busy = root.classList.contains('vt');
+      const busy = busyNow();
       gl.uniform1f(uni.uTaps, busy ? 3 : (amtHi ? 9 : (idle ? 2 : 5)));
       gl.uniform2f(uni.uCam, S.cx + S.wx, S.cy);
       gl.uniform1f(uni.uInv, S.inv > .5 ? 1 : 0);
