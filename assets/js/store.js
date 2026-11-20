@@ -108,7 +108,7 @@ function show(id, o = {}) {
   if (!o.first) kick(to);
   curView = id; navSync();
   if (!o.first && o.push !== false) { try { history.pushState(null, '', urlFor(id)); } catch (e) {} }
-  if (id === 'catalogo') draw();
+  if (id === 'catalogo') requestAnimationFrame(draw);
   U.reveal(to, !o.first);
   U.vib(6);
 }

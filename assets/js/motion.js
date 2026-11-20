@@ -1,11 +1,15 @@
 (() => {
   'use strict';
-  const c = document.getElementById('count');
-  if (!c || !('MutationObserver' in window) || window.__reduce) return;
-  let last = c.textContent;
-  new MutationObserver(() => {
-    if (c.textContent === last) return;
-    last = c.textContent;
-    c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
-  }).observe(c, { childList: true, characterData: true, subtree: true });
+  if (!('MutationObserver' in window) || window.__reduce) return;
+  const pop = el => {
+    if (!el) return;
+    let last = el.textContent;
+    new MutationObserver(() => {
+      if (el.textContent === last) return;
+      last = el.textContent;
+      el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+    }).observe(el, { childList: true, characterData: true, subtree: true });
+  };
+  pop(document.getElementById('count'));
+  pop(document.getElementById('tot'));
 })();
