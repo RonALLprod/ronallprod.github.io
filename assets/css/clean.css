@@ -244,3 +244,16 @@ html:not(.rm) body .license-layer.is-open .window-mark{animation:cleanWin .5s .0
 @media(prefers-reduced-motion:reduce){
   html body :is(.brand img,.lockbg,.license-launch,.chip.on,.nav button.on>svg,.license-layer .lic,.license-layer .buy){animation:none!important}
 }
+
+/* V72.2 · precios nítidos y botones de móvil */
+html body .license-window :is(.lp,.tot),html body .license-window-body .buy .tot{
+  font-family:var(--ui);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+  text-shadow:0 0 28px rgba(255,255,255,.18);-webkit-font-smoothing:antialiased
+}
+html body .license-window .lic .lp{font-size:clamp(24px,2.4vw,30px)}
+html body .license-window-body .buy .tot{font-size:clamp(48px,5vw,64px)}
+html body .license-window-body .buy .btn{white-space:nowrap}
+@media(max-width:760px){
+  html body .license-window-body .buy .btn{font-size:13px;padding:0 10px;gap:7px;min-height:48px}
+  html body .license-window-body .buy .tot{font-size:40px}
+}
