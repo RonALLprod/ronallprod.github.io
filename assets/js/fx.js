@@ -518,11 +518,11 @@ void main(){
   }
   function boot() {
     motionToggle();
-    grab(); artFx(); sceneLeak(); hud(); bgword();
-    glOK = initGL();
+    grab(); artFx();
+    glOK = false; /* fondo WebGL desactivado: se usa el fondo CSS ligero */
     if (glOK) watchCover();
     if (reduce) return;
-    pointer(); lane(); chaos(); letters();
+    pointer();
     raf = requestAnimationFrame(frame);
     D.addEventListener('visibilitychange', () => {
       if (D.hidden) { cancelAnimationFrame(raf); raf = 0; }

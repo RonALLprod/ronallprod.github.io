@@ -47,7 +47,7 @@
   /* ── liquid glass: mapa de refracción para el borde del panel (solo Chromium) ── */
   const brands = (navigator.userAgentData && navigator.userAgentData.brands) || [];
   const chromium = brands.some(b => /Chrom|Edge|Opera|Brave/i.test(b.brand));
-  if (chromium && !weak) root.classList.add('lq');
+  /* refracción desactivada: cristal limpio */
 
   const NS = 'http://www.w3.org/2000/svg';
   let fImg, fEl, lw = 0, lh = 0;

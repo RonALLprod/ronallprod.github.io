@@ -4,7 +4,7 @@
 (() => {
   'use strict';
   const root = document.documentElement;
-  if (!Element.prototype.animate || root.classList.contains('rm') || root.classList.contains('lite')) return;
+  if (!Element.prototype.animate || root.classList.contains('rm')) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   let seed = (Math.random() * 1e9) | 0;
@@ -17,21 +17,27 @@
     // péndulo colgando del borde superior
     swing(el, k = 1) {
       el.style.transformOrigin = '50% 0';
-      const a = between(1.1, 2.3) * k;
+      const a = between(2.4, 4.6) * k;
       return { kf: [{ rotate: `${-a}deg` }, { rotate: `${a}deg` }], o: { duration: between(3.8, 6.4) * 1000, direction: 'alternate' } };
     },
     // flotar arriba/abajo
     bob(el, k = 1) {
-      const y = between(1.6, 3.6) * k;
+      const y = between(3.5, 7) * k;
       return { kf: [{ translate: `0 ${y}px` }, { translate: `0 ${-y}px` }], o: { duration: between(3.2, 5.8) * 1000, direction: 'alternate' } };
     },
     // deriva lenta con leve giro (portada)
     drift(el, k = 1) {
-      const x = 3 * k, y = 7 * k, r = .5 * k;
+      const x = 6 * k, y = 12 * k, r = 1.1 * k;
       return { kf: [
         { translate: '0 0', rotate: '0deg' }, { translate: `${x}px ${-y}px`, rotate: `${r}deg` },
         { translate: `${-x}px ${-y * .4}px`, rotate: `${-r}deg` }, { translate: '0 0', rotate: '0deg' }
       ], o: { duration: between(9, 13) * 1000 } };
+    },
+    // tarjeta: flota y se mece como colgada (arranca tras la animación de entrada)
+    float(el) {
+      const y = between(4, 8), r = between(.5, 1);
+      return { kf: [{ translate: `0 ${y}px`, rotate: `${-r}deg` }, { translate: `0 ${-y}px`, rotate: `${r}deg` }],
+        o: { duration: between(5, 8) * 1000, direction: 'alternate', delay: 1300, iterationStart: rnd() }, fixed: 1 };
     },
     // campana: suena un momento y descansa
     ring(el) {
@@ -43,7 +49,7 @@
 
   // [selector, tipo, intensidad]
   const SINGLE = [
-    ['#tgs span', 'swing'], ['#meta span', 'bob', .8], ['.acts .ib', 'bob', .9], ['.art img', 'drift'],
+    ['#grid .bc', 'float'], ['#tgs span', 'swing'], ['#meta span', 'bob', .8], ['.acts .ib', 'bob', .9], ['.art img', 'drift'],
     ['.chip', 'bob', .6], ['.bc-ty', 'swing', .8], ['.bc-pr', 'bob', .7],
     ['.lockbg', 'swing', 1.6], ['.priv .btn', 'bob'], ['.ctc .btn', 'bob'],
     ['[data-i="bell"] svg', 'ring'], ['.cartb svg', 'swing', 1.8]
@@ -53,7 +59,7 @@
 
   const add = (el, spec, delay) => {
     if (live.length >= MAX) return;
-    const a = el.animate(spec.kf, Object.assign({ iterations: Infinity, easing: 'ease-in-out', delay }, spec.o));
+    const a = el.animate(spec.kf, Object.assign({ iterations: Infinity, easing: 'ease-in-out' }, spec.o, { delay }));
     el._alive = 1; live.push(a);
     if (hold()) a.pause();
   };
@@ -65,14 +71,14 @@
       for (const el of document.querySelectorAll(sel)) {
         if (el._alive) continue;
         const s = kinds[kind](el, k);
-        add(el, s, -rnd() * s.o.duration);
+        add(el, s, s.fixed ? s.o.delay : -rnd() * s.o.duration);
       }
     }
     for (const sel of WAVE) {
       for (const h of document.querySelectorAll(sel)) {
         h.querySelectorAll('.l').forEach((l, i) => {
           if (l._alive) return;
-          add(l, { kf: [{ translate: '0 -2.6px' }, { translate: '0 2.6px' }], o: { duration: 3600, direction: 'alternate' } }, -i * 170);
+          add(l, { kf: [{ translate: '0 -4.5px' }, { translate: '0 4.5px' }], o: { duration: 3600, direction: 'alternate' } }, -i * 170);
         });
       }
     }

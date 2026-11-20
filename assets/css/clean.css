@@ -341,3 +341,34 @@ html body .license-window .lic-info{border-radius:20px;border-color:rgba(255,255
   html body .license-layer .license-window{border-radius:28px 28px 0 0}
   html body .license-window-body .buy{border-radius:0;border-width:1px 0 0;background:rgba(16,16,20,.84);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
 }
+
+
+/* ═════════ V74 · Fondo limpio: fuera efectos decorativos ═════════ */
+html body .scene :is(.orb,.scan,.grain,.leak,.vig){display:none!important}
+html body .scene::before,html body .scene::after{display:none!important}
+html body #hud,html body #ruler{display:none!important}
+html body #v-home::before,html body #v-home::after{content:none!important;display:none!important}
+html:not(.fx-on) .scene .bgc.on{opacity:.5}
+
+/* ═════════ V74 · Panel de licencias: cristal sobrio ═════════ */
+html body .license-layer .license-backdrop,html body .license-layer.is-open .license-backdrop{background:rgba(0,0,0,.55)}
+html body .license-layer .license-window,html.lq body .license-layer .license-window{
+  border-radius:26px;border:1px solid rgba(255,255,255,.14);
+  background:rgba(22,22,26,.62);
+  -webkit-backdrop-filter:blur(28px) saturate(1.5);backdrop-filter:blur(28px) saturate(1.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 40px 100px -30px rgba(0,0,0,.85)
+}
+html body .license-layer .license-window::before,html body .license-layer.is-open .license-window::before{display:none}
+html body .license-window-head{border-bottom-color:rgba(255,255,255,.1)}
+html body .window-foot{background:none;border-top-color:rgba(255,255,255,.08)}
+html body .window-close{background:rgba(255,255,255,.08);box-shadow:none;border-color:rgba(255,255,255,.18)}
+html body .license-layer .license-window .lic{
+  border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);box-shadow:none
+}
+html body .license-layer .license-window .lic:hover{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.07)}
+html body .license-layer .license-window .lic.sel{border-color:rgba(255,255,255,.75);background:rgba(255,255,255,.1);box-shadow:0 0 0 1px rgba(255,255,255,.2)}
+html body .license-window-body .buy{border-radius:20px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);box-shadow:none}
+html body .license-window-body .buy .btn.fill{background:#fff;color:#000;box-shadow:none}
+html body .license-window-body .buy .btn:not(.fill){background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.22);box-shadow:none}
+html body .license-window .lic-info{border-radius:16px;background:rgba(255,255,255,.04);box-shadow:none}
+@media(max-width:760px){html body .license-layer .license-window{border-radius:24px 24px 0 0}html body .license-window-body .buy{background:rgba(22,22,26,.92);box-shadow:none}}
